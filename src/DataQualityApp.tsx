@@ -377,6 +377,7 @@ export default function DataQualityApp() {
       {/* Successo */}
       <div className="raw">
         <div className="partofRaw">
+          {/* Non anonimi */}
           {result && (
             <div className="containerResults">
               <button
@@ -415,6 +416,7 @@ export default function DataQualityApp() {
           )}
         </div>
         <div className="partofRaw">
+          {/* Anonimizzati */}
           {resultAnonymous && (
             <div className="containerResults">
               <button

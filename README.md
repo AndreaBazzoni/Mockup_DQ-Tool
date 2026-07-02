@@ -1,8 +1,8 @@
 Instructions:
 
-git clone https://github.com/DACKYLAM/dq-app.git
+git clone https://github.com/AndreaBazzoni/Mockup_DQ-Tool.git
 
-cd dq-app
+cd Mockup_DQ-Tool
 
 npm install
 

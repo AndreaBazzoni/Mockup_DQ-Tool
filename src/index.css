@@ -2,6 +2,7 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
 
+
 /* Dipendenza Tailwind */
 @tailwind base;
 @tailwind components;
@@ -56,6 +57,11 @@
   @media (max-width: 1024px) {
     width: 500px;
   }
+}
+
+a:hover {
+  color: rgb(36, 99, 236);
+  text-decoration: underline;
 }
 
 h1,
