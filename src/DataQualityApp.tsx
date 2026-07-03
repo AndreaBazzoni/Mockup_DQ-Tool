@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Eye, EyeOff, Pencil, Trash, XCircle } from "lucide-react";
+import { Eye, EyeOff, Pencil, Trash, XCircle, ChevronDownCircle, ChevronUpCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner";
@@ -33,6 +33,21 @@ export default function DataQualityApp() {
   const [openModify, setOpenModify] = useState(false);
   const [openRemove, setOpenRemove] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  // DA TOGLIERE
+  const [visibleModification, setVisibleModification] = useState(false);
+  // ------------
+
+  // Dimensioni finestra
+  const [dimMobile, setDimMobile] = useState(window.innerWidth < 1024);
+  useEffect(() => {
+    const handleResize = () => {
+      setDimMobile(window.innerWidth < 1024);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   // Insieme dei centri
   const [centers, setCenters] = useState<{ name: string; url: string; token: string }[]>(() => {
@@ -54,7 +69,7 @@ export default function DataQualityApp() {
     setCenters((prev) => {
       // Esiste già un centro con tale nome
       if (prev.some((c) => c.name === name)) {
-        toast.error("Esiste già un centro con tale nome")
+        toast.error("Already exists a center with this name");
         return prev;
       }
       return [...prev, { name, url, token }];
@@ -65,24 +80,24 @@ export default function DataQualityApp() {
   const createCenter = () => {
     // Campi mancanti
     if (!newName || !newUrl || !newToken) {
-      toast.warning("Compila tutti i campi");
+      toast.warning("Please fill in all fields");
       return;
     }
     // Esiste già un centro con tale nome
     if (centers.some((c) => c.name === newName)) {
-      toast.error("Esiste già un centro con tale nome")
+      toast.error("Already exists a center with this name")
       return;
     }
     // Nuovo token non valido
     if (newToken.length < dimMinToken) {
-      toast.error(`Token non valido (almeno ${dimMinToken} caratteri)`);
+      toast.error(`Invalid token (at least ${dimMinToken} characters)`);
       return;
     }
     setLoading(true)
     addCenter(newName, newUrl, newToken);
     setOpenCreate(false);
     setLoading(false);
-    toast.success("Centro creato con successo!");
+    toast.success("Center created successfully!");
   };
 
   // Modifico un centro
@@ -92,19 +107,19 @@ export default function DataQualityApp() {
       const center = centers.find((c) => c.name === name);
       // Centro non trovato
       if (!center || !currentCenter) {
-        throw new Error("Problemi nella ricerca del centro");
+        throw new Error("Problems finding the center");
       }
       // Token inserito non corretto
       if (verifyToken!==center.token) {
-        throw new Error("Token non corretto");
+        throw new Error("Incorrect token");
       }
       // Esiste già un centro con tale nome
       if (centers.some((c) => c.name === newName) && (newName!==currentCenter.name)) {
-        throw new Error("Esiste già un centro con tale nome");
+        throw new Error("Already exists a center with this name");
       }
       // Nuovo token non valido
       if (newToken.length < dimMinToken) {
-        throw new Error(`Token non valido (almeno ${dimMinToken} caratteri)`);
+        throw new Error(`Invalid token (at least ${dimMinToken} characters)`);
       }
       // AZIONE
       setCenters((prev) =>
@@ -113,9 +128,9 @@ export default function DataQualityApp() {
       if (selectedCenter === name) {
         setSelectedCenter(newName);
       }
-      toast.success("Centro modificato con successo!");
+      toast.success("Center modified successfully!");
     } catch (err: any) {
-      toast.error(err.message || "Errore durante l'operazione");
+      toast.error(err.message || "Error during the operation");
       return;
     } finally {
       setOpenModify(false);
@@ -130,11 +145,11 @@ export default function DataQualityApp() {
       const center = centers.find((c) => c.name === name);
       // Centro non trovato
       if (!center || !currentCenter) {
-        throw new Error("Problemi nella ricerca del centro");
+        throw new Error("Problems finding the center");
       }
       // Token inserito non corretto
       if (verifyToken!==center.token) {
-        throw new Error("Token non corretto");
+        throw new Error("Incorrect token");
       }
       // AZIONE
       setCenters((prev) => prev.filter((c) => c.name !== currentCenter.name));
@@ -142,9 +157,9 @@ export default function DataQualityApp() {
         setSelectedCenter("");
         setToken("");
       }
-      toast.success("Centro eliminato con successo!");
+      toast.success("Center removed successfully!");
     } catch (err: any) {
-      toast.error(err.message || "Errore durante l'operazione");
+      toast.error(err.message || "Error during the operation");
       return;
     } finally {
       setOpenRemove(false);
@@ -157,7 +172,7 @@ export default function DataQualityApp() {
     setSelectedCenter(name);
     const found = centers.find((c) => c.name === name);
     if (found) {
-      const fillToken = confirm("Vuoi precompilare il token per il centro corrispondente?");
+      const fillToken = confirm("Do you want to fill the token automatically?");
       if (fillToken) {
         setToken(found.token);
       } else {
@@ -175,17 +190,17 @@ export default function DataQualityApp() {
       const center = centers.find((c) => c.name === name);
       // Dati mancanti
       if (!selectedCenter || !token) {
-        throw new Error("Seleziona un centro e inserisci il token");
+        throw new Error("Select a center and insert the token");
       }
       // Simulazione chiamata API
       await new Promise((resolve) => setTimeout(resolve, 1500));
       // Centro non trovato
       if (!center) {
-        throw new Error("Problemi nella ricerca del centro");
+        throw new Error("Problems finding the center");
       }
       // Token inserito non corretto
       if (token!==center.token) {
-        throw new Error("Token non corretto");
+        throw new Error("Incorrect token");
       }
       // Creazione dei risultati
       const fakeResult = {
@@ -199,7 +214,7 @@ export default function DataQualityApp() {
       };
       setResult(fakeResult);
     } catch(err: any) {
-      toast.error(err.message || "Errore durante l'operazione");
+      toast.error(err.message || "Error during the operation");
     } finally {
       setLoading(false);
     }
@@ -212,17 +227,17 @@ export default function DataQualityApp() {
       const center = centers.find((c) => c.name === name);
       // Dati mancanti
       if (!selectedCenter || !token) {
-        throw new Error("Seleziona un centro e inserisci il token");
+        throw new Error("Select a center and insert the token");
       }
       // Simulazione chiamata API
       await new Promise((resolve) => setTimeout(resolve, 1500));
       // Centro non trovato
       if (!center) {
-        throw new Error("Problemi nella ricerca del centro");
+        throw new Error("Problems finding the center");
       }
       // Token inserito non corretto
       if (token!==center.token) {
-        throw new Error("Token non corretto");
+        throw new Error("Incorrect token");
       }
       // Creazione dei risultati
       const fakeResultAnonymous = {
@@ -236,7 +251,7 @@ export default function DataQualityApp() {
       };
       setResultAnonymous(fakeResultAnonymous);
     } catch(err: any) {
-      toast.error(err.message || "Errore durante l'operazione");
+      toast.error(err.message || "Error during the operation");
     } finally {
       setLoading(false);
     }
@@ -268,9 +283,22 @@ export default function DataQualityApp() {
     <div className="container">
 
       {/* Titolo */}
-      <h1>Data Quality Tool</h1>
+      <div className="relative">
+        <h1>Data Quality Tool</h1>
+        {/* DA TOGLIERE */}
+        <button
+          id="toggleModification"
+          type="button"
+          disabled={loading}
+          onClick={() => setVisibleModification((v) => !v)}
+        >
+          {visibleModification && <ChevronUpCircle size={20}/>}
+          {!visibleModification && <ChevronDownCircle size={20}/>}
+        </button>
+        {/* ------------ */}
+      </div>
 
-      {/* Centro e creazione */}
+      {/* Centro e Token */}
       <div className="raw">
         <div className="partofRaw">
           <Select
@@ -279,11 +307,11 @@ export default function DataQualityApp() {
             disabled={loading}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Seleziona centro" />
+              <SelectValue placeholder="Select center" />
             </SelectTrigger>
             <SelectContent side="bottom" align="start">
               <SelectItem key="" value="">
-                - Seleziona centro -
+                - Select center -
               </SelectItem>
               {sortedCenters.map((c) => (
                 <SelectItem key={c.name} value={c.name}>
@@ -293,31 +321,13 @@ export default function DataQualityApp() {
             </SelectContent>
           </Select>
         </div>
-        <button
-          className="partofRaw"
-          disabled={loading}
-          onClick={() => {
-            setNewName("");
-            setNewUrl("");
-            setNewToken("");
-            setVerifyToken("");
-            setShowTokenCreate(false);
-            setOpenCreate(true)
-          }}
-        >
-          Crea centro
-        </button>
-      </div>
-
-      {/* Token e gestione */}
-      <div className="raw">
         <div className="partofRaw">
           <div className="tokenInput">
             <input
               id="token"
               type={showToken ? "text" : "password"}
               value={token}
-              placeholder="Inserisci token"
+              placeholder="Insert token"
               disabled={loading}
               onChange={(e) => setToken(e.target.value)}
             />
@@ -332,23 +342,44 @@ export default function DataQualityApp() {
             </button>
           </div>
         </div>
-        <button
-          className="partofRaw"
-          disabled={loading}
-          onClick={() => {
-            setNewName("");
-            setNewUrl("");
-            setNewToken("");
-            setVerifyToken("");
-            setShowTokenCreate(false);
-            setShowTokenNew(false);
-            setShowTokenOld(false);
-            setOpenManage(true);
-          }}
-        >
-          Gestione centri
-        </button>
       </div>
+
+      {/* DA TOGLIERE */}
+      {visibleModification && (
+        <div className="raw">
+          <button
+            className="partofRaw"
+            disabled={loading}
+            onClick={() => {
+              setNewName("");
+              setNewUrl("");
+              setNewToken("");
+              setVerifyToken("");
+              setShowTokenCreate(false);
+              setOpenCreate(true)
+            }}
+          >
+            Create center
+          </button>
+          <button
+            className="partofRaw"
+            disabled={loading}
+            onClick={() => {
+              setNewName("");
+              setNewUrl("");
+              setNewToken("");
+              setVerifyToken("");
+              setShowTokenCreate(false);
+              setShowTokenNew(false);
+              setShowTokenOld(false);
+              setOpenManage(true);
+            }}
+          >
+            Manage centers
+          </button>
+        </div>
+      )}
+      {/* ------------ */}
 
       {/* Bottone DQ */}
       <div className="raw">
@@ -359,7 +390,7 @@ export default function DataQualityApp() {
             onClick={() => handleRunDQ(selectedCenter)}
             disabled={loading}
           >
-            Esegui DQ
+            Run Data Quality
           </button>
         </div>
         <div className="partofRaw">
@@ -369,7 +400,7 @@ export default function DataQualityApp() {
             onClick={() => handleRunDQ_anonymous(selectedCenter)}
             disabled={loading}
           >
-            DQ anonimizzata
+            Anonymous Data Sharing
           </button>
         </div>
       </div>
@@ -386,12 +417,16 @@ export default function DataQualityApp() {
               >
                 <XCircle size={24}/>
               </button>
-              <div className="titleResults">✅ &nbsp; <u>Analisi completata</u> &nbsp; ✅</div>
+              <div className="titleResults">
+                {!dimMobile && <span>✅</span>}
+                &nbsp;<u>COMPLETE</u>&nbsp;
+                {!dimMobile && <span>✅</span>}
+              </div>
               <ul className="infoResults">
-                <li className="scrollText"><b>Centro:</b> {result.centerName}</li>
-                <li className="scrollText"><b>Data estrazione:</b> {result.extractionDate}</li>
-                <li className="scrollText"><b>Totale pazienti:</b> {result.totalPatients}</li>
-                <li className="scrollText"><b>Span time:</b> {result.spanTime}</li>
+                <li className="scrollText"><b>Center:</b> {result.centerName}</li>
+                <li className="scrollText"><b>Extraction Date:</b> {result.extractionDate}</li>
+                <li className="scrollText"><b>Total Patients:</b> {result.totalPatients}</li>
+                <li className="scrollText"><b>Span Time:</b> {result.spanTime}</li>
               </ul>
               <button
                 id="downloadResults"
@@ -399,7 +434,7 @@ export default function DataQualityApp() {
                 className="manageButton"
                 disabled={loading}
               >
-                Scarica risultati
+                Download Results
               </button>
               <button
                 id="shareResults"
@@ -407,10 +442,10 @@ export default function DataQualityApp() {
                 className="manageButton"
                 disabled={loading}
               >
-                Condividi risultati
+                Share Results
               </button>
               {showShareModal && (
-                <ShareModal centerName={result.centerName} title="Condividi risultati" onClose={() => setShowShareModal(false)} />
+                <ShareModal centerName={result.centerName} title="Share Results" onClose={() => setShowShareModal(false)} />
               )}
             </div>
           )}
@@ -425,12 +460,16 @@ export default function DataQualityApp() {
               >
                 <XCircle size={24}/>
               </button>
-              <div className="titleResults">✅ &nbsp; <u>Analisi anonima</u> &nbsp; ✅</div>
+              <div className="titleResults">
+                {!dimMobile && <span>✅</span>}
+                &nbsp;<u>READY to SHARE</u>&nbsp;
+                {!dimMobile && <span>✅</span>}
+              </div>
               <ul className="infoResults">
-                <li className="scrollText"><b>Centro:</b> {resultAnonymous.centerName}</li>
-                <li className="scrollText"><b>Data estrazione:</b> {resultAnonymous.extractionDate}</li>
-                <li className="scrollText"><b>Totale pazienti:</b> {resultAnonymous.totalPatients}</li>
-                <li className="scrollText"><b>Span time:</b> {resultAnonymous.spanTime}</li>
+                <li className="scrollText"><b>Center:</b> {resultAnonymous.centerName}</li>
+                <li className="scrollText"><b>Extraction Date:</b> {resultAnonymous.extractionDate}</li>
+                <li className="scrollText"><b>Total Patients:</b> {resultAnonymous.totalPatients}</li>
+                <li className="scrollText"><b>Span Time:</b> {resultAnonymous.spanTime}</li>
               </ul>
               <button
                 id="downloadResults"
@@ -438,7 +477,7 @@ export default function DataQualityApp() {
                 className="manageButton"
                 disabled={loading}
               >
-                Scarica anonimi
+                Download Anonymous
               </button>
               <button
                 id="shareResults"
@@ -446,10 +485,10 @@ export default function DataQualityApp() {
                 className="manageButton"
                 disabled={loading}
               >
-                Condividi anonimi
+                Share Anonymous
               </button>
               {showShareModal && (
-                <ShareModal centerName={result.centerName} title="Condividi anonimi" onClose={() => setShowShareModal(false)} />
+                <ShareModal centerName={result.centerName} title="Share Anonymous" onClose={() => setShowShareModal(false)} />
               )}
             </div>
           )}
@@ -470,18 +509,18 @@ export default function DataQualityApp() {
           <DialogHeader>
             <DialogTitle>
               <div>
-                <b><u>Crea centro</u></b>
+                <b><u>Create center</u></b>
               </div>
             </DialogTitle>
           </DialogHeader>
           <div className="dialogBody">
             <input
-              placeholder="Nome"
+              placeholder="Name"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
             />
             <input
-              placeholder="URL sito"
+              placeholder="URL website"
               type="url"
               value={newUrl}
               onChange={(e) => setNewUrl(e.target.value)}
@@ -509,9 +548,14 @@ export default function DataQualityApp() {
                 setOpenCreate(false);
               }}
             >
-              Annulla
+              Cancel
             </button>
-            <button className="manageButton" onClick={() => createCenter()}>Crea</button>
+            <button
+              className="manageButton"
+              onClick={() => createCenter()}
+            >
+              Create
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -530,12 +574,12 @@ export default function DataQualityApp() {
           <DialogHeader>
             <DialogTitle>
               <div>
-                <b><u>Gestione centri</u></b>
+                <b><u>Manage centers</u></b>
               </div>
             </DialogTitle>
           </DialogHeader>
           <div className="dialogBody">
-            {centers.length === 0 && <p>Nessun centro configurato.</p>}
+            {centers.length === 0 && <p>No centers configured.</p>}
             {sortedCenters.map((c) => (
               <div key={c.name} className="flex flex-row justify-between">
                 <div className="infoCenter">
@@ -579,7 +623,11 @@ export default function DataQualityApp() {
             ))}
           </div>
           <DialogFooter>
-            <button onClick={() => setOpenManage(false)}>Chiudi</button>
+            <button
+              onClick={() => setOpenManage(false)}
+            >
+              Close
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -603,7 +651,7 @@ export default function DataQualityApp() {
             <DialogHeader>
               <DialogTitle>
                 <div>
-                  <b><u>Modifica centro</u></b>
+                  <b><u>Modify Center</u></b>
                 </div>
               </DialogTitle>
             </DialogHeader>
@@ -612,12 +660,12 @@ export default function DataQualityApp() {
             </div>
             <div className="dialogBody">
               <input
-                placeholder="Nuovo nome"
+                placeholder="New name"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
               />
               <input
-                placeholder="Nuovo URL sito"
+                placeholder="New website URL"
                 type="url"
                 value={newUrl}
                 onChange={(e) => setNewUrl(e.target.value)}
@@ -625,7 +673,7 @@ export default function DataQualityApp() {
               <div className="tokenInput">
                 <input
                   type={showTokenNew ? "text" : "password"}
-                  placeholder="Nuovo token"
+                  placeholder="New token"
                   value={newToken}
                   onChange={(e) => setNewToken(e.target.value)}
                 />
@@ -641,7 +689,7 @@ export default function DataQualityApp() {
               <div className="tokenInput">
                 <input
                   type={showTokenOld ? "text" : "password"}
-                  placeholder="Vecchio token"
+                  placeholder="Old token"
                   value={verifyToken}
                   onChange={(e) => setVerifyToken(e.target.value)}
                 />
@@ -656,8 +704,17 @@ export default function DataQualityApp() {
               </div>
             </div>
             <DialogFooter>
-              <button onClick={() => setOpenModify(false)}>Annulla</button>
-              <button className="manageButton" onClick={() => modifyCenter(currentCenter.name)}>Conferma</button>
+              <button
+                onClick={() => setOpenModify(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="manageButton"
+                onClick={() => modifyCenter(currentCenter.name)}
+              >
+                Confirm
+              </button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -682,14 +739,14 @@ export default function DataQualityApp() {
             <DialogHeader>
               <DialogTitle>
                 <div>
-                  <b><u>Rimuovi centro</u></b>
+                  <b><u>Remove center</u></b>
                 </div>
               </DialogTitle>
             </DialogHeader>
             <div className="scrollText">
               <i>{currentCenter.name}</i>
             </div>
-            <p>Inserisci il token per confermare.</p>
+            <p>Enter the token to confirm.</p>
             <div className="tokenInput">
               <input
                 type={showTokenOld ? "text" : "password"}
@@ -707,8 +764,17 @@ export default function DataQualityApp() {
               </button>
             </div>
             <DialogFooter>
-              <button onClick={() => setOpenRemove(false)}>Annulla</button>
-              <button className="manageButton" onClick={() => removeCenter(currentCenter.name)}>Conferma</button>
+              <button
+                onClick={() => setOpenRemove(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="manageButton"
+                onClick={() => removeCenter(currentCenter.name)}
+              >
+                Confirm
+              </button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

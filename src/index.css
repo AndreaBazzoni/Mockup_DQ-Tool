@@ -14,8 +14,8 @@
   --text-h: rgb(20, 20, 20, 0.9);
   --bg: white;
   --code-bg: rgb(180, 180, 180, 0.4);
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --sans: 'Segoe UI', system-ui, Roboto, sans-serif;
+  --heading: 'Optima', system-ui, Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
   font: 18px/160% var(--sans);
   letter-spacing: 0.18px;
@@ -53,7 +53,7 @@
 
 .container {
   margin-bottom: 64px;
-  width: 800px;
+  width: 1000px;
   @media (max-width: 1024px) {
     width: 500px;
   }
@@ -173,6 +173,7 @@ svg {
   display: flex;
   flex-direction: row;
   justify-content: center;
+  align-items: center;
   margin: 16px;
   gap: 16px;
 }
@@ -233,7 +234,7 @@ svg {
 #shareResults,
 #closeModal {
   margin-top: 12px;
-  width: 80%
+  width: 96%
 }
 
 .containerResults{
@@ -271,6 +272,12 @@ svg {
 .titleResults {
   font-size: 20px;
   margin: 4px 24px;
+  font-family: var(--heading);
+  letter-spacing: 0.8px;
+  @media (max-width: 1024px) {
+    margin: 4px 4px;
+    margin-top: 24px;
+  }
 }
 
 .infoResults {
@@ -413,3 +420,15 @@ footer {
   padding: 12px 12px;
   margin-bottom: 8px;
 }
+
+
+/* DA TOGLIERE */
+#toggleModification {
+  position: absolute;
+  bottom: -20%;
+  right: 16%;
+  @media (min-width: 1024px) {
+    right: 25%;
+  }
+}
+/* ------------- */

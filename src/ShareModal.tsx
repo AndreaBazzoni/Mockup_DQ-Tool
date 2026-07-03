@@ -1,4 +1,4 @@
-import { XCircle, Mail, MessageCircle } from "lucide-react";
+import { XCircle, CloudUpload } from "lucide-react";
 
 
 interface ShareModalProps {
@@ -9,20 +9,15 @@ interface ShareModalProps {
 
 
 export default function ShareModal({ centerName, title, onClose }: ShareModalProps) {
-  const shareText = `Risultati analisi - ${centerName}`;
 
-  const handleEmail = () => {
-    // mailto: precompila oggetto/corpo
-    window.location.href = `mailto:?subject=${encodeURIComponent(shareText)}&body=${encodeURIComponent(
-      "In allegato trovi i risultati dell'analisi. (Ricorda di allegare manualmente il file scaricato)"
-    )}`;
-    onClose();
-  };
-
-  const handleWhatsapp = () => {
-    window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank");
-    onClose();
-  };
+  const handleEURACAN = () => {
+    // Implement the logic to send data to the EURACAN server
+    /* HERE */
+    console.log(`Sending data for center "${centerName}" to EURACAN server.`);
+    alert(`Sending data for center "${centerName}" to EURACAN server.`);
+    /* ---- */
+    onClose(); // Close the modal after sending
+  }
 
   return (
     <div 
@@ -46,24 +41,19 @@ export default function ShareModal({ centerName, title, onClose }: ShareModalPro
         </div>
         <button
           className="shareOption"
-          onClick={handleEmail}
+          onClick={handleEURACAN}
         >
-          <Mail size={16} /> Invia via email
-        </button>
-        <button
-          className="shareOption"
-          onClick={handleWhatsapp}
-        >
-          <MessageCircle size={16} /> WhatsApp
+          <CloudUpload size={16} /> Send to server EURACAN
         </button>
         <button
           id="closeModal"
           className="manageButton"
           onClick={onClose}
         >
-          Annulla
+          Cancel
         </button>
       </div>
     </div>
   );
+
 }
