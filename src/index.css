@@ -41,7 +41,7 @@
 }
 
 #root {
-  max-width: 90%;
+  max-width: 96%;
   margin: 0 auto;
   text-align: center;
   min-height: 100svh;
@@ -55,7 +55,8 @@
   margin-bottom: 64px;
   width: 1000px;
   @media (max-width: 1024px) {
-    width: 500px;
+    width: 100%;
+    min-width: 500px;
   }
 }
 
@@ -88,6 +89,15 @@ h2 {
   margin: 0 0 8px;
   @media (max-width: 1024px) {
     font-size: 20px;
+  }
+}
+
+.DQ_Title {
+  position: relative;
+  width: 1000px;
+  @media (max-width: 1024px) {
+    width: 100%;
+    min-width: 500px;
   }
 }
 
