@@ -171,6 +171,8 @@ export default function DataQualityApp() {
   // Cambio il centro selezionato
   const handleCenterChange = (name: string) => {
     setSelectedCenter(name);
+    /* Riempimento automatico del token */
+    /*
     const found = centers.find((c) => c.name === name);
     if (found) {
       const fillToken = confirm("Do you want to fill the token automatically?");
@@ -182,6 +184,9 @@ export default function DataQualityApp() {
     } else {
       setToken("");
     }
+    */
+    /* Riempimento manuale del token */
+    setToken("");
     // Resetto i risultati
     setResultQuality(null);
     setResultAnonymous(null);
@@ -383,7 +388,7 @@ export default function DataQualityApp() {
             onClick={() => handleRun(selectedCenter, true)}
             disabled={loading}
           >
-            Anonymous Data
+            Share Anonymous Data
           </button>
         </div>
       </div>
