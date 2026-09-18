@@ -432,13 +432,10 @@ footer {
 }
 
 
-/* DA TOGLIERE */
-#toggleModification {
-  position: absolute;
-  bottom: -20%;
-  right: 16%;
-  @media (min-width: 1024px) {
-    right: 25%;
-  }
+/* ERRORE (Centri duplicati) */
+.errorMessage {
+  padding: 16px;
+  border: 2px solid var(--text);
+  border-radius: 16px;
+  margin-top: 80px;
 }
-/* ------------- */
