@@ -3,8 +3,8 @@ import { Eye, EyeOff, XCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner";
 import ShareModal from "@/ShareModal";
-import { ListOfCenters } from "@/ListOfCenters";
-import { fetchFileRepository, fetchCohort, createCohort, getCohort } from "@/fetch/redcap-fetch"
+import { ListOfCenters, CurrentAnalysis } from "@/ManageCenters";
+import { fetchFileRepository, fetchCohort, getCohort, createFileCohort, createDirectory } from "@/fetch/redcap-fetch"
 import { createTxtFile } from "@/utils/createFile";
 
 
@@ -17,7 +17,8 @@ export default function DataQualityApp() {
   const [resultAnonymous, setResultAnonymous] = useState<any>(null);
   const [showShareQuality, setShowShareQuality] = useState(false);
   const [showShareAnonymous, setShowShareAnonymous] = useState(false);
-  const [cohort, setCohort] = useState<String[]>([]);
+  const [cohort, setCohort] = useState<string[]>([]);
+
 
   // Dimensioni finestra
   const [dimMobile, setDimMobile] = useState(window.innerWidth < 1024);
@@ -43,13 +44,15 @@ export default function DataQualityApp() {
     setResultAnonymous(null);
   };
 
-  // Run (Data Quality or Anonymous Data)
+
+  // ---- RUN ----
   const handleRun = async (name: string | undefined, isAnonymous: boolean) => {
     // Dati mancanti
     if (!selectedCenter || !token) {
       toast.error("Select a center and insert the token");
       return;
     }
+
     setLoading(true);
     try {
       const center = ListOfCenters.find((c) => c.name === name);
@@ -57,44 +60,84 @@ export default function DataQualityApp() {
       if (!center) {
         throw new Error("Problems finding the center");
       }
-      // Chiamata API
-      const fileList = await fetchFileRepository(center.id, token)
-      const cohortFile = fileList.find((file: any) => file.name === `coorte-${center.id}.txt`)
-      if (cohortFile) {
-        // Se è presente la coorte, la estrapolo
-        setCohort(await getCohort(center.id, token, cohortFile.doc_id));
-        console.log(`Coorte dell'ospedale "${center.name}": `, cohort);
-        // Creazione dei risultati
-        const result = {
-          centerName: center.name,
-          extractionDate: new Date().toLocaleString("it-IT"),
-          totalPatients: 100,
-          spanTime: "01/01/2023 - 31/12/2023",
-          missingData: 5,
-          errors: ["No errors found"],
-          anonymous: isAnonymous
-        };
-        // Distinguo tra Quality e Anonymous
-        if (isAnonymous) {
-          setResultAnonymous(result);
+      // Gestione REDCap centro
+      const nameDirectory = "EHE-Federated";
+      const nameFileCohort = `${CurrentAnalysis}_${center.id}_cohort.txt`;
+
+      // Chiamata API al File Repository - Directory
+      const fileRepository = await fetchFileRepository(center.url, token, "");
+      const directoryExists = fileRepository.find((dir: any) => dir.name === nameDirectory);
+      // Verifico la presenza della cartella
+      if (directoryExists) {
+        // Se è presente la cartella, verifico il contenuto
+          // Chiamata API al File Repository - FileCohort
+        const fileRepositoryEHE = await fetchFileRepository(center.url, token, directoryExists.folder_id);
+        const fileCohortExists = fileRepositoryEHE.find((file: any) => file.name === nameFileCohort);
+        // Verifico la presenza della coorte
+        if (fileCohortExists) {
+          // Se è presente la coorte, la estrapolo
+          setCohort(await getCohort(center.url, token, fileCohortExists.doc_id));
+          console.log(`Coorte dell'ospedale "${center.name}": `, cohort);
+
+          // Creazione dei risultati
+          const result = {
+            centerName: center.name,
+            extractionDate: new Date().toLocaleString("it-IT"),
+            totalPatients: 100,
+            spanTime: "01/01/2023 - 31/12/2023",
+            missingData: 5,
+            errors: ["No errors found"],
+            anonymous: isAnonymous
+          };
+          // Distinguo tra Quality e Anonymous
+          if (isAnonymous) {
+            setResultAnonymous(result);
+          } else {
+            setResultQuality(result);
+          }
+
         } else {
-          setResultQuality(result);
+          // Se non è presente la coorte, la creo e la utilizzo
+            // Tutti i dati
+          let totalData = await fetchCohort(center.url, token);
+            // Solo i bl_record_id
+          let recordIds = totalData.map((patient: any) => patient.bl_record_id);
+            // Elimino gli ID duplicati
+          recordIds = [...new Set(recordIds)];
+          setCohort(recordIds);
+            // Creo il file .txt della coorte
+          const cohortTxtFile = createTxtFile(recordIds, `${CurrentAnalysis}_${center.id}_cohort.txt`);
+          await createFileCohort(center.url, token, cohortTxtFile, directoryExists.folder_id);
+          console.log(`Coorte creata per l'ospedale "${center.name}"`);
+          toast.success("Coorte creata con successo!");
         }
+
       } else {
-        // Se non è presente la coorte, la creo e la utilizzo
-        setCohort(await fetchCohort(center.id, token));
-        const cohortIds = cohort.map((patient: any) => patient.record_id);
-        const cohortTxtFile = createTxtFile(cohortIds, `coorte-${center.id}.txt`);
-        await createCohort(center.id, token, cohortTxtFile);
+        // Se non è presente la cartella, la creo e creo la coorte
+        await createDirectory(center.url, token, nameDirectory, "");
+          // Tutti i dati
+        let totalData = await fetchCohort(center.url, token);
+          // Solo i bl_record_id
+        let recordIds = totalData.map((patient: any) => patient.bl_record_id);
+          // Elimino gli ID duplicati
+        recordIds = [...new Set(recordIds)];
+        setCohort(recordIds);
+          // Creo il file .txt della coorte
+        const cohortTxtFile = createTxtFile(recordIds, `${CurrentAnalysis}_${center.id}_cohort.txt`);
+        const fileRepository_new = await fetchFileRepository(center.url, token, "");
+        const directoryExists_new = fileRepository_new.find((dir: any) => dir.name === nameDirectory);
+        await createFileCohort(center.url, token, cohortTxtFile, directoryExists_new.folder_id);
         console.log(`Coorte creata per l'ospedale "${center.name}"`);
         toast.success("Coorte creata con successo!");
       }
+
     } catch(err: any) {
       toast.error(err.message || "Error during the operation");
     } finally {
       setLoading(false);
     }
   };
+
 
   // Scaricamento dei risultati (Data Quality o Anonymous Data)
   const downloadResult = (isAnonymous: boolean) => {
@@ -130,11 +173,14 @@ export default function DataQualityApp() {
 
 
   // VERIFICA: assenza di duplicati
-  const hasDuplicates = new Set(ListOfCenters.map(center => center.name)).size != ListOfCenters.length
-  if (hasDuplicates) {
+  const hasDuplicatesNames = new Set(ListOfCenters.map(center => center.name)).size != ListOfCenters.length
+  const hasDuplicatesIds = new Set(ListOfCenters.map(center => center.id)).size != ListOfCenters.length
+  if (hasDuplicatesNames || hasDuplicatesIds) {
+    console.log("Duplicates Names: ", hasDuplicatesNames);
+    console.log("Duplicates Ids: ", hasDuplicatesIds);
     return (
       <div className="errorMessage">
-        Errore grave: presenti due ospedali con lo stesso nome.<br/>
+        Errore grave: presenti due ospedali con lo stesso nome o lo stesso id.<br/>
         Contattare un amministratore per risolvere il problema.
       </div>
     )
@@ -201,7 +247,10 @@ export default function DataQualityApp() {
           <button
             id="runDQ"
             className="manageButton"
-            onClick={() => handleRun(selectedCenter, false)}
+            onClick={() => {
+              setResultQuality(null);
+              handleRun(selectedCenter, false)
+            }}
             disabled={loading}
           >
             Data Quality
@@ -211,7 +260,10 @@ export default function DataQualityApp() {
           <button
             id="runDQ_anonymous"
             className="manageButton"
-            onClick={() => handleRun(selectedCenter, true)}
+            onClick={() => {
+              setResultAnonymous(null);
+              handleRun(selectedCenter, true)
+            }}
             disabled={loading}
           >
             Anonymous Data
@@ -241,6 +293,7 @@ export default function DataQualityApp() {
                 <li className="scrollText"><b>Extraction Date:</b> {resultQuality.extractionDate}</li>
                 <li className="scrollText"><b>Total Patients:</b> {resultQuality.totalPatients}</li>
                 <li className="scrollText"><b>Span Time:</b> {resultQuality.spanTime}</li>
+                <li className="scrollText"><b>Name: </b> {CurrentAnalysis} - {selectedCenter}</li>
                 <li className="scrollText"><b>Cohort: </b> {cohort.join(", ")}</li>
               </ul>
               <button
@@ -289,6 +342,7 @@ export default function DataQualityApp() {
                 <li className="scrollText"><b>Extraction Date:</b> {resultAnonymous.extractionDate}</li>
                 <li className="scrollText"><b>Total Patients:</b> {resultAnonymous.totalPatients}</li>
                 <li className="scrollText"><b>Span Time:</b> {resultAnonymous.spanTime}</li>
+                <li className="scrollText"><b>Name: </b> {CurrentAnalysis} - {selectedCenter}</li>
                 <li className="scrollText"><b>Cohort: </b> {cohort.join(", ")}</li>
               </ul>
               <button

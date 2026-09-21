@@ -1,9 +1,10 @@
-export const fetchFileRepository = async (centerId: string, token: string) => {
+export const fetchFileRepository = async (centerUrl: string, token: string, folder_id: string) => {
   const formdata = new FormData();
   formdata.append("token", token);
   formdata.append("content", "fileRepository");
   formdata.append("action", "list");
   formdata.append("format", "json");
+  formdata.append("folder_id", folder_id);
   formdata.append("returnFormat", "json");
 
   const requestOptions: RequestInit = {
@@ -12,7 +13,15 @@ export const fetchFileRepository = async (centerId: string, token: string) => {
     redirect: "follow",
   };
 
-  const response = await fetch(`/redcap-api/${centerId}/`, requestOptions);
+  let response: Response;
+  try {
+    response = await fetch(centerUrl, requestOptions);
+  } catch (err) {
+    if (err instanceof TypeError) {
+      throw new Error("Impossible to contact REDCap Server.");
+    }
+    throw err;
+  }
   const resultText = await response.text();
 
   // N.B.: { response.ok = true } solo se status = 200÷299
@@ -34,7 +43,7 @@ export const fetchFileRepository = async (centerId: string, token: string) => {
 };
 
 
-export const getCohort = async (centerId: string, token: string, doc_id: string) => {
+export const getCohort = async (centerUrl: string, token: string, doc_id: string) => {
   const formdata = new FormData();
   formdata.append("token", token);
   formdata.append("content", "fileRepository");
@@ -48,7 +57,15 @@ export const getCohort = async (centerId: string, token: string, doc_id: string)
     redirect: "follow",
   };
 
-  const response = await fetch(`/redcap-api/${centerId}/`, requestOptions);
+  let response: Response;
+  try {
+    response = await fetch(centerUrl, requestOptions);
+  } catch (err) {
+    if (err instanceof TypeError) {
+      throw new Error("Impossible to contact REDCap Server.");
+    }
+    throw err;
+  }
   const resultText = await response.text();
 
   // N.B.: { response.ok = true } solo se status = 200÷299
@@ -75,7 +92,7 @@ export const getCohort = async (centerId: string, token: string, doc_id: string)
 };
 
 
-export const fetchCohort = async (centerId: string, token: string) => {
+export const fetchCohort = async (centerUrl: string, token: string) => {
   const formdata = new FormData();
   formdata.append("token", token);
   formdata.append("content", "record");
@@ -95,7 +112,15 @@ export const fetchCohort = async (centerId: string, token: string) => {
     redirect: "follow",
   };
 
-  const response = await fetch(`/redcap-api/${centerId}/`, requestOptions);
+  let response: Response;
+  try {
+    response = await fetch(centerUrl, requestOptions);
+  } catch (err) {
+    if (err instanceof TypeError) {
+      throw new Error("Impossible to contact REDCap Server.");
+    }
+    throw err;
+  }
   const resultText = await response.text();
 
   // N.B.: { response.ok = true } solo se status = 200÷299
@@ -117,13 +142,14 @@ export const fetchCohort = async (centerId: string, token: string) => {
 };
 
 
-export const createCohort = async (centerId: string, token: string, file: File) => {
+export const createFileCohort = async (centerUrl: string, token: string, file: File, dirId: string) => {
   const formdata = new FormData();
   formdata.append("token", token);
   formdata.append("content", "fileRepository");
   formdata.append("action", "import");
   formdata.append("returnFormat", "json");
   formdata.append("file", file);
+  formdata.append("folder_id", dirId);
 
   const requestOptions: RequestInit = {
     method: "POST",
@@ -131,7 +157,51 @@ export const createCohort = async (centerId: string, token: string, file: File) 
     redirect: "follow",
   };
 
-  const response = await fetch(`/redcap-api/${centerId}/`, requestOptions);
+  let response: Response;
+  try {
+    response = await fetch(centerUrl, requestOptions);
+  } catch (err) {
+    if (err instanceof TypeError) {
+      throw new Error("Impossible to contact REDCap Server.");
+    }
+    throw err;
+  }
+  const resultText = await response.text();
+
+  // N.B.: { response.ok = true } solo se status = 200÷299
+  if (!response.ok) {
+    if (response.status === 403) {
+      throw new Error("Invalid token or insufficient permissions.");
+    }
+    throw new Error(`REDCap error (status ${response.status}): ${resultText}`);
+  }
+};
+
+
+export const createDirectory = async (centerUrl: string, token: string, name: string, nameDir: string) => {
+  const formdata = new FormData();
+  formdata.append("token", token);
+  formdata.append("content", "fileRepository");
+  formdata.append("action", "createFolder");
+  formdata.append("format", "json");
+  formdata.append("name", name);
+  formdata.append("folder_id", nameDir);
+
+  const requestOptions: RequestInit = {
+    method: "POST",
+    body: formdata,
+    redirect: "follow",
+  };
+
+  let response: Response;
+  try {
+    response = await fetch(centerUrl, requestOptions);
+  } catch (err) {
+    if (err instanceof TypeError) {
+      throw new Error("Impossible to contact REDCap Server.");
+    }
+    throw err;
+  }
   const resultText = await response.text();
 
   // N.B.: { response.ok = true } solo se status = 200÷299
