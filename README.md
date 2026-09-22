@@ -7,7 +7,8 @@ cd Mockup_DQ-Tool
 npm install
 
 npm install crypto-js
-
 npm install --save-dev @types/crypto-js
+
+npm install xlsx
 
 npm run dev

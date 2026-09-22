@@ -20,9 +20,9 @@ export const removeFieldCheck = (recordData: any, attribute: any, pazienteId: an
 
 
 export const elapsedDays = (recordData: any, dateTarget: any, dateList: any) => {
+  let targetDate: Date | null = null;
 
-	let targetDate: any = null;
-	//recupero la data target da usare per le differenze e la converto in Date ( targetDate) poi setto a 0 la colonna
+	// Recupero la data target da usare per le differenze e la converto in Date (targetDate) poi setto a 0 la colonna
 	recordData.forEach((item: any) => {
     if (item[dateTarget]) {
       targetDate = new Date(item[dateTarget]);
@@ -37,7 +37,13 @@ export const elapsedDays = (recordData: any, dateTarget: any, dateList: any) => 
       if (item[date]) {
 				//estraggo la data e faccio la differenza con la data target in giorni
         const currentDate = new Date(item[date]);
-        const diffDays = Math.round((currentDate.getTime() - targetDate.getTime()) / (1000 * 60 * 60 * 24));
+        let diffDays;
+        // Controllo che le date non siano "null" (errore con getTime())
+        if (currentDate === null || targetDate === null) {
+          diffDays = "NA"
+        } else {
+          diffDays = Math.round((currentDate.getTime() - targetDate.getTime()) / (1000 * 60 * 60 * 24));
+        }
 				//lo setto nella cella corrispondente
 				item[date] = diffDays;
       }

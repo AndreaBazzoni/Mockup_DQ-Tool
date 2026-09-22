@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Eye, EyeOff, XCircle } from "lucide-react";
+import { Eye, EyeOff, LucideArrowDownRightFromCircle, XCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner";
 import { DoAnonymizedData } from "@/DoAnonymizedData";
+import { DownloadAnonymizedData } from "@/DownloadAnonymizedData";
 import ShareModal from "@/ShareModal";
 import { ListOfCenters, CurrentAnalysis } from "@/ManageCenters";
 import { ManageCohort } from "@/ManageCohort";
@@ -16,9 +17,11 @@ export default function DataQualityApp() {
   const [loading, setLoading] = useState(false);
   const [cohortResults, setCohortResults] = useState<string[] | null>(null);
   const [recordDataResults, setRecordDataResults] = useState<REDCapRecord[][] | null>(null);
-
   const [resultQuality, setResultQuality] = useState<any>(null);
   const [resultAnonymous, setResultAnonymous] = useState<any>(null);
+
+  const [resultQuality2, setResultQuality2] = useState<any>(null);
+  const [resultAnonymous2, setResultAnonymous2] = useState<any>(null);
   const [showShareQuality, setShowShareQuality] = useState(false);
   const [showShareAnonymous, setShowShareAnonymous] = useState(false);
 
@@ -43,10 +46,20 @@ export default function DataQualityApp() {
     setSelectedCenter(name)
     // Resetto token e risultati
     setToken("");
-    setResultQuality(null);
-    setResultAnonymous(null);
+    setResultQuality2(null);
+    setResultAnonymous2(null);
     setCohortResults(null);
     setRecordDataResults(null);
+  };
+
+  // Modifico il token scritto
+  const handleTokenChange = (value: string) => {
+    setToken(value);
+    // Invalido la cache: il nuovo token potrebbe corrispondere a permessi/dati diversi
+    setCohortResults(null);
+    setRecordDataResults(null);
+    setResultQuality2(null);
+    setResultAnonymous2(null);
   };
 
 
@@ -88,26 +101,36 @@ export default function DataQualityApp() {
 
       if (!isAnonymous) {
         // -- Data Quality --
-        // const dqResults = dataQuality(recordData); // funzione ancora da scrivere/collegare
-        setResultQuality({
+        /*
+        const dqResults = dataQuality(recordData); // funzione ancora da scrivere/collegare
+        if (anonResults === null) {
+          throw new Error("Failed during anonymization.");
+        }
+        */
+        // ---- FAKE!! ---- //
+        setResultQuality2({
           centerName: center.name,
           extractionDate: new Date().toLocaleString("it-IT"),
           // ... altri campi, costruiti da dqResults
           anonymous: false,
         });
+        // ---------------- //
 
       } else {
         // -- Anonymous Data --
-        const anonResults = await DoAnonymizedData(recordData);
-        if (anonResults === null) {
+        const anonymousResult = await DoAnonymizedData(recordData);
+        if (anonymousResult === null) {
           throw new Error("Failed during anonymization.");
         }
-        setResultAnonymous({
+        setResultAnonymous(anonymousResult);
+        // ---- FAKE!! ---- //
+        setResultAnonymous2({
           centerName: center.name,
           extractionDate: new Date().toLocaleString("it-IT"),
           // ... altri campi, costruiti da anonResults
           anonymous: true,
         });
+        // ---------------- //
       }
 
       toast.success(isAnonymous ? "Anonimizzazione completata!" : "Data Quality completata!");
@@ -117,14 +140,23 @@ export default function DataQualityApp() {
       toast.error(err.message || "Error during the operation.");
 
     } finally {
+      console.log("Cohort: ", cohortResults);
+      console.log("RecordData: ", recordDataResults);
       setLoading(false);
     }
   };
 
 
+  // Scaricamento Anonymous Data
+  const downloadResultAnonymous = () => {
+    DownloadAnonymizedData(selectedCenter, CurrentAnalysis, resultAnonymous);
+  }
+
+
+  // ---- FAKE!! ---- //
   // Scaricamento dei risultati (Data Quality o Anonymous Data)
-  const downloadResult = (isAnonymous: boolean) => {
-    const result = isAnonymous ? resultAnonymous : resultQuality;
+  const downloadResult2 = (isAnonymous: boolean) => {
+    const result = isAnonymous ? resultAnonymous2 : resultQuality2;
     if (!result) return;
     // Creazione del Blob (Binary Large Object)
     const blob = new Blob([JSON.stringify(result, null, 2)], {
@@ -143,8 +175,8 @@ export default function DataQualityApp() {
   };
 
   // Condivisione dei risultati (Data Quality o Anonymous Data)
-  const shareResult = (isAnonymous: boolean) => {
-    const result = isAnonymous ? resultAnonymous : resultQuality;
+  const shareResult2 = (isAnonymous: boolean) => {
+    const result = isAnonymous ? resultAnonymous2 : resultQuality2;
     if (!result) return;
     // Implementazione della condivisione
     if (isAnonymous) {
@@ -153,6 +185,7 @@ export default function DataQualityApp() {
       setShowShareQuality(true);
     }
   }
+  // ---------------- //
 
 
   // VERIFICA: assenza di duplicati
@@ -209,7 +242,7 @@ export default function DataQualityApp() {
               value={token}
               placeholder="Insert token"
               disabled={loading}
-              onChange={(e) => setToken(e.target.value)}
+              onChange={(e) => handleTokenChange(e.target.value)}
             />
             <button
               type="button"
@@ -231,7 +264,7 @@ export default function DataQualityApp() {
             id="runDQ"
             className="manageButton"
             onClick={() => {
-              setResultQuality(null);
+              setResultQuality2(null);
               handleRun(selectedCenter, false)
             }}
             disabled={loading}
@@ -244,7 +277,7 @@ export default function DataQualityApp() {
             id="runDQ_anonymous"
             className="manageButton"
             onClick={() => {
-              setResultAnonymous(null);
+              setResultAnonymous2(null);
               handleRun(selectedCenter, true)
             }}
             disabled={loading}
@@ -258,10 +291,10 @@ export default function DataQualityApp() {
       <div className="raw">
         <div className="partofRaw">
           {/* Non anonimi */}
-          {resultQuality && (
+          {resultQuality2 && (
             <div className="containerResults">
               <button
-                onClick={() => setResultQuality(null)}
+                onClick={() => setResultQuality2(null)}
                 className="buttonX"
               >
                 <XCircle size={24}/>
@@ -275,14 +308,14 @@ export default function DataQualityApp() {
                 (cohortResults !== null && recordDataResults !== null) &&
                 <div>
                   <ul className="infoResults">
-                    <li className="scrollText"><b>Center:</b> {resultQuality.centerName}</li>
-                    <li className="scrollText"><b>Extraction Date:</b> {resultQuality.extractionDate}</li>
+                    <li className="scrollText"><b>Center:</b> {resultQuality2.centerName}</li>
+                    <li className="scrollText"><b>Extraction Date:</b> {resultQuality2.extractionDate}</li>
                     <li className="scrollText"><b>Name: </b> {CurrentAnalysis} - {selectedCenter}</li>
                     <li className="scrollText"><b>Cohort: </b> {cohortResults.join(", ")}</li>
                   </ul>
                   <button
                     id="downloadResults"
-                    onClick={() => downloadResult(false)}
+                    onClick={() => downloadResult2(false)}
                     className="manageButton"
                     disabled={loading}
                   >
@@ -290,7 +323,7 @@ export default function DataQualityApp() {
                   </button>
                   <button
                     id="shareResults"
-                    onClick={() => shareResult(false)}
+                    onClick={() => shareResult2(false)}
                     className="manageButton"
                     disabled={loading}
                   >
@@ -298,8 +331,8 @@ export default function DataQualityApp() {
                   </button>
                   {showShareQuality && (
                     <ShareModal
-                      key={`${resultQuality.centerName}-${resultQuality.extractionDate}`}
-                      centerName={resultQuality.centerName}
+                      key={`${resultQuality2.centerName}-${resultQuality2.extractionDate}`}
+                      centerName={resultQuality2.centerName}
                       title="quality"
                       onClose={() => setShowShareQuality(false)} />
                   )}
@@ -320,10 +353,10 @@ export default function DataQualityApp() {
         </div>
         <div className="partofRaw">
           {/* Anonimizzati */}
-          {resultAnonymous && (
+          {resultAnonymous2 && (
             <div className="containerResults">
               <button
-                onClick={() => setResultAnonymous(null)}
+                onClick={() => setResultAnonymous2(null)}
                 className="buttonX"
               >
                 <XCircle size={24}/>
@@ -337,14 +370,14 @@ export default function DataQualityApp() {
                 (cohortResults !== null && recordDataResults !== null) &&
                 <div>
                   <ul className="infoResults">
-                    <li className="scrollText"><b>Center:</b> {resultAnonymous.centerName}</li>
-                    <li className="scrollText"><b>Extraction Date:</b> {resultAnonymous.extractionDate}</li>
+                    <li className="scrollText"><b>Center:</b> {resultAnonymous2.centerName}</li>
+                    <li className="scrollText"><b>Extraction Date:</b> {resultAnonymous2.extractionDate}</li>
                     <li className="scrollText"><b>Name: </b> {CurrentAnalysis} - {selectedCenter}</li>
                     <li className="scrollText"><b>Cohort: </b> {cohortResults.join(", ")}</li>
                   </ul>
                   <button
                     id="downloadResults"
-                    onClick={() => downloadResult(true)}
+                    onClick={() => downloadResultAnonymous()}
                     className="manageButton"
                     disabled={loading}
                   >
@@ -352,7 +385,7 @@ export default function DataQualityApp() {
                   </button>
                   <button
                     id="shareResults"
-                    onClick={() => shareResult(true)}
+                    onClick={() => shareResult2(true)}
                     className="manageButton"
                     disabled={loading}
                   >
@@ -360,8 +393,8 @@ export default function DataQualityApp() {
                   </button>
                   {showShareAnonymous && (
                     <ShareModal
-                      key={`${resultAnonymous.centerName}-${resultAnonymous.extractionDate}`}
-                      centerName={resultAnonymous.centerName}
+                      key={`${resultAnonymous2.centerName}-${resultAnonymous2.extractionDate}`}
+                      centerName={resultAnonymous2.centerName}
                       title="anonymous"
                       onClose={() => setShowShareAnonymous(false)} />
                   )}
