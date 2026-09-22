@@ -1,10 +1,10 @@
-import type { REDCapRecord } from "@/utils/types";
 import { anonymazeData } from '@/fetch/process-record';
+import type { REDCapRecord } from "@/utils/types";
 
 
 export const DoAnonymizedData = async (recordDataResults: REDCapRecord[][]) => {
   // Inizializzo il vettore risultante e il conteggio dei pazienti
-  let anonymizedResults = {};
+  let anonymizedResults: Record<number, REDCapRecord[]> = {};
   let patientCounter = 1;
   let secret = "prova_segreto";
 
@@ -26,6 +26,7 @@ export const DoAnonymizedData = async (recordDataResults: REDCapRecord[][]) => {
       // Incremento il Counter
       patientCounter++;
 		});
+    return anonymizedResults;
 
   } catch (err: any) {
     console.error(err.message || "Error during the Data Anonymization");

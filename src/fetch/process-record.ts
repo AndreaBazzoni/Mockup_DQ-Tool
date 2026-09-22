@@ -1,16 +1,19 @@
 import { anonChecks } from "@/utils/config-anonymaze";
+import type { REDCapRecord } from "@/utils/types";
 
 
-export const anonimazeData = (data, pazienteId, secret) => {
-	let results = {};
+export const anonymazeData = (
+    data: REDCapRecord[],
+    pazienteId: number,
+    secret: string
+): REDCapRecord[] => {
+	let results: REDCapRecord[] = [];
 	
 	// Dynamically execute each check based on the configuration
 	anonChecks.forEach(check => {
-		console.log(check.name);
 		// Evaluate the check
-			results = check.func(data, ...check.params, pazienteId, secret);
-		console.log(results);
-
+		results = check.func(data, ...check.params, pazienteId, secret);
 	});
+
 	return results;
 };

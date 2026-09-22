@@ -3,10 +3,11 @@ import {
 	elapsedDays,
 	hmacHash
 } from '@/utils/function-anonymaze';
+import type { AnonCheck } from "@/utils/types";
 
 
 // Define a mapping of check names to function references and parameters
-export const anonChecks = [
+export const anonChecks: AnonCheck[] = [
 	{
 		name: 'anon_1',
 		desc: 'Remove the record_id',
