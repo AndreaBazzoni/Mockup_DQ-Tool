@@ -3,9 +3,9 @@ import type { REDCapRecord } from "@/utils/types";
 
 
 export const anonymazeData = (
-    data: REDCapRecord[],
-    pazienteId: number,
-    secret: string
+  data: REDCapRecord[],
+  pazienteId: number,
+  secret: string
 ): REDCapRecord[] => {
 	let results: REDCapRecord[] = [];
 	

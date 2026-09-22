@@ -2,12 +2,11 @@ import { useState, useEffect } from "react";
 import { Eye, EyeOff, XCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner";
+import { DoAnonymizedData } from "@/DoAnonymizedData";
 import ShareModal from "@/ShareModal";
 import { ListOfCenters, CurrentAnalysis } from "@/ManageCenters";
-import { fetchFileRepository, fetchCohort, getCohort, createFileCohort, createDirectory } from "@/fetch/redcap-fetch"
+import { ManageCohort } from "@/ManageCohort";
 import type { REDCapRecord } from "@/utils/types";
-import { createTxtFile } from "@/utils/createFile";
-import { achieveRecordData } from "@/utils/achieveRecordData"
 
 
 export default function DataQualityApp() {
@@ -15,7 +14,7 @@ export default function DataQualityApp() {
   const [token, setToken] = useState("");
   const [showToken, setShowToken] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [cohort, setCohort] = useState<string[]>([]);
+  const [cohortResults, setCohortResults] = useState<string[] | null>(null);
   const [recordDataResults, setRecordDataResults] = useState<REDCapRecord[][] | null>(null);
 
   const [resultQuality, setResultQuality] = useState<any>(null);
@@ -46,121 +45,76 @@ export default function DataQualityApp() {
     setToken("");
     setResultQuality(null);
     setResultAnonymous(null);
+    setCohortResults(null);
+    setRecordDataResults(null);
   };
 
 
   // ---- RUN ----
-  const handleRun = async (name: string | undefined, isAnonymous: boolean) => {
-    // Dati mancanti
+  const handleRun = async (centerName: string | undefined, isAnonymous: boolean) => {
     if (!selectedCenter || !token) {
-      toast.error("Select a center and insert the token");
+      toast.error("Select a center and insert the token.");
       return;
     }
 
     setLoading(true);
 
     try {
-      const center = ListOfCenters.find((c) => c.name === name);
-      // Centro non trovato
+      const center = ListOfCenters.find((c) => c.name === centerName);
       if (!center) {
-        throw new Error("Problems finding the center");
+        throw new Error("Problems finding the center.");
       }
-      // Gestione REDCap centro
-      const nameDirectory = "EHE-Federated";
-      const nameFileCohort = `${CurrentAnalysis}_${center.id}_cohort.txt`;
 
-      // Chiamata API al File Repository - Directory
-      const fileRepository = await fetchFileRepository(center.url, token, "");
-      const directoryExists = fileRepository.find((dir: any) => dir.name === nameDirectory);
-      // Verifico la presenza della cartella
-      if (directoryExists) {
-        // Se è presente la cartella, verifico il contenuto
-          // Chiamata API al File Repository - FileCohort
-        const fileRepositoryEHE = await fetchFileRepository(center.url, token, directoryExists.folder_id);
-        const fileCohortExists = fileRepositoryEHE.find((file: any) => file.name === nameFileCohort);
-        // Verifico la presenza della coorte
-        if (fileCohortExists) {
-          // Se è presente la coorte, la estrapolo
-          const coorte = await getCohort(center.url, token, fileCohortExists.doc_id);
-          setCohort(coorte);
-          console.log(`Coorte dell'ospedale "${center.name}": `, cohort);
-            // Ottengo i dati della coorte da REDCap
-          const recordDataTotal = await achieveRecordData(center.url, token, coorte)
-          setRecordDataResults(recordDataTotal);
-          if (recordDataTotal===null) {
-            throw new Error("Failed to fetch data.");
-          }
-          console.log("Totale dei Record: ", recordDataTotal);
+      let cohort: string[] | null;
+      let recordData: REDCapRecord[][] | null;
 
-          // Creazione dei risultati
-          const result = {
-            centerName: center.name,
-            extractionDate: new Date().toLocaleString("it-IT"),
-            totalPatients: 100,
-            spanTime: "01/01/2023 - 31/12/2023",
-            missingData: 5,
-            errors: ["No errors found"],
-            anonymous: isAnonymous
-          };
-          // Distinguo tra Quality e Anonymous
-          if (isAnonymous) {
-            setResultAnonymous(result);
-          } else {
-            setResultQuality(result);
-          }
+      // Verifico se ho già caricato cohort e recordData
+      if (cohortResults !== null && recordDataResults !== null) {
+        cohort = cohortResults;
+        recordData = recordDataResults;
+      } else {
+        const { cohort: cohortFetched, recordData: recordDataFetched } = await ManageCohort(center, token, CurrentAnalysis);
+        setCohortResults(cohortFetched);
+        setRecordDataResults(recordDataFetched);
+        cohort = cohortFetched;
+        recordData = recordDataFetched;
+      }
+      
+      if ((cohort === null) || (recordData === null)) {
+        throw new Error("Failed to fetch data.");
+      }
 
-        } else {
-          // Se non è presente la coorte, la creo e la utilizzo
-            // Tutti i dati
-          let totalData = await fetchCohort(center.url, token);
-            // Solo i bl_record_id
-          let recordIds = totalData.map((patient: any) => patient.bl_record_id);
-            // Elimino gli ID duplicati
-          recordIds = [...new Set(recordIds)];
-          setCohort(recordIds);
-            // Creo il file .txt della coorte
-          const cohortTxtFile = createTxtFile(recordIds, `${CurrentAnalysis}_${center.id}_cohort.txt`);
-          await createFileCohort(center.url, token, cohortTxtFile, directoryExists.folder_id);
-            // Ottengo i dati della coorte da REDCap
-          const recordDataTotal = await achieveRecordData(center.url, token, recordIds)
-          setRecordDataResults(recordDataTotal);
-          if (recordDataTotal===null) {
-            throw new Error("Failed to fetch data.");
-          }
-          console.log("Totale dei Record: ", recordDataTotal);
-          console.log(`Coorte creata per l'ospedale "${center.name}"`);
-          toast.success("Coorte creata con successo!");
-        }
+      // -- BRANCH --
+
+      if (!isAnonymous) {
+        // -- Data Quality --
+        // const dqResults = dataQuality(recordData); // funzione ancora da scrivere/collegare
+        setResultQuality({
+          centerName: center.name,
+          extractionDate: new Date().toLocaleString("it-IT"),
+          // ... altri campi, costruiti da dqResults
+          anonymous: false,
+        });
 
       } else {
-        // Se non è presente la cartella, la creo e creo la coorte
-        await createDirectory(center.url, token, nameDirectory, "");
-          // Tutti i dati
-        let totalData = await fetchCohort(center.url, token);
-          // Solo i bl_record_id
-        let recordIds = totalData.map((patient: any) => patient.bl_record_id);
-          // Elimino gli ID duplicati
-        recordIds = [...new Set(recordIds)];
-        setCohort(recordIds);
-          // Creo il file .txt della coorte
-        const cohortTxtFile = createTxtFile(recordIds, `${CurrentAnalysis}_${center.id}_cohort.txt`);
-        const fileRepository_new = await fetchFileRepository(center.url, token, "");
-        const directoryExists_new = fileRepository_new.find((dir: any) => dir.name === nameDirectory);
-        await createFileCohort(center.url, token, cohortTxtFile, directoryExists_new.folder_id);
-          // Ottengo i dati della coorte da REDCap
-        const recordDataTotal = await achieveRecordData(center.url, token, recordIds)
-        setRecordDataResults(recordDataTotal);
-        if (recordDataTotal===null) {
-          throw new Error("Failed to fetch data.");
+        // -- Anonymous Data --
+        const anonResults = await DoAnonymizedData(recordData);
+        if (anonResults === null) {
+          throw new Error("Failed during anonymization.");
         }
-        console.log("Totale dei Record: ", recordDataTotal);
-        console.log(`Coorte creata per l'ospedale "${center.name}"`);
-        toast.success("Coorte creata con successo!");
+        setResultAnonymous({
+          centerName: center.name,
+          extractionDate: new Date().toLocaleString("it-IT"),
+          // ... altri campi, costruiti da anonResults
+          anonymous: true,
+        });
       }
 
-    } catch(err: any) {
-      console.error(err.message || "Error during the operation");
-      toast.error(err.message || "Error during the operation");
+      toast.success(isAnonymous ? "Anonimizzazione completata!" : "Data Quality completata!");
+
+    } catch (err: any) {
+      console.error(err.message || "Error during the operation.");
+      toast.error(err.message || "Error during the operation.");
 
     } finally {
       setLoading(false);
@@ -317,37 +271,50 @@ export default function DataQualityApp() {
                 &nbsp;<u>QUALITY</u>&nbsp;
                 {!dimMobile && <span>✅</span>}
               </div>
-              <ul className="infoResults">
-                <li className="scrollText"><b>Center:</b> {resultQuality.centerName}</li>
-                <li className="scrollText"><b>Extraction Date:</b> {resultQuality.extractionDate}</li>
-                <li className="scrollText"><b>Total Patients:</b> {resultQuality.totalPatients}</li>
-                <li className="scrollText"><b>Span Time:</b> {resultQuality.spanTime}</li>
-                <li className="scrollText"><b>Name: </b> {CurrentAnalysis} - {selectedCenter}</li>
-                <li className="scrollText"><b>Cohort: </b> {cohort.join(", ")}</li>
-              </ul>
-              <button
-                id="downloadResults"
-                onClick={() => downloadResult(false)}
-                className="manageButton"
-                disabled={loading}
-              >
-                Download Quality
-              </button>
-              <button
-                id="shareResults"
-                onClick={() => shareResult(false)}
-                className="manageButton"
-                disabled={loading}
-              >
-                Share Quality
-              </button>
-              {showShareQuality && (
-                <ShareModal
-                  key={`${resultQuality.centerName}-${resultQuality.extractionDate}`}
-                  centerName={resultQuality.centerName}
-                  title="quality"
-                  onClose={() => setShowShareQuality(false)} />
-              )}
+              {
+                (cohortResults !== null && recordDataResults !== null) &&
+                <div>
+                  <ul className="infoResults">
+                    <li className="scrollText"><b>Center:</b> {resultQuality.centerName}</li>
+                    <li className="scrollText"><b>Extraction Date:</b> {resultQuality.extractionDate}</li>
+                    <li className="scrollText"><b>Name: </b> {CurrentAnalysis} - {selectedCenter}</li>
+                    <li className="scrollText"><b>Cohort: </b> {cohortResults.join(", ")}</li>
+                  </ul>
+                  <button
+                    id="downloadResults"
+                    onClick={() => downloadResult(false)}
+                    className="manageButton"
+                    disabled={loading}
+                  >
+                    Download Quality
+                  </button>
+                  <button
+                    id="shareResults"
+                    onClick={() => shareResult(false)}
+                    className="manageButton"
+                    disabled={loading}
+                  >
+                    Share Quality
+                  </button>
+                  {showShareQuality && (
+                    <ShareModal
+                      key={`${resultQuality.centerName}-${resultQuality.extractionDate}`}
+                      centerName={resultQuality.centerName}
+                      title="quality"
+                      onClose={() => setShowShareQuality(false)} />
+                  )}
+                </div>
+              }
+              {
+                (cohortResults === null || recordDataResults === null) &&
+                <ul className="infoResults">
+                  <li className="scrollText">
+                    <b>
+                      Errore nel caricamento dei dati.<br/>Contatta un amministratore.
+                    </b> 
+                  </li>
+                </ul>
+              }
             </div>
           )}
         </div>
@@ -366,37 +333,50 @@ export default function DataQualityApp() {
                 &nbsp;<u>ANONYMOUS</u>&nbsp;
                 {!dimMobile && <span>✅</span>}
               </div>
-              <ul className="infoResults">
-                <li className="scrollText"><b>Center:</b> {resultAnonymous.centerName}</li>
-                <li className="scrollText"><b>Extraction Date:</b> {resultAnonymous.extractionDate}</li>
-                <li className="scrollText"><b>Total Patients:</b> {resultAnonymous.totalPatients}</li>
-                <li className="scrollText"><b>Span Time:</b> {resultAnonymous.spanTime}</li>
-                <li className="scrollText"><b>Name: </b> {CurrentAnalysis} - {selectedCenter}</li>
-                <li className="scrollText"><b>Cohort: </b> {cohort.join(", ")}</li>
-              </ul>
-              <button
-                id="downloadResults"
-                onClick={() => downloadResult(true)}
-                className="manageButton"
-                disabled={loading}
-              >
-                Download Anonymous
-              </button>
-              <button
-                id="shareResults"
-                onClick={() => shareResult(true)}
-                className="manageButton"
-                disabled={loading}
-              >
-                Share Anonymous
-              </button>
-              {showShareAnonymous && (
-                <ShareModal
-                  key={`${resultAnonymous.centerName}-${resultAnonymous.extractionDate}`}
-                  centerName={resultAnonymous.centerName}
-                  title="anonymous"
-                  onClose={() => setShowShareAnonymous(false)} />
-              )}
+              {
+                (cohortResults !== null && recordDataResults !== null) &&
+                <div>
+                  <ul className="infoResults">
+                    <li className="scrollText"><b>Center:</b> {resultAnonymous.centerName}</li>
+                    <li className="scrollText"><b>Extraction Date:</b> {resultAnonymous.extractionDate}</li>
+                    <li className="scrollText"><b>Name: </b> {CurrentAnalysis} - {selectedCenter}</li>
+                    <li className="scrollText"><b>Cohort: </b> {cohortResults.join(", ")}</li>
+                  </ul>
+                  <button
+                    id="downloadResults"
+                    onClick={() => downloadResult(true)}
+                    className="manageButton"
+                    disabled={loading}
+                  >
+                    Download Anonymous
+                  </button>
+                  <button
+                    id="shareResults"
+                    onClick={() => shareResult(true)}
+                    className="manageButton"
+                    disabled={loading}
+                  >
+                    Share Anonymous
+                  </button>
+                  {showShareAnonymous && (
+                    <ShareModal
+                      key={`${resultAnonymous.centerName}-${resultAnonymous.extractionDate}`}
+                      centerName={resultAnonymous.centerName}
+                      title="anonymous"
+                      onClose={() => setShowShareAnonymous(false)} />
+                  )}
+                </div>
+              }
+              {
+                (cohortResults === null || recordDataResults === null) &&
+                <ul className="infoResults">
+                  <li className="scrollText">
+                    <b>
+                      Errore nel caricamento dei dati.<br/>Contatta un amministratore.
+                    </b> 
+                  </li>
+                </ul>
+              }
             </div>
           )}
         </div>
