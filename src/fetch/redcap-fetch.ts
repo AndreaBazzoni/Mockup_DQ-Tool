@@ -1,3 +1,6 @@
+import type { REDCapRecord } from "@/utils/types";
+
+
 export const fetchFileRepository = async (centerUrl: string, token: string, folder_id: string) => {
   const formdata = new FormData();
   formdata.append("token", token);
@@ -211,4 +214,59 @@ export const createDirectory = async (centerUrl: string, token: string, name: st
     }
     throw new Error(`REDCap error (status ${response.status}): ${resultText}`);
   }
+};
+
+
+export const getRecordData = async (
+  centerUrl: string,
+  token: string,
+  recordId: string
+): Promise<REDCapRecord[]> => {
+  const formdata = new FormData();
+  formdata.append("token", token);
+  formdata.append("content", "record");
+  formdata.append("action", "export");
+  formdata.append("format", "json");
+  formdata.append("type", "flat");
+  formdata.append("records", recordId);
+  formdata.append("rawOrLabel", "raw");
+  formdata.append("rawOrLabelHeaders", "raw");
+  formdata.append("exportCheckboxLabel", "false");
+  formdata.append("exportSurveyFields", "false");
+  formdata.append("exportDataAccessGroups", "false");
+  formdata.append("returnFormat", "json");
+
+  const requestOptions: RequestInit = {
+    method: "POST",
+    body: formdata,
+    redirect: "follow",
+  };
+
+  let response: Response;
+  try {
+    response = await fetch(centerUrl, requestOptions);
+  } catch (err) {
+    if (err instanceof TypeError) {
+      throw new Error("Impossible to contact REDCap Server.");
+    }
+    throw err;
+  }
+  const resultText = await response.text();
+
+  // N.B.: { response.ok = true } solo se status = 200÷299
+  if (!response.ok) {
+    if (response.status === 403) {
+      throw new Error("Invalid token or insufficient permissions.");
+    }
+    throw new Error(`REDCap error (status ${response.status}): ${resultText}`);
+  }
+
+  let result: REDCapRecord[];
+  try {
+    result = JSON.parse(resultText);
+  } catch {
+    throw new Error("Impossible to achieve Data from the cohort.");
+  }
+
+  return result;
 };

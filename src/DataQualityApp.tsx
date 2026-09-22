@@ -5,7 +5,9 @@ import { toast } from "sonner";
 import ShareModal from "@/ShareModal";
 import { ListOfCenters, CurrentAnalysis } from "@/ManageCenters";
 import { fetchFileRepository, fetchCohort, getCohort, createFileCohort, createDirectory } from "@/fetch/redcap-fetch"
+import type { REDCapRecord } from "@/utils/types";
 import { createTxtFile } from "@/utils/createFile";
+import { achieveRecordData } from "@/utils/achieveRecordData"
 
 
 export default function DataQualityApp() {
@@ -13,11 +15,13 @@ export default function DataQualityApp() {
   const [token, setToken] = useState("");
   const [showToken, setShowToken] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [cohort, setCohort] = useState<string[]>([]);
+  const [recordDataResults, setRecordDataResults] = useState<REDCapRecord[][] | null>(null);
+
   const [resultQuality, setResultQuality] = useState<any>(null);
   const [resultAnonymous, setResultAnonymous] = useState<any>(null);
   const [showShareQuality, setShowShareQuality] = useState(false);
   const [showShareAnonymous, setShowShareAnonymous] = useState(false);
-  const [cohort, setCohort] = useState<string[]>([]);
 
 
   // Dimensioni finestra
@@ -54,6 +58,7 @@ export default function DataQualityApp() {
     }
 
     setLoading(true);
+
     try {
       const center = ListOfCenters.find((c) => c.name === name);
       // Centro non trovato
@@ -76,8 +81,16 @@ export default function DataQualityApp() {
         // Verifico la presenza della coorte
         if (fileCohortExists) {
           // Se è presente la coorte, la estrapolo
-          setCohort(await getCohort(center.url, token, fileCohortExists.doc_id));
+          const coorte = await getCohort(center.url, token, fileCohortExists.doc_id);
+          setCohort(coorte);
           console.log(`Coorte dell'ospedale "${center.name}": `, cohort);
+            // Ottengo i dati della coorte da REDCap
+          const recordDataTotal = await achieveRecordData(center.url, token, coorte)
+          setRecordDataResults(recordDataTotal);
+          if (recordDataTotal===null) {
+            throw new Error("Failed to fetch data.");
+          }
+          console.log("Totale dei Record: ", recordDataTotal);
 
           // Creazione dei risultati
           const result = {
@@ -108,6 +121,13 @@ export default function DataQualityApp() {
             // Creo il file .txt della coorte
           const cohortTxtFile = createTxtFile(recordIds, `${CurrentAnalysis}_${center.id}_cohort.txt`);
           await createFileCohort(center.url, token, cohortTxtFile, directoryExists.folder_id);
+            // Ottengo i dati della coorte da REDCap
+          const recordDataTotal = await achieveRecordData(center.url, token, recordIds)
+          setRecordDataResults(recordDataTotal);
+          if (recordDataTotal===null) {
+            throw new Error("Failed to fetch data.");
+          }
+          console.log("Totale dei Record: ", recordDataTotal);
           console.log(`Coorte creata per l'ospedale "${center.name}"`);
           toast.success("Coorte creata con successo!");
         }
@@ -127,12 +147,20 @@ export default function DataQualityApp() {
         const fileRepository_new = await fetchFileRepository(center.url, token, "");
         const directoryExists_new = fileRepository_new.find((dir: any) => dir.name === nameDirectory);
         await createFileCohort(center.url, token, cohortTxtFile, directoryExists_new.folder_id);
+          // Ottengo i dati della coorte da REDCap
+        const recordDataTotal = await achieveRecordData(center.url, token, recordIds)
+        setRecordDataResults(recordDataTotal);
+        if (recordDataTotal===null) {
+          throw new Error("Failed to fetch data.");
+        }
+        console.log("Totale dei Record: ", recordDataTotal);
         console.log(`Coorte creata per l'ospedale "${center.name}"`);
         toast.success("Coorte creata con successo!");
       }
 
     } catch(err: any) {
       toast.error(err.message || "Error during the operation");
+
     } finally {
       setLoading(false);
     }

@@ -1,8 +1,4 @@
-export interface Center {
-  name: string;
-  id: string;
-  url: string;
-}
+import type { Center } from "@/utils/types";
 
 export const ListOfCenters: Center[] = [
   {
@@ -17,4 +13,4 @@ export const ListOfCenters: Center[] = [
   },
 ];
 
-export const CurrentAnalysis: string = "2027";
+export const CurrentAnalysis: string = "2026";
