@@ -17,7 +17,7 @@ export const achieveRecordData = async (
     return recordDataTotal;
 
   } catch (err: any) {
-    console.log("Failed to fetch data: ", err);
+    console.error("Failed to fetch data: ", err);
     return null;
   }
 }
@@ -32,7 +32,7 @@ export const achieveRecordData = async (centerUrl: string, token: string, cohort
     return recordDataTotal;
 
   } catch (err: any) {
-    console.log("Failed to fetch data: ", err);
+    console.error("Failed to fetch data: ", err);
     return null;
   }
 };

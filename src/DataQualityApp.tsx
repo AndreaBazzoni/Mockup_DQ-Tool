@@ -159,6 +159,7 @@ export default function DataQualityApp() {
       }
 
     } catch(err: any) {
+      console.error(err.message || "Error during the operation");
       toast.error(err.message || "Error during the operation");
 
     } finally {
