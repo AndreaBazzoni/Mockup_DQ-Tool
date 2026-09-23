@@ -3,11 +3,8 @@ import type { REDCapRecord } from "@/utils/types";
 
 
 export const createAnonXlsx = (recordData: REDCapRecord[][]) => {
-  // CONTROLLA!!!
-	console.log("CCCC: ", recordData)
 	//recordData è un oggetto che facciamo diventare array di oggetti
  	const rows = Object.values(recordData).flat();
-	console.log("DDDD: ", rows)
 
 	// Create a new workbook and a worksheet
 	const workbook = XLSX.utils.book_new();
@@ -25,7 +22,7 @@ export const createAnonXlsx = (recordData: REDCapRecord[][]) => {
 	return dataBlob;
 }
 
-export function DownloadAnonymizedData(centerName: string, CurrentAnalysis: string, resultAnonymous: REDCapRecord[][]) {
+export function DownloadAnonymizedData(centerId: string, CurrentAnalysis: string, resultAnonymous: REDCapRecord[][]) {
   // Generate a timestamp for the file name
   const now = new Date();
   const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -35,7 +32,7 @@ export function DownloadAnonymizedData(centerName: string, CurrentAnalysis: stri
   const timestamp = `${dateString}_${hourString}${minuteString}${secondString}`;
 
   // Construct the file name
-  const fileName = `${centerName}_${CurrentAnalysis}_${timestamp}.xlsx`;
+  const fileName = `${CurrentAnalysis}_${centerId}_${timestamp}.xlsx`;
 
   // Creation of the Blob (Binary Large Object)
   const dataBlob = createAnonXlsx(resultAnonymous);

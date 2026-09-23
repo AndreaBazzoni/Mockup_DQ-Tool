@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Eye, EyeOff, LucideArrowDownRightFromCircle, XCircle } from "lucide-react";
+import { Eye, EyeOff, XCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner";
 import { DoAnonymizedData } from "@/DoAnonymizedData";
@@ -7,11 +7,11 @@ import { DownloadAnonymizedData } from "@/DownloadAnonymizedData";
 import ShareModal from "@/ShareModal";
 import { ListOfCenters, CurrentAnalysis } from "@/ManageCenters";
 import { ManageCohort } from "@/ManageCohort";
-import type { REDCapRecord } from "@/utils/types";
+import type { Center, REDCapRecord } from "@/utils/types";
 
 
 export default function DataQualityApp() {
-  const [selectedCenter, setSelectedCenter] = useState("");
+  const [selectedCenter, setSelectedCenter] = useState<Center | null>(null);
   const [token, setToken] = useState("");
   const [showToken, setShowToken] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,14 +42,19 @@ export default function DataQualityApp() {
   const sortedCenters = [...ListOfCenters].sort((a, b) => a.name.localeCompare(b.name));
 
   // Cambio il centro selezionato
-  const handleCenterChange = (name: string) => {
-    setSelectedCenter(name)
+  const handleCenterChange = (centerId: string) => {
+    const center = ListOfCenters.find(center => (center.id === centerId));
+    if (!center) {
+      setSelectedCenter(null);
+    } else {
+      setSelectedCenter(center);
+    }
     // Resetto token e risultati
     setToken("");
-    setResultQuality2(null);
-    setResultAnonymous2(null);
     setCohortResults(null);
     setRecordDataResults(null);
+    setResultQuality2(null);
+    setResultAnonymous2(null);
   };
 
   // Modifico il token scritto
@@ -64,7 +69,7 @@ export default function DataQualityApp() {
 
 
   // ---- RUN ----
-  const handleRun = async (centerName: string | undefined, isAnonymous: boolean) => {
+  const handleRun = async (isAnonymous: boolean) => {
     if (!selectedCenter || !token) {
       toast.error("Select a center and insert the token.");
       return;
@@ -73,7 +78,7 @@ export default function DataQualityApp() {
     setLoading(true);
 
     try {
-      const center = ListOfCenters.find((c) => c.name === centerName);
+      const center = ListOfCenters.find((c) => c.id === selectedCenter.id);
       if (!center) {
         throw new Error("Problems finding the center.");
       }
@@ -149,7 +154,12 @@ export default function DataQualityApp() {
 
   // Scaricamento Anonymous Data
   const downloadResultAnonymous = () => {
-    DownloadAnonymizedData(selectedCenter, CurrentAnalysis, resultAnonymous);
+    if (!selectedCenter) {
+      console.error("Error during the download.");
+      toast.error("Error during the download.");
+    } else {
+      DownloadAnonymizedData(selectedCenter.id, CurrentAnalysis, resultAnonymous);
+    }
   }
 
 
@@ -215,7 +225,7 @@ export default function DataQualityApp() {
       <div className="raw">
         <div className="partofRaw">
           <Select
-            value={selectedCenter}
+            value={selectedCenter?.id ?? "empty"}
             onValueChange={handleCenterChange}
             disabled={loading}
           >
@@ -223,11 +233,11 @@ export default function DataQualityApp() {
               <SelectValue placeholder="Select center" />
             </SelectTrigger>
             <SelectContent side="bottom" align="start">
-              <SelectItem key="" value="">
+              <SelectItem key="empty" value="empty">
                 - Select center -
               </SelectItem>
               {sortedCenters.map((c) => (
-                <SelectItem key={c.name} value={c.name}>
+                <SelectItem key={c.id} value={c.id}>
                   {c.name}
                 </SelectItem>
               ))}
@@ -265,7 +275,7 @@ export default function DataQualityApp() {
             className="manageButton"
             onClick={() => {
               setResultQuality2(null);
-              handleRun(selectedCenter, false)
+              handleRun(false)
             }}
             disabled={loading}
           >
@@ -278,7 +288,7 @@ export default function DataQualityApp() {
             className="manageButton"
             onClick={() => {
               setResultAnonymous2(null);
-              handleRun(selectedCenter, true)
+              handleRun(true)
             }}
             disabled={loading}
           >
@@ -305,12 +315,12 @@ export default function DataQualityApp() {
                 {!dimMobile && <span>✅</span>}
               </div>
               {
-                (cohortResults !== null && recordDataResults !== null) &&
+                (selectedCenter!==null && cohortResults!==null && recordDataResults!==null) &&
                 <div>
                   <ul className="infoResults">
                     <li className="scrollText"><b>Center:</b> {resultQuality2.centerName}</li>
                     <li className="scrollText"><b>Extraction Date:</b> {resultQuality2.extractionDate}</li>
-                    <li className="scrollText"><b>Name: </b> {CurrentAnalysis} - {selectedCenter}</li>
+                    <li className="scrollText"><b>Name: </b> {CurrentAnalysis} - {selectedCenter.name}</li>
                     <li className="scrollText"><b>Cohort: </b> {cohortResults.join(", ")}</li>
                   </ul>
                   <button
@@ -339,7 +349,7 @@ export default function DataQualityApp() {
                 </div>
               }
               {
-                (cohortResults === null || recordDataResults === null) &&
+                (selectedCenter===null || cohortResults===null || recordDataResults===null) &&
                 <ul className="infoResults">
                   <li className="scrollText">
                     <b>
@@ -367,12 +377,12 @@ export default function DataQualityApp() {
                 {!dimMobile && <span>✅</span>}
               </div>
               {
-                (cohortResults !== null && recordDataResults !== null) &&
+                (selectedCenter!==null && cohortResults!==null && recordDataResults!==null) &&
                 <div>
                   <ul className="infoResults">
                     <li className="scrollText"><b>Center:</b> {resultAnonymous2.centerName}</li>
                     <li className="scrollText"><b>Extraction Date:</b> {resultAnonymous2.extractionDate}</li>
-                    <li className="scrollText"><b>Name: </b> {CurrentAnalysis} - {selectedCenter}</li>
+                    <li className="scrollText"><b>Name: </b> {CurrentAnalysis} - {selectedCenter.name}</li>
                     <li className="scrollText"><b>Cohort: </b> {cohortResults.join(", ")}</li>
                   </ul>
                   <button
@@ -401,7 +411,7 @@ export default function DataQualityApp() {
                 </div>
               }
               {
-                (cohortResults === null || recordDataResults === null) &&
+                (selectedCenter===null || cohortResults===null || recordDataResults===null) &&
                 <ul className="infoResults">
                   <li className="scrollText">
                     <b>
