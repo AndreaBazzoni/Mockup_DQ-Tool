@@ -5,10 +5,16 @@ import type { REDCapRecord } from "@/utils/types";
 export function DownloadAnonymizedData(centerId: string, CurrentAnalysis: string, resultAnonymous: REDCapRecord[][]) {
   // Generate a timestamp for the file name
   const now = new Date();
-  const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+  // Anno = presente
+  // const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  // Anno = assente
+  const dateString = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
   const hourString = `${String(now.getHours()).padStart(2, '0')}`;
   const minuteString = `${String(now.getMinutes()).padStart(2, '0')}`;
   const secondString = `${String(now.getSeconds()).padStart(2, '0')}`;
+
   const timestamp = `${dateString}_${hourString}${minuteString}${secondString}`;
 
   // Construct the file name

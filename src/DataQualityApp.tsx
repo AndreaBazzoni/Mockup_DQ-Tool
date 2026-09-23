@@ -17,8 +17,8 @@ export default function DataQualityApp() {
   const [loading, setLoading] = useState(false);
   const [cohortResults, setCohortResults] = useState<string[] | null>(null);
   const [recordDataResults, setRecordDataResults] = useState<REDCapRecord[][] | null>(null);
-  const [resultQuality, setResultQuality] = useState<any>(null);
-  const [resultAnonymous, setResultAnonymous] = useState<any>(null);
+  const [resultQuality, setResultQuality] = useState<REDCapRecord[][] | null>(null);
+  const [resultAnonymous, setResultAnonymous] = useState<REDCapRecord[][] | null>(null);
   const [showShareQuality, setShowShareQuality] = useState(false);
   const [showShareAnonymous, setShowShareAnonymous] = useState(false);
 
@@ -110,7 +110,8 @@ export default function DataQualityApp() {
         if (qualityResult === null) {
           throw new Error("Failed during Data Quality.");
         }
-        setResultQuality(qualityResult);
+        const qualityArray: REDCapRecord[][] = Object.values(qualityResult);
+        setResultQuality(qualityArray);
         // ---------------------------
         // ---------------------------
         // ---------------------------
@@ -120,7 +121,8 @@ export default function DataQualityApp() {
         if (anonymousResult === null) {
           throw new Error("Failed during Data Anonymization.");
         }
-        setResultAnonymous(anonymousResult);
+        const anonymousArray: REDCapRecord[][] = Object.values(anonymousResult);
+        setResultAnonymous(anonymousArray);
       }
 
       toast.success(isAnonymous ? "Anonimizzazione completata!" : "Data Quality completata!");
@@ -139,12 +141,13 @@ export default function DataQualityApp() {
 
   // Scaricamento Anonymous Data
   const downloadResult = (isAnonymous: boolean) => {
-    if (!selectedCenter || resultQuality===null || resultAnonymous===null) {
+    if (!selectedCenter) {
       console.error("Error during the download.");
       toast.error("Error during the download.");
+      return;
     } else {
       // Implementazione del download
-      if (!isAnonymous) {
+      if (!isAnonymous && resultQuality!==null) {
         // ---------------------------
         // ---- !!!! DA FARE !!!! ----
         // ---------------------------
@@ -152,8 +155,12 @@ export default function DataQualityApp() {
         // ---------------------------
         // ---------------------------
         // ---------------------------
-      } else {
+      } else if (isAnonymous && resultAnonymous!==null) {
         DownloadAnonymizedData(selectedCenter.id, CurrentAnalysis, resultAnonymous);
+      } else {
+        console.error("Error during the download.");
+        toast.error("Error during the download.");
+        return;
       }
     }
   }
@@ -316,6 +323,7 @@ export default function DataQualityApp() {
                       key={`${selectedCenter.id}`}
                       center={selectedCenter}
                       title="quality"
+                      result={resultQuality}
                       onClose={() => setShowShareQuality(false)} />
                   )}
                 </div>
@@ -376,6 +384,7 @@ export default function DataQualityApp() {
                       key={`${selectedCenter.id}`}
                       center={selectedCenter}
                       title="anonymous"
+                      result={resultAnonymous}
                       onClose={() => setShowShareAnonymous(false)} />
                   )}
                 </div>

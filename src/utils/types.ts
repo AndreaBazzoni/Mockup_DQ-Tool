@@ -21,5 +21,6 @@ export interface AnonCheck {
 export interface ShareModalProps {
   center: Center;
   title: string;
+  result: REDCapRecord[][];
   onClose: () => void;
 }

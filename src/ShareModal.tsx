@@ -9,7 +9,7 @@ import type { Center, REDCapRecord, ShareModalProps } from "@/utils/types";
 const handleShareResult = async (
   center: Center,
   title: string,
-  recordData: REDCapRecord[][]
+  result: REDCapRecord[][]
 ): Promise<void> => {
   try {
     // Costruisco la URL
@@ -23,33 +23,30 @@ const handleShareResult = async (
     else {
       console.error(`Unknown title "${title}". Cannot send data to EURACAN server.`);
       alert(`Unknown title "${title}". Cannot send data to EURACAN server.`);
+      return;
+    }
+    // File creation
+    const file = createXlsxFile(result);
+    // Upload diretto su S3
+    await shareResultsToS3(presignedUrl, file);
+    // Conferma all'utente
+    if (title==="quality") {
+      toast.success("Sharing di Data Quality avvenuta con successo!");
+    }
+    if (title==="anonymous") {
+      toast.success("Sharing di Anonymous Data avvenuta con successo!");
     }
 
-    // Upload diretto su S3
-    await shareResultToS3(presignedUrl, file);
-
-    // Conferma all'utente
-    showToast("Risultato condiviso correttamente.", "success");
-
-  } catch (err) {
-    // 4. Errore in uno dei due passaggi
-    console.error(err);
-
-    showToast(
-      err instanceof Error
-        ? err.message
-        : "Errore durante la condivisione del risultato.",
-      "error"
-    );
+  } catch (err: any) {
+    console.error(err.message || "Error during the Data Sharing.");
+    toast.error(err.message || "Error during the Data Sharing.");
   }
 };
 
 
-export default function ShareModal({ center, title, onClose }: ShareModalProps) {
+export default function ShareModal({ center, title, result, onClose }: ShareModalProps) {
 
   const handleEURACAN = () => {
-    // Implement the logic to send data to the EURACAN server
-    /* -- HERE -- */
 
     // Data Quality
     if (title==="quality") 
@@ -61,7 +58,7 @@ export default function ShareModal({ center, title, onClose }: ShareModalProps) 
     // Anonymous Data
     else if (title==="anonymous")
     {
-      handleShareResult(center, title, file);
+      handleShareResult(center, title, result);
     }
 
     // Unknown title
@@ -70,10 +67,10 @@ export default function ShareModal({ center, title, onClose }: ShareModalProps) 
       console.error(`Unknown title "${title}". Cannot send data to EURACAN server.`);
       alert(`Unknown title "${title}". Cannot send data to EURACAN server.`);
     }
-    /* ---------- */
     
     onClose(); // Close the modal after sending
   }
+
 
   return (
     <div 
@@ -111,5 +108,4 @@ export default function ShareModal({ center, title, onClose }: ShareModalProps) 
       </div>
     </div>
   );
-
 }
