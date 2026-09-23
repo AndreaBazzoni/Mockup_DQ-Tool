@@ -1,26 +1,6 @@
-import * as XLSX from 'xlsx';
+import { createXlsxFile } from "@/utils/createFile";
 import type { REDCapRecord } from "@/utils/types";
 
-
-export const createAnonXlsx = (recordData: REDCapRecord[][]) => {
-	//recordData è un oggetto che facciamo diventare array di oggetti
- 	const rows = Object.values(recordData).flat();
-
-	// Create a new workbook and a worksheet
-	const workbook = XLSX.utils.book_new();
-	const worksheet = XLSX.utils.json_to_sheet(rows);
-
-	// Append the worksheet to the workbook
-	XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-
-	// Generate a binary string from the workbook
-	const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-
-	// Create a blob from the binary string
-	const dataBlob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-
-	return dataBlob;
-}
 
 export function DownloadAnonymizedData(centerId: string, CurrentAnalysis: string, resultAnonymous: REDCapRecord[][]) {
   // Generate a timestamp for the file name
@@ -35,7 +15,7 @@ export function DownloadAnonymizedData(centerId: string, CurrentAnalysis: string
   const fileName = `${CurrentAnalysis}_${centerId}_${timestamp}.xlsx`;
 
   // Creation of the Blob (Binary Large Object)
-  const dataBlob = createAnonXlsx(resultAnonymous);
+  const dataBlob = createXlsxFile(resultAnonymous);
 
   // Create a link element to download the file
   const urlBlob = window.URL.createObjectURL(dataBlob);

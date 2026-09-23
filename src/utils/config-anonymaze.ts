@@ -15,7 +15,6 @@ export const anonChecks: AnonCheck[] = [
 		precParams: null,
 		func: removeFieldCheck,
 		params: ["bl_record_id"],
-
 	},
 	{
 		name: 'anon_2',

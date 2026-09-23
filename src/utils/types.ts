@@ -17,3 +17,9 @@ export interface AnonCheck {
   func: (data: REDCapRecord[], ...args: any[]) => REDCapRecord[];
   params: any[];
 }
+
+export interface ShareModalProps {
+  center: Center;
+  title: string;
+  onClose: () => void;
+}

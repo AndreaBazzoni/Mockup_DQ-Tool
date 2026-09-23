@@ -1,7 +1,11 @@
 import type { REDCapRecord } from "@/utils/types";
 
 
-export const fetchFileRepository = async (centerUrl: string, token: string, folder_id: string) => {
+export const fetchFileRepository = async (
+  centerUrl: string,
+  token: string,
+  folder_id: string
+) => {
   const formdata = new FormData();
   formdata.append("token", token);
   formdata.append("content", "fileRepository");
@@ -46,7 +50,11 @@ export const fetchFileRepository = async (centerUrl: string, token: string, fold
 };
 
 
-export const getCohort = async (centerUrl: string, token: string, doc_id: string) => {
+export const getCohort = async (
+  centerUrl: string,
+  token: string,
+  doc_id: string
+) => {
   const formdata = new FormData();
   formdata.append("token", token);
   formdata.append("content", "fileRepository");
@@ -95,7 +103,10 @@ export const getCohort = async (centerUrl: string, token: string, doc_id: string
 };
 
 
-export const fetchCohort = async (centerUrl: string, token: string) => {
+export const fetchCohort = async (
+  centerUrl: string,
+  token: string
+) => {
   const formdata = new FormData();
   formdata.append("token", token);
   formdata.append("content", "record");
@@ -145,7 +156,12 @@ export const fetchCohort = async (centerUrl: string, token: string) => {
 };
 
 
-export const createFileCohort = async (centerUrl: string, token: string, file: File, dirId: string) => {
+export const createFileCohort = async (
+  centerUrl: string,
+  token: string,
+  file: File,
+  dirId: string
+) => {
   const formdata = new FormData();
   formdata.append("token", token);
   formdata.append("content", "fileRepository");
@@ -181,7 +197,12 @@ export const createFileCohort = async (centerUrl: string, token: string, file: F
 };
 
 
-export const createDirectory = async (centerUrl: string, token: string, name: string, nameDir: string) => {
+export const createDirectory = async (
+  centerUrl: string,
+  token: string,
+  name: string,
+  nameDir: string
+) => {
   const formdata = new FormData();
   formdata.append("token", token);
   formdata.append("content", "fileRepository");
