@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { DoDataQuality } from "@/DoDataQuality";
 import { DoAnonymizedData } from "@/DoAnonymizedData";
+import { DownloadDataQuality } from "@/DownloadDataQuality";
 import { DownloadAnonymizedData } from "@/DownloadAnonymizedData";
 import ShareModal from "@/ShareModal";
 import { ListOfCenters, CurrentAnalysis } from "@/ManageCenters";
@@ -152,13 +153,7 @@ export default function DataQualityApp() {
     } else {
       // Implementazione del download
       if (!isAnonymous && resultQuality!==null) {
-        // ---------------------------
-        // ---- !!!! DA FARE !!!! ----
-        // ---------------------------
-        DownloadAnonymizedData(selectedCenter.id, CurrentAnalysis, resultQuality);
-        // ---------------------------
-        // ---------------------------
-        // ---------------------------
+        DownloadDataQuality(selectedCenter.id, CurrentAnalysis, resultQuality);
       } else if (isAnonymous && resultAnonymous!==null) {
         DownloadAnonymizedData(selectedCenter.id, CurrentAnalysis, resultAnonymous);
       } else {
