@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Eye, EyeOff, XCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner";
+import { DoDataQuality } from "@/DoDataQuality";
 import { DoAnonymizedData } from "@/DoAnonymizedData";
 import { DownloadAnonymizedData } from "@/DownloadAnonymizedData";
 import ShareModal from "@/ShareModal";
@@ -103,18 +104,21 @@ export default function DataQualityApp() {
 
       if (!isAnonymous) {
         // -- Data Quality --
-        // ---------------------------
-        // ---- !!!! DA FARE !!!! ----
-        // ---------------------------
-        const qualityResult = await DoAnonymizedData(recordData);
-        if (qualityResult === null) {
+        if (cohortResults!==null) {
+          let qualityResult = [];
+          for (const recordId of cohortResults) {
+            let recordIdNumber = Number(recordId);
+            let dq = await DoDataQuality(recordData[recordIdNumber]);
+            qualityResult[recordIdNumber] = dq;
+          }
+          if (qualityResult === null) {
+            throw new Error("Failed during Data Quality.");
+          }
+          setResultQuality(qualityResult);
+        } else {
           throw new Error("Failed during Data Quality.");
         }
-        const qualityArray: REDCapRecord[][] = Object.values(qualityResult);
-        setResultQuality(qualityArray);
-        // ---------------------------
-        // ---------------------------
-        // ---------------------------
+
       } else {
         // -- Anonymous Data --
         const anonymousResult = await DoAnonymizedData(recordData);

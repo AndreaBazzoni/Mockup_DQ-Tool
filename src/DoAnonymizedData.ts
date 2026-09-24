@@ -6,6 +6,8 @@ export const DoAnonymizedData = async (recordDataResults: REDCapRecord[][]) => {
   // Inizializzo il vettore risultante e il conteggio dei pazienti
   let anonymizedResults: Record<number, REDCapRecord[]> = {};
   let patientCounter = 1;
+
+  // Chiave per l'anonimizzazione
   let secret = "prova_segreto";
 
   try {
