@@ -14,11 +14,11 @@ const handleShareResult = async (
   try {
     // Costruisco la URL
     let presignedUrl;
-    if (title==="quality") {
-      presignedUrl = `https://test-ehedq-upload-public.s3.amazonaws.com/export_quality_${CurrentAnalysis}-${center.id}`;
+    if (title === "quality") {
+      presignedUrl = `https://test-ehedq-upload-public.s3.amazonaws.com/DQ_${CurrentAnalysis}-${center.id}.xlsx`;
     }
-    else if (title==="anonymous") {
-      presignedUrl = `https://test-ehedq-upload-public.s3.amazonaws.com/export_quality_${CurrentAnalysis}-${center.id}`;
+    else if (title === "anonymous") {
+      presignedUrl = `https://test-ehedq-upload-public.s3.amazonaws.com/EXPORT_${CurrentAnalysis}-${center.id}.xlsx`;
     }
     else {
       console.error(`Unknown title "${title}". Cannot send data to EURACAN server.`);
@@ -30,10 +30,10 @@ const handleShareResult = async (
     // Upload diretto su S3
     await shareResultsToS3(presignedUrl, file);
     // Conferma all'utente
-    if (title==="quality") {
+    if (title === "quality") {
       toast.success("Sharing di Data Quality avvenuta con successo!");
     }
-    if (title==="anonymous") {
+    if (title === "anonymous") {
       toast.success("Sharing di Anonymous Data avvenuta con successo!");
     }
 
@@ -49,14 +49,14 @@ export default function ShareModal({ center, title, result, onClose }: ShareModa
   const handleEURACAN = () => {
 
     // Data Quality
-    if (title==="quality") 
+    if (title === "quality") 
     {
       console.log(`Sending quality data for center "${center.name}" to EURACAN server.`);
       alert(`Sending quality data for center "${center.name}" to EURACAN server.`);
     }
 
     // Anonymous Data
-    else if (title==="anonymous")
+    else if (title === "anonymous")
     {
       handleShareResult(center, title, result);
     }

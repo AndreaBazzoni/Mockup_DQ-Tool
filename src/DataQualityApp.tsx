@@ -329,7 +329,7 @@ export default function DataQualityApp() {
                 </div>
               }
               {
-                (selectedCenter===null || cohortResults===null || recordDataResults===null) &&
+                (selectedCenter === null || cohortResults === null || recordDataResults === null) &&
                 <ul className="infoResults">
                   <li className="scrollText">
                     <b>
@@ -390,7 +390,7 @@ export default function DataQualityApp() {
                 </div>
               }
               {
-                (selectedCenter===null || cohortResults===null || recordDataResults===null) &&
+                (selectedCenter === null || cohortResults === null || recordDataResults === null) &&
                 <ul className="infoResults">
                   <li className="scrollText">
                     <b>
