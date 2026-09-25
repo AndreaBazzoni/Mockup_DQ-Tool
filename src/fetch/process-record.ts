@@ -2,6 +2,7 @@ import { anonChecks } from "@/utils/config-anonymaze";
 import type { REDCapRecord } from "@/utils/types";
 
 
+// Funzione per anonimizzare i Dati
 export const anonymazeData = (
   data: REDCapRecord[],
   pazienteId: number,

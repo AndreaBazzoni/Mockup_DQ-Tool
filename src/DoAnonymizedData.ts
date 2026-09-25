@@ -2,7 +2,9 @@ import { anonymazeData } from '@/fetch/process-record';
 import type { REDCapRecord } from "@/utils/types";
 
 
-export const DoAnonymizedData = async (recordDataResults: REDCapRecord[][]) => {
+export const DoAnonymizedData = async (
+  recordDataResults: REDCapRecord[][]
+) => {
   // Inizializzo il vettore risultante e il conteggio dei pazienti
   let anonymizedResults: Record<number, REDCapRecord[]> = {};
   let patientCounter = 1;

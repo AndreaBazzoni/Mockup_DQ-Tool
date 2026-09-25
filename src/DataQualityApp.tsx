@@ -9,7 +9,7 @@ import { DownloadAnonymizedData } from "@/DownloadAnonymizedData";
 import ShareModal from "@/ShareModal";
 import { ListOfCenters, CurrentAnalysis } from "@/ManageCenters";
 import { ManageCohort } from "@/ManageCohort";
-import type { Center, REDCapRecord } from "@/utils/types";
+import type { Center, REDCapRecord, DQRecord } from "@/utils/types";
 
 
 export default function DataQualityApp() {
@@ -19,7 +19,7 @@ export default function DataQualityApp() {
   const [loading, setLoading] = useState(false);
   const [cohortResults, setCohortResults] = useState<string[] | null>(null);
   const [recordDataResults, setRecordDataResults] = useState<REDCapRecord[][] | null>(null);
-  const [resultQuality, setResultQuality] = useState<REDCapRecord[][] | null>(null);
+  const [resultQuality, setResultQuality] = useState<Record<string, DQRecord> | null>(null);
   const [resultAnonymous, setResultAnonymous] = useState<REDCapRecord[][] | null>(null);
   const [showShareQuality, setShowShareQuality] = useState(false);
   const [showShareAnonymous, setShowShareAnonymous] = useState(false);
@@ -105,20 +105,17 @@ export default function DataQualityApp() {
 
       if (!isAnonymous) {
         // -- Data Quality --
-        if (cohortResults!==null) {
-          let qualityResult = [];
-          for (const recordId of cohortResults) {
-            let recordIdNumber = Number(recordId);
-            let dq = await DoDataQuality(recordData[recordIdNumber]);
-            qualityResult[recordIdNumber] = dq;
-          }
-          if (qualityResult === null) {
-            throw new Error("Failed during Data Quality.");
-          }
-          setResultQuality(qualityResult);
-        } else {
+        if (cohort===null) throw new Error("Failed during Data Quality.");
+        const qualityResult: Record<string, DQRecord> = {};
+        for (let i = 0; i < cohort.length; i++) {
+          let dq = await DoDataQuality(recordData[i], selectedCenter.url, token);
+          qualityResult[cohort[i]] = dq;
+        }
+        if (qualityResult === null) {
           throw new Error("Failed during Data Quality.");
         }
+        setResultQuality(qualityResult);
+        console.log("AAAA: ", qualityResult)
 
       } else {
         // -- Anonymous Data --
@@ -144,7 +141,7 @@ export default function DataQualityApp() {
   };
 
 
-  // Scaricamento Anonymous Data
+  // Scaricamento (Data Quality o Anonymous Data)
   const downloadResult = (isAnonymous: boolean) => {
     if (!selectedCenter) {
       console.error("Error during the download.");
@@ -153,7 +150,7 @@ export default function DataQualityApp() {
     } else {
       // Implementazione del download
       if (!isAnonymous && resultQuality!==null) {
-        DownloadDataQuality(selectedCenter.id, CurrentAnalysis, resultQuality);
+        //DownloadDataQuality(selectedCenter.id, CurrentAnalysis, resultQuality);
       } else if (isAnonymous && resultAnonymous!==null) {
         DownloadAnonymizedData(selectedCenter.id, CurrentAnalysis, resultAnonymous);
       } else {

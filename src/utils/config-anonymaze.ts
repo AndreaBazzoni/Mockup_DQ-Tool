@@ -68,7 +68,6 @@ export const anonChecks: AnonCheck[] = [
 			"spr_surg_date_liver", "spr_surg_date_bone", "spr_surg_date_soft", "spr_surg_date_lymph", "spr_surg_date_serosal",
 			"spr_surg_date_oth", "spr_pathol_date", "spr_dod", "lsu_status_date", "lsu_dod", "lsu_clinical_trials_dstart",
 			"lsu_clinical_trials_dend", "lsu_clinical_trials_dstart_2", "lsu_clinical_trials_dend_2", "lsu_clinical_trials_dstart_3", "lsu_clinical_trials_dend_3"]],
-
 	},
 	{
 		name: 'anon_3',

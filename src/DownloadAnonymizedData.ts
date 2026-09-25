@@ -2,7 +2,11 @@ import { createXlsxFile } from "@/utils/createFile";
 import type { REDCapRecord } from "@/utils/types";
 
 
-export function DownloadAnonymizedData(centerId: string, CurrentAnalysis: string, resultAnonymous: REDCapRecord[][]) {
+export function DownloadAnonymizedData(
+  centerId: string,
+  CurrentAnalysis: string,
+  resultAnonymous: REDCapRecord[][]
+) {
   // Generate a timestamp for the file name
   const now = new Date();
 
