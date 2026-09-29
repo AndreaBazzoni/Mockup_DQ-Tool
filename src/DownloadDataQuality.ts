@@ -1,4 +1,4 @@
-import { createXlsxFile } from "@/utils/createFile";
+import { createExcelDQ } from "@/utils/createFile";
 import { obtainParamsExcelDQ } from "@/utils/obtainParamsExcelDQ";
 import type { Center, DQRecord, REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
 
@@ -10,7 +10,7 @@ export async function DownloadDataQuality(
   instrumentsVsEvents: REDCapInstrVsEventsField[],
   repeatings: REDCapRepeatingsField[],
   CurrentAnalysis: string,
-  resultAnonymous: Record<string, DQRecord>
+  resultQuality: Record<string, DQRecord>
 ) {
   // Generate a timestamp for the file name
   const now = new Date();
@@ -34,7 +34,7 @@ export async function DownloadDataQuality(
   const {unknownSummaryState, timelineSummaryState, baselineCountersState, diseaseExtensionCountersState} = rslt;
 
   // Creation of the Blob (Binary Large Object)
-  const dataBlob = createXlsxFile(resultAnonymous);
+  const dataBlob = createExcelDQ(resultQuality, metadata, unknownSummaryState, timelineSummaryState, baselineCountersState, diseaseExtensionCountersState);
 
   // Create a link element to download the file
   const urlBlob = window.URL.createObjectURL(dataBlob);

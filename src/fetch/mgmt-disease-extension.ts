@@ -1,8 +1,25 @@
 import type { REDCapRecord } from "@/utils/types";
 
 
+interface DiseaseExtensionCounter {
+  diagnosisYear: number;
+  baselineDiseaseExtension: string;
+  currentDiseaseExtension: string;
+  count: number;
+}
+type DiseaseExtensionCounters = Record<string,DiseaseExtensionCounter>;
+
+interface DiseaseExtensionPatient {
+  record: string;
+  diagnosisYear: string;
+  baselineDiseaseExtension: string;
+  currentDiseaseExtension: string;
+}
+type DiseaseExtensionPatients = Record<string,DiseaseExtensionPatient>;
+
+
 // Funzione per aggiornare la Disease Extension Patients
-export function updateDiseaseExtensionPatients(diseaseExtensionPatients: any, timeline: any) {
+export function updateDiseaseExtensionPatients(diseaseExtensionPatients: DiseaseExtensionPatients, timeline: any) {
   if (!timeline.length) {
     return null;
   }
@@ -32,7 +49,7 @@ export function updateDiseaseExtensionPatients(diseaseExtensionPatients: any, ti
 
 
 // Funzione per aggiornare la Disease Extension Counters
-export function updateDiseaseExtensionCounters(diseaseExtensionCounters: any, timeline: any) {
+export function updateDiseaseExtensionCounters(diseaseExtensionCounters: DiseaseExtensionCounters, timeline: any) {
   if (!timeline.length) {
     return null;
   }
@@ -64,6 +81,47 @@ export function updateDiseaseExtensionCounters(diseaseExtensionCounters: any, ti
   }
 
   diseaseExtensionCounters[key].count++;
+}
+
+
+export function aggregateDiseaseExtensionCounters(diseaseExtensionCounters: DiseaseExtensionCounters) {
+
+  const aggregated: DiseaseExtensionCounters = {};
+
+  const FOLLOWUP_EXTENSION_MAP: Record<string, string> = {
+    "unifocal_arm_1, unifocal_followup": "Unifocal",
+    "unifocal_arm_1, unifocal_local_recurrence": "Unifocal",
+    //"unifocal_arm_1, unifocal_distant_metastases": "Distant metastases",
+    "unifocal_arm_1, unifocal_distant_metastases": "Systemic metastases",
+    "locoregional_arm_1, locoregional_followup": "Locoregional",
+    //"locoregional_arm_1, locoregional_progression": "Distant metastases",
+    "locoregional_arm_1, locoregional_progression": "Systemic metastases",
+    "systemic_metastase_arm_1, systemic_metastases_followup": "Systemic metastases",
+    "systemic_metastase_arm_1, systemic_metastases_progression": "Systemic metastases"
+  };
+
+  for (const item of Object.values(diseaseExtensionCounters)) {
+
+    const aggregatedCurrentExtension =
+      FOLLOWUP_EXTENSION_MAP[item.currentDiseaseExtension] ??
+      item.currentDiseaseExtension;
+
+    const aggregatedKey =
+      `${item.diagnosisYear}|||${item.baselineDiseaseExtension}|||${aggregatedCurrentExtension}`;
+
+    if (!aggregated[aggregatedKey]) {
+      aggregated[aggregatedKey] = {
+        diagnosisYear: item.diagnosisYear,
+        baselineDiseaseExtension: item.baselineDiseaseExtension,
+        currentDiseaseExtension: aggregatedCurrentExtension,
+        count: 0
+      };
+    }
+
+    aggregated[aggregatedKey].count += item.count;
+  }
+
+  return aggregated;
 }
 
 

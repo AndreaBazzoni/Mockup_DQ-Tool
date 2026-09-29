@@ -2,7 +2,7 @@ import { useState } from "react";
 import { fetchRecords } from "@/fetch/dq-fetch";
 import { getRecordData } from "@/fetch/redcap-fetch";
 import { initializeBaselineCounters,	processBaselineRecord } from '@/fetch/mgmt-complete-patients';
-import { buildDiseaseExtensionTimeline, updateDiseaseExtensionPatients, updateDiseaseExtensionCounters } from '@/fetch/mgmt-disease-extension';
+import { buildDiseaseExtensionTimeline, updateDiseaseExtensionPatients, updateDiseaseExtensionCounters, aggregateDiseaseExtensionCounters } from '@/fetch/mgmt-disease-extension';
 import { initializeFollowupStats, buildStatusTimeline, buildTimelineSummary, analyzeFollowupCompleteness } from '@/fetch/mgmt-followup';
 import { buildUnknownSummary, processUnknownRecord, extractUnknownCodes } from '@/fetch/mgmt-unknown';
 import type { REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
@@ -93,11 +93,14 @@ export const obtainParamsExcelDQ = async(
 
     const unknownSummary = buildUnknownSummary(unknownMatrix);
     setUnknownSummaryState(unknownSummary);
+
     const timelineSummary = buildTimelineSummary(allTimeline);
     setTimelineSummaryState(timelineSummary);
 
     setBaselineCountersState(baselineCounters);
-    setDiseaseExtensionCountersState(diseaseExtensionCounters);
+
+    const aggregatedDiseaseExtensionCounters = aggregateDiseaseExtensionCounters(diseaseExtensionCounters);
+    setDiseaseExtensionCountersState(aggregatedDiseaseExtensionCounters);
   }
     
   catch (err) {
