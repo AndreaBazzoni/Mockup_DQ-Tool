@@ -105,14 +105,13 @@ export default function DataQualityApp() {
 
       if (!isAnonymous) {
         // -- Data Quality --
-        if (cohort===null) throw new Error("Failed during Data Quality.");
         const qualityResult: Record<string, DQRecord> = {};
         for (let i = 0; i < cohort.length; i++) {
           let dq = await DoDataQuality(recordData[i], selectedCenter.url, token);
+          if (dq === null) {
+            throw new Error("Failed during Data Quality.");
+          }
           qualityResult[cohort[i]] = dq;
-        }
-        if (qualityResult === null) {
-          throw new Error("Failed during Data Quality.");
         }
         setResultQuality(qualityResult);
         console.log("AAAA: ", qualityResult)

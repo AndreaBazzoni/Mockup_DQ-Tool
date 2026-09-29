@@ -24,6 +24,16 @@ export interface AnonCheck {
   params: any[];
 }
 
+export interface QualCheck {
+  name: string;
+  desc: string;
+  prec: any | null;
+  precParams: any[] | null;
+  func: (recordData: any, ...throuples: any[]) => any;
+  params: any[];
+  vars: string[];
+}
+
 
 interface ShareModalQualityProps {
   center: Center;
@@ -73,4 +83,29 @@ export interface REDCapRepeatingsField {
   event_name: string;
   form_name: string;
   custom_form_label: string;
+}
+
+export interface DQContext {
+  data: REDCapRecord[];
+  metadata: REDCapMetadataField[];
+  instrumentsVsEvents: REDCapInstrVsEventsField[];
+  repeatingInstrumentsAndEvents: REDCapRepeatingsField[];
+}
+
+
+export interface BranchRefVar {
+  name: string,
+  instrument: string,
+  event: string | null
+}
+
+export interface VariableRef {
+  event: string | null;
+  instrument: string | null;
+  field: string | null;
+  instance: string | null;
+  orig: string;
+  realField: string;
+  realVar: string;
+  raw: string[] | null;
 }

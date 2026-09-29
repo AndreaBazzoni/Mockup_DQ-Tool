@@ -21,10 +21,11 @@ import {
 	dateCompareToFixedDateRepInstr,  //n:1
 	uniqueDateCompareToFixedDateRepInstr,  //1:1  (in realtà n:1, ma si presume che le n siano tutte uguali)
 } from '@/utils/function-dqchecks';
+import type { QualCheck } from './types';
 
 
 // Define a mapping of check names to function references and parameters
-export const dqChecks = [
+export const dqChecks: QualCheck[] = [
 /*	
 	{
 		name:'dq_1_0',
