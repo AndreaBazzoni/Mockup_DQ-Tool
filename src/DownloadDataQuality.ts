@@ -3,7 +3,7 @@ import { obtainParamsExcelDQ } from "@/utils/obtainParamsExcelDQ";
 import type { Center, DQRecord, REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
 
 
-export function DownloadDataQuality(
+export async function DownloadDataQuality(
   center: Center,
   token: string,
   metadata: REDCapMetadataField[],
@@ -30,7 +30,7 @@ export function DownloadDataQuality(
   const fileName = `${CurrentAnalysis}_${center.id}_${timestamp}.xlsx`;
 
   // Obtain parameters for file building
-  const rslt = obtainParamsExcelDQ(center.url, token, metadata, instrumentsVsEvents, repeatings);
+  const rslt = await obtainParamsExcelDQ(center.url, token, metadata, instrumentsVsEvents, repeatings);
   const {unknownSummaryState, timelineSummaryState, baselineCountersState, diseaseExtensionCountersState} = rslt;
 
   // Creation of the Blob (Binary Large Object)
