@@ -94,9 +94,9 @@ export interface DQContext {
 
 
 export interface BranchRefVar {
-  name: string,
-  instrument: string,
-  event: string | null
+  name: string;
+  instrument: string;
+  event: string | null;
 }
 
 export interface VariableRef {

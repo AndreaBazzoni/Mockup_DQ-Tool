@@ -141,3 +141,55 @@ export const getRepeatings = async (
   return result;
 };
 
+
+// fetch Records
+export const fetchRecords = async (
+  centerUrl: string,
+  token: string,
+  idAttr: string = "record_id"
+): Promise<string[]> => {
+  const formdata = new FormData();
+  formdata.append("token", token);
+  formdata.append("content", "record");
+  formdata.append("format", "json");
+  formdata.append("returnFormat", "json");
+  formdata.append("fields", idAttr);
+
+  const requestOptions: RequestInit = {
+    method: "POST",
+    body: formdata,
+    redirect: "follow",
+  };
+
+  let response: Response;
+  try {
+    response = await fetch(centerUrl, requestOptions);
+  } catch (err) {
+    if (err instanceof TypeError) {
+      throw new Error("Impossible to contact REDCap Server.");
+    }
+    throw err;
+  }
+  const resultText = await response.text();
+
+  // N.B.: { response.ok = true } solo se status = 200÷299
+  if (!response.ok) {
+    if (response.status === 403) {
+      throw new Error("Invalid token or insufficient permissions.");
+    }
+    throw new Error(`REDCap error (status ${response.status}): ${resultText}`);
+  }
+
+  let recordsRaw: Record<string, string>[];
+  try {
+    recordsRaw = JSON.parse(resultText);
+  } catch {
+    throw new Error("Impossible to fetch Records.");
+  }
+  const records: string[] = recordsRaw.map((record: any) => record[idAttr]);
+
+  // Elimino i duplicati
+  const uniqueRecords: string[] = [...new Set(records)];
+
+	return uniqueRecords;
+};

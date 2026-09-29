@@ -9,7 +9,8 @@ import { DownloadAnonymizedData } from "@/DownloadAnonymizedData";
 import ShareModal from "@/ShareModal";
 import { ListOfCenters, CurrentAnalysis } from "@/ManageCenters";
 import { ManageCohort } from "@/ManageCohort";
-import type { Center, REDCapRecord, DQRecord } from "@/utils/types";
+import { getMetadata, getInstrVsEvents, getRepeatings } from "@/fetch/dq-fetch";
+import type { Center, REDCapRecord, DQRecord, REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
 
 
 export default function DataQualityApp() {
@@ -23,6 +24,9 @@ export default function DataQualityApp() {
   const [resultAnonymous, setResultAnonymous] = useState<REDCapRecord[][] | null>(null);
   const [showShareQuality, setShowShareQuality] = useState(false);
   const [showShareAnonymous, setShowShareAnonymous] = useState(false);
+  const [metadata, setMetadata] = useState<REDCapMetadataField[]>([]);
+  const [instrumentsVsEvents, setInstrumentsVsEvents] = useState<REDCapInstrVsEventsField[]>([]);
+  const [repeatingInstrumentsAndEvents, setRepeatingInstrumentsAndEvents] = useState<REDCapRepeatingsField[]>([]);
 
 
   // Dimensioni finestra
@@ -45,7 +49,8 @@ export default function DataQualityApp() {
     const center = ListOfCenters.find(center => (center.id === centerId));
     if (!center) {
       setSelectedCenter(null);
-    } else {
+    }
+    else {
       setSelectedCenter(center);
     }
     // Resetto token e risultati
@@ -67,7 +72,9 @@ export default function DataQualityApp() {
   };
 
 
+  // -------------
   // ---- RUN ----
+  // -------------
   const handleRun = async (isAnonymous: boolean) => {
     if (!selectedCenter || !token) {
       toast.error("Select a center and insert the token.");
@@ -89,7 +96,8 @@ export default function DataQualityApp() {
       if (cohortResults !== null && recordDataResults !== null) {
         cohort = cohortResults;
         recordData = recordDataResults;
-      } else {
+      }
+      else {
         const { cohort: cohortFetched, recordData: recordDataFetched } = await ManageCohort(center, token, CurrentAnalysis);
         setCohortResults(cohortFetched);
         setRecordDataResults(recordDataFetched);
@@ -101,23 +109,39 @@ export default function DataQualityApp() {
         throw new Error("Failed to fetch data.");
       }
 
-      // -- BRANCH --
+      // ---- BRANCH ----
 
       if (!isAnonymous) {
-        // -- Data Quality --
+        // ---- Data Quality ----
         const qualityResult: Record<string, DQRecord> = {};
+        // Chiamate API per ottenere i dati che mi servono
+          // Metadata
+        let metadataAPI = await getMetadata(selectedCenter.url, token);
+          // Instrument vs Event
+        let instrumentsVsEventsAPI = await getInstrVsEvents(selectedCenter.url, token);
+          // Repeatings
+        let repeatingInstrumentsAndEventsAPI = await getRepeatings(selectedCenter.url, token);
+        // Verifico che nessuno dei valori necessari sia nullo
+        if (metadataAPI === null || instrumentsVsEventsAPI === null || repeatingInstrumentsAndEventsAPI === null) {
+          throw new Error("Failed to fetch information for Data Quality.");
+        }
+        // Se nessuno dei valori è nullo, li salvo
+        setMetadata(metadataAPI);
+        setInstrumentsVsEvents(instrumentsVsEventsAPI);
+        setRepeatingInstrumentsAndEvents(repeatingInstrumentsAndEventsAPI);
+        // Inizio cicli DQ
         for (let i = 0; i < cohort.length; i++) {
-          let dq = await DoDataQuality(recordData[i], selectedCenter.url, token);
+          let dq = await DoDataQuality(recordData[i], metadataAPI, instrumentsVsEventsAPI, repeatingInstrumentsAndEventsAPI);
           if (dq === null) {
             throw new Error("Failed during Data Quality.");
           }
           qualityResult[cohort[i]] = dq;
         }
         setResultQuality(qualityResult);
-        console.log("AAAA: ", qualityResult)
-
-      } else {
-        // -- Anonymous Data --
+      }
+      
+      else {
+        // ---- Anonymous Data ----
         const anonymousResult = await DoAnonymizedData(recordData);
         if (anonymousResult === null) {
           throw new Error("Failed during Data Anonymization.");
@@ -126,6 +150,7 @@ export default function DataQualityApp() {
         setResultAnonymous(anonymousArray);
       }
 
+      // -- Completed --
       toast.success(isAnonymous ? "Anonimizzazione completata!" : "Data Quality completata!");
 
     } catch (err: any) {
@@ -138,6 +163,9 @@ export default function DataQualityApp() {
       setLoading(false);
     }
   };
+  // -------------
+  // ---- End ----
+  // -------------
 
 
   // Scaricamento (Data Quality o Anonymous Data)
@@ -146,13 +174,18 @@ export default function DataQualityApp() {
       console.error("Error during the download.");
       toast.error("Error during the download.");
       return;
-    } else {
+    }
+    else {
       // Implementazione del download
       if (!isAnonymous && resultQuality!==null) {
-        //DownloadDataQuality(selectedCenter.id, CurrentAnalysis, resultQuality);
-      } else if (isAnonymous && resultAnonymous!==null) {
-        DownloadAnonymizedData(selectedCenter.id, CurrentAnalysis, resultAnonymous);
-      } else {
+        // ---- Data Quality ----
+        DownloadDataQuality(selectedCenter, token, metadata, instrumentsVsEvents, repeatingInstrumentsAndEvents, CurrentAnalysis, resultQuality);
+      }
+      else if (isAnonymous && resultAnonymous!==null) {
+        // ---- Anonymous Data ----
+        DownloadAnonymizedData(selectedCenter, CurrentAnalysis, resultAnonymous);
+      }
+      else {
         console.error("Error during the download.");
         toast.error("Error during the download.");
         return;
@@ -168,7 +201,8 @@ export default function DataQualityApp() {
     // Implementazione della condivisione
     if (!isAnonymous) {
       setShowShareQuality(true);
-    } else {
+    }
+    else {
       setShowShareAnonymous(true);
     }
   }

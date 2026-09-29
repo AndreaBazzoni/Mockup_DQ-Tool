@@ -1,9 +1,9 @@
 import { createXlsxFile } from "@/utils/createFile";
-import type { REDCapRecord } from "@/utils/types";
+import type { Center, REDCapRecord } from "@/utils/types";
 
 
 export function DownloadAnonymizedData(
-  centerId: string,
+  center: Center,
   CurrentAnalysis: string,
   resultAnonymous: REDCapRecord[][]
 ) {
@@ -22,7 +22,7 @@ export function DownloadAnonymizedData(
   const timestamp = `${dateString}_${hourString}${minuteString}${secondString}`;
 
   // Construct the file name
-  const fileName = `${CurrentAnalysis}_${centerId}_${timestamp}.xlsx`;
+  const fileName = `${CurrentAnalysis}_${center.id}_${timestamp}.xlsx`;
 
   // Creation of the Blob (Binary Large Object)
   const dataBlob = createXlsxFile(resultAnonymous);

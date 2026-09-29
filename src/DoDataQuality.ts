@@ -1,6 +1,5 @@
-import { getMetadata, getInstrVsEvents, getRepeatings } from "@/fetch/dq-fetch";
 import { dqChecks } from "@/utils/config-dqchecks";
-import type { REDCapRecord, DQRecord, DQContext, REDCapMetadataField, BranchRefVar, VariableRef } from "@/utils/types";
+import type { REDCapRecord, DQRecord, DQContext, REDCapMetadataField, BranchRefVar, VariableRef, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
 
 
 export const getEventOfInstrument = (instrument: string, dqContext: DQContext) => {
@@ -528,7 +527,7 @@ const missingParams = (recordData: REDCapRecord[], parameters: any[] | null, dqC
 	}
 
 	// Estraggo tutti i nomi variabile da "params" o "precParams" (che non ha type fisso).
-	const vars = extractVarsFromParams2(parameters, dqContext);
+	const vars = extractVarsFromParams(parameters, dqContext);
 		
 	// Se arrivo qui ho un check/precheck da eseguire e params/precParams non nullo, quindi vars (array delle variabili da verificare) non dovrebbe mai essere null.
 	if (vars.length === 0){
@@ -579,7 +578,7 @@ const missingParams = (recordData: REDCapRecord[], parameters: any[] | null, dqC
 };
 
 
-const extractVarsFromParams2 = (parameters: any[], dqContext: DQContext) => {
+const extractVarsFromParams = (parameters: any[], dqContext: DQContext) => {
 	// Funzione per riconoscere quali sono le variabili dentro a params e precParams.
 	// NOTA: arrivare qui dopo aver eseguito checkVarsConsistency dovrebbe garantire che non ci siano typo/nomi sbagliati tra quelli inclusi in precParams e params.
 	// La funzione legge precParam ricorsivamente, qualsiasi sia la sua struttura, fino ad arrivare ai singoli token di tipo stringa.
@@ -611,25 +610,15 @@ const extractVarsFromParams2 = (parameters: any[], dqContext: DQContext) => {
 
 
 
+// -----------------------------
 // ---- FUNZIONE PRINCIPALE ----
+// -----------------------------
 export const DoDataQuality = async (
   recordData: REDCapRecord[],
-  centerUrl: string,
-  token: string
+  metadata: REDCapMetadataField[],
+  instrumentsVsEvents: REDCapInstrVsEventsField[],
+  repeatingInstrumentsAndEvents: REDCapRepeatingsField[]
 ): Promise<DQRecord | null> => {
-  // Chiamate API per ottenere i dati che mi servono
-    // Metadata
-	let metadata = await getMetadata(centerUrl, token);
-    // Instrument vs Event
-	let instrumentsVsEvents = await getInstrVsEvents(centerUrl, token);
-  	// Repeatings
-	let repeatingInstrumentsAndEvents = await getRepeatings(centerUrl, token);
-
-  // Verifico che nessuno dei valori necessari sia nullo
-  if (recordData === null || metadata === null || instrumentsVsEvents === null || repeatingInstrumentsAndEvents === null) {
-    return null;
-  }
-
   // Creo l'oggetto dqContext, il quale specifica il contesto su cui eseguirò la Data Quality
   const dqContext: DQContext = {
     data: recordData,
@@ -996,3 +985,7 @@ export const DoDataQuality = async (
     // return allResults;
 	return results;
 };
+
+// -------------
+// ---- END ----
+// -------------
