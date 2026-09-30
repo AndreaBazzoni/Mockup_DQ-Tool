@@ -30,6 +30,14 @@ export function updateDiseaseExtensionPatients(diseaseExtensionPatients: Disease
   // Ultimo elemento = disease extension più recente
   const latest = timeline[timeline.length - 1];
 
+  // ---- !AGGIUNTE! ----
+  if (baseline === undefined || latest === undefined) {
+    return null;
+  }
+  // Mi è capitato che baseline fosse undefined, quindi che mi ritornasse undefined.
+  // Non posso ovviamente estrarre valori da un parametro undefined.
+  // --------------------
+
   const diagnosisYear = latest.diagnosisYear;
   const baselineDiseaseExtension = baseline.diseaseExtension;
   const currentDiseaseExtension = latest.diseaseExtension;
@@ -59,6 +67,14 @@ export function updateDiseaseExtensionCounters(diseaseExtensionCounters: Disease
 
   // Ultimo elemento = disease extension più recente
   const latest = timeline[timeline.length - 1];
+
+  // ---- !AGGIUNTE! ----
+  if (baseline === undefined || latest === undefined) {
+    return null;
+  }
+  // Mi è capitato che baseline fosse undefined, quindi che mi ritornasse undefined.
+  // Non posso ovviamente estrarre valori da un parametro undefined.
+  // --------------------
 
   const diagnosisYear = latest.diagnosisYear;
   const baselineDiseaseExtension = baseline.diseaseExtension;

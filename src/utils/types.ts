@@ -40,6 +40,10 @@ interface ShareModalQualityProps {
   title: "quality";
   result: DQRecord;
   onClose: () => void;
+  token: string;
+  metadata: REDCapMetadataField[];
+  instrumentsVsEvents: REDCapInstrVsEventsField[];
+  repeatings: REDCapRepeatingsField[];
 }
 
 interface ShareModalAnonymousProps {

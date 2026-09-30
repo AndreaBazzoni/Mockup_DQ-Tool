@@ -1,24 +1,31 @@
+import { useState } from "react";
 import { XCircle, CloudUpload } from "lucide-react";
 import { toast } from "sonner";
 import { shareResultsToS3 } from "@/fetch/share-results";
-import { createXlsxFile, createTxtFile } from "@/utils/createFile";
+import { obtainParamsExcelDQ } from "@/utils/obtainParamsExcelDQ";
+import { createXlsxFile, createExcelDQ } from "@/utils/createFile";
 import { CurrentAnalysis } from "@/ManageCenters";
 import type { Center, REDCapRecord, DQRecord, ShareModalProps } from "@/utils/types";
+import type { REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
 
 
 const handleShareResultQuality = async (
   center: Center,
   title: string,
-  result: DQRecord
+  result: Record<string, DQRecord>,
+  timestamp: string,
+  token: string,
+  metadata: REDCapMetadataField[],
+  instrumentsVsEvents: REDCapInstrVsEventsField[],
+  repeatings: REDCapRepeatingsField[]
 ): Promise<void> => {
-  console.log(`Sending quality data for center "${center.name}" to EURACAN server.`);
-  alert(`Sending quality data for center "${center.name}" to EURACAN server.`);
   try {
     // Costruisco la URL
-    const presignedUrl = `https://test-ehedq-upload-public.s3.amazonaws.com/DQ_${CurrentAnalysis}-${center.id}.xlsx`;
+    const presignedUrl = `https://test-ehedq-upload-public.s3.amazonaws.com/DQ_${CurrentAnalysis}_${center.id}_${timestamp}.xlsx`;
     // File creation
-    // -------- CAMBIA --------
-    const file = createTxtFile(["1","2","3"], "prova");
+    const rslt = await obtainParamsExcelDQ(center.url, token, metadata, instrumentsVsEvents, repeatings);
+    const {unknownSummaryState, timelineSummaryState, baselineCountersState, diseaseExtensionCountersState} = rslt;
+    const file = createExcelDQ(result, metadata, unknownSummaryState, timelineSummaryState, baselineCountersState, diseaseExtensionCountersState);
     // ------------------------
     // Upload diretto su S3
     await shareResultsToS3(presignedUrl, file);
@@ -40,11 +47,12 @@ const handleShareResultQuality = async (
 const handleShareResultAnonymous = async (
   center: Center,
   title: string,
-  result: REDCapRecord[][]
+  result: REDCapRecord[][],
+  timestamp: string,
 ): Promise<void> => {
   try {
     // Costruisco la URL
-    const presignedUrl = `https://test-ehedq-upload-public.s3.amazonaws.com/EXPORT_${CurrentAnalysis}-${center.id}.xlsx`;
+    const presignedUrl = `https://test-ehedq-upload-public.s3.amazonaws.com/EXPORT_${CurrentAnalysis}_${center.id}_${timestamp}.xlsx`;
     // File creation
     const file = createXlsxFile(result);
     // Upload diretto su S3
@@ -64,38 +72,67 @@ const handleShareResultAnonymous = async (
 };
 
 
-export default function ShareModal({ center, title, result, onClose }: ShareModalProps) {
+export default function ShareModal(props: ShareModalProps) {
+  const { center, title, result, onClose } = props;
+  const [isSharing, setIsSharing] = useState(false);
 
-  const handleEURACAN = () => {
+  const handleEURACAN = async () => {
+    setIsSharing(true);
 
-    // Data Quality
-    if (title === "quality") 
-    {
-      handleShareResultQuality(center, title, result);
+    // -- Generazione Data/Ora per nome del file --
+    // Generate a timestamp for the file name
+    const now = new Date();
+
+    // Anno = presente
+    const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    // Anno = assente
+    //const dateString = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+    const hourString = `${String(now.getHours()).padStart(2, '0')}`;
+    const minuteString = `${String(now.getMinutes()).padStart(2, '0')}`;
+    const secondString = `${String(now.getSeconds()).padStart(2, '0')}`;
+
+    const timestamp = `${dateString}_${hourString}${minuteString}${secondString}`;
+    // --------------------------------------------
+
+
+    try {
+      // Data Quality
+      if (title === "quality") {
+        const { token, metadata, instrumentsVsEvents, repeatings } = props;
+        await handleShareResultQuality(center, title, result, timestamp, token, metadata, instrumentsVsEvents, repeatings);
+      }
+
+      // Anonymous Data
+      else if (title === "anonymous") {
+        await handleShareResultAnonymous(center, title, result, timestamp);
+      }
+
+      // Unknown title
+      else {
+        console.error("Cannot send data to EURACAN server.");
+        alert("Cannot send data to EURACAN server.");
+      }
     }
 
-    // Anonymous Data
-    else if (title === "anonymous")
-    {
-      handleShareResultAnonymous(center, title, result);
+    catch (err: any) {
+      console.error(err.message || "Error during the sharing.");
+      toast.error(err.message || "Error during the sharing.");
     }
 
-    // Unknown title
-    else
-    {
-      console.error("Cannot send data to EURACAN server.");
-      alert("Cannot send data to EURACAN server.");
+    finally {
+      setIsSharing(false);
+      onClose(); // Close the modal after sending
     }
-    
-    onClose(); // Close the modal after sending
   }
 
 
   return (
     <div 
       className="modalOverlay"
-      onClick={onClose}
+      onClick={isSharing ? undefined : onClose}
     >
+
       <div
         className="shareModal"
         onClick={(e) => e.stopPropagation()}
@@ -107,6 +144,7 @@ export default function ShareModal({ center, title, result, onClose }: ShareModa
           <button
             onClick={onClose}
             className="buttonX"
+            disabled={isSharing}
           >
             <XCircle size={24}/>
           </button>
@@ -114,6 +152,7 @@ export default function ShareModal({ center, title, result, onClose }: ShareModa
         <button
           className="shareOption"
           onClick={handleEURACAN}
+          disabled={isSharing}
         >
           <CloudUpload size={16} /> Send to server EURACAN
         </button>
@@ -121,10 +160,12 @@ export default function ShareModal({ center, title, result, onClose }: ShareModa
           id="closeModal"
           className="manageButton"
           onClick={onClose}
+          disabled={isSharing}
         >
           Cancel
         </button>
       </div>
+
     </div>
   );
 }

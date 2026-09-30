@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { fetchRecords } from "@/fetch/dq-fetch";
 import { getRecordData } from "@/fetch/redcap-fetch";
 import { initializeBaselineCounters,	processBaselineRecord } from '@/fetch/mgmt-complete-patients';
@@ -15,10 +14,8 @@ export const obtainParamsExcelDQ = async(
   instrumentsVsEvents: REDCapInstrVsEventsField[],
   repeatings: REDCapRepeatingsField[]
 ) => {
-	const [unknownSummaryState, setUnknownSummaryState] = useState({});
-	const [timelineSummaryState, setTimelineSummaryState] = useState({});
-  const [baselineCountersState, setBaselineCountersState] = useState({});
-	const [diseaseExtensionCountersState, setDiseaseExtensionCountersState] = useState({});
+  // Valori che devo ritornare (NON USARE useState!)
+  let unknownSummaryState, timelineSummaryState, baselineCountersState, diseaseExtensionCountersState;
 
   try {
     let fetchedRecords = await fetchRecords(centerUrl, token, 'bl_record_id');
@@ -92,15 +89,15 @@ export const obtainParamsExcelDQ = async(
     }
 
     const unknownSummary = buildUnknownSummary(unknownMatrix);
-    setUnknownSummaryState(unknownSummary);
+    unknownSummaryState = unknownSummary;
 
     const timelineSummary = buildTimelineSummary(allTimeline);
-    setTimelineSummaryState(timelineSummary);
+    timelineSummaryState = timelineSummary;
 
-    setBaselineCountersState(baselineCounters);
+    baselineCountersState = baselineCounters;
 
     const aggregatedDiseaseExtensionCounters = aggregateDiseaseExtensionCounters(diseaseExtensionCounters);
-    setDiseaseExtensionCountersState(aggregatedDiseaseExtensionCounters);
+    diseaseExtensionCountersState = aggregatedDiseaseExtensionCounters;
   }
     
   catch (err) {

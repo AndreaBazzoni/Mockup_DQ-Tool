@@ -2,7 +2,7 @@ import { createXlsxFile } from "@/utils/createFile";
 import type { Center, REDCapRecord } from "@/utils/types";
 
 
-export function DownloadAnonymizedData(
+export async function DownloadAnonymizedData(
   center: Center,
   CurrentAnalysis: string,
   resultAnonymous: REDCapRecord[][]
@@ -11,9 +11,9 @@ export function DownloadAnonymizedData(
   const now = new Date();
 
   // Anno = presente
-  // const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   // Anno = assente
-  const dateString = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  //const dateString = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
   const hourString = `${String(now.getHours()).padStart(2, '0')}`;
   const minuteString = `${String(now.getMinutes()).padStart(2, '0')}`;

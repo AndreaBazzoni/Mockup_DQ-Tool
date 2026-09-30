@@ -82,15 +82,14 @@ export default function DataQualityApp() {
     }
 
     setLoading(true);
+    let cohort: string[] | null;
+    let recordData: REDCapRecord[][] | null;
 
     try {
       const center = ListOfCenters.find((c) => c.id === selectedCenter.id);
       if (!center) {
         throw new Error("Problems finding the center.");
       }
-
-      let cohort: string[] | null;
-      let recordData: REDCapRecord[][] | null;
 
       // Verifico se ho già caricato cohort e recordData
       if (cohortResults !== null && recordDataResults !== null) {
@@ -108,6 +107,9 @@ export default function DataQualityApp() {
       if ((cohort === null) || (recordData === null)) {
         throw new Error("Failed to fetch data.");
       }
+
+      console.log("Cohort: ", cohort);
+      console.log("RecordData: ", recordData);
 
       // ---- BRANCH ----
 
@@ -158,8 +160,6 @@ export default function DataQualityApp() {
       toast.error(err.message || "Error during the operation.");
 
     } finally {
-      console.log("Cohort: ", cohortResults);
-      console.log("RecordData: ", recordDataResults);
       setLoading(false);
     }
   };
@@ -169,27 +169,33 @@ export default function DataQualityApp() {
 
 
   // Scaricamento (Data Quality o Anonymous Data)
-  const downloadResult = (isAnonymous: boolean) => {
+  const downloadResult = async (isAnonymous: boolean) => {
     if (!selectedCenter) {
       console.error("Error during the download.");
       toast.error("Error during the download.");
       return;
     }
-    else {
+
+    setLoading(true);
+
+    try {
       // Implementazione del download
-      if (!isAnonymous && resultQuality!==null) {
+      if (!isAnonymous && resultQuality !== null) {
         // ---- Data Quality ----
-        DownloadDataQuality(selectedCenter, token, metadata, instrumentsVsEvents, repeatingInstrumentsAndEvents, CurrentAnalysis, resultQuality);
+        await DownloadDataQuality(selectedCenter, token, metadata, instrumentsVsEvents, repeatingInstrumentsAndEvents, CurrentAnalysis, resultQuality);
       }
-      else if (isAnonymous && resultAnonymous!==null) {
+      else if (isAnonymous && resultAnonymous !== null) {
         // ---- Anonymous Data ----
-        DownloadAnonymizedData(selectedCenter, CurrentAnalysis, resultAnonymous);
+        await DownloadAnonymizedData(selectedCenter, CurrentAnalysis, resultAnonymous);
       }
       else {
         console.error("Error during the download.");
         toast.error("Error during the download.");
         return;
       }
+    }
+    finally {
+      setLoading(false);
     }
   }
 
@@ -198,6 +204,7 @@ export default function DataQualityApp() {
   const shareResult = (isAnonymous: boolean) => {
     const result = isAnonymous ? resultAnonymous : resultQuality;
     if (!result) return;
+
     // Implementazione della condivisione
     if (!isAnonymous) {
       setShowShareQuality(true);
@@ -316,6 +323,7 @@ export default function DataQualityApp() {
               <button
                 onClick={() => setResultQuality(null)}
                 className="buttonX"
+                disabled={loading}
               >
                 <XCircle size={24}/>
               </button>
@@ -353,7 +361,12 @@ export default function DataQualityApp() {
                       center={selectedCenter}
                       title="quality"
                       result={resultQuality}
-                      onClose={() => setShowShareQuality(false)} />
+                      onClose={() => setShowShareQuality(false)}
+                      token={token}
+                      metadata={metadata}
+                      instrumentsVsEvents={instrumentsVsEvents}
+                      repeatings={repeatingInstrumentsAndEvents}
+                    />
                   )}
                 </div>
               }
@@ -377,6 +390,7 @@ export default function DataQualityApp() {
               <button
                 onClick={() => setResultAnonymous(null)}
                 className="buttonX"
+                disabled={loading}
               >
                 <XCircle size={24}/>
               </button>
@@ -414,7 +428,8 @@ export default function DataQualityApp() {
                       center={selectedCenter}
                       title="anonymous"
                       result={resultAnonymous}
-                      onClose={() => setShowShareAnonymous(false)} />
+                      onClose={() => setShowShareAnonymous(false)}
+                    />
                   )}
                 </div>
               }

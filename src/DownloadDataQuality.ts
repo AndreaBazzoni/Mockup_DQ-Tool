@@ -16,9 +16,9 @@ export async function DownloadDataQuality(
   const now = new Date();
 
   // Anno = presente
-  // const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   // Anno = assente
-  const dateString = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  //const dateString = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
   const hourString = `${String(now.getHours()).padStart(2, '0')}`;
   const minuteString = `${String(now.getMinutes()).padStart(2, '0')}`;
