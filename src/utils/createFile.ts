@@ -48,7 +48,7 @@ export const createExcelDQ = (
 ) => {
 	const workbook = XLSX.utils.book_new();
 
-	const DQ_SHEET_NAMES = {
+	const DQ_SHEET_NAMES: Record<string, string> = {
 		dq_1: "baseline",
 		dq_2: "unifocal fu",
 		dq_3: "unifocal local recurrence",
@@ -64,10 +64,10 @@ export const createExcelDQ = (
 	const groupedSheets = transformDataForDQ2(dataQualityResults, metadata);
 
   Object.entries(groupedSheets).forEach(([dqGroup, rows]) => {
-      // Use the mapping to name the sheets
-      const sheetName = DQ_SHEET_NAMES[dqGroup] || dqGroup;
-      const worksheet = XLSX.utils.aoa_to_sheet(rows);
-      XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+    // Use the mapping to name the sheets
+    const sheetName = DQ_SHEET_NAMES[dqGroup] || dqGroup;
+    const worksheet = XLSX.utils.aoa_to_sheet(rows);
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
   });
 
   //const missingSheet = buildMissingSheet(dataQualityResults);
@@ -211,4 +211,174 @@ const cleanLabel = (label: string) => {
 		.trim();
 
 	return text;
+};
+
+
+function buildCompletePatientsSheet(baselineCounters: any) {
+	return [
+		["BASELINE", "", ""],
+		["form status", "Description", "patients"],
+		[
+			"complete",
+			"unselected",
+			baselineCounters.complete2_blank
+		],
+		[
+			"complete",
+			"unifocal",
+			baselineCounters.complete2_1
+		],
+		[
+			"complete",
+			"locoregional",
+			baselineCounters.complete2_2
+		],
+		[
+			"complete",
+			"systemic metastases at presentation",
+			baselineCounters.complete2_3
+		],
+		["", "", ""],
+		[
+			"incomplete",
+			"unselected",
+			baselineCounters.complete0_blank
+		],
+		[
+			"incomplete",
+			"unifocal",
+			baselineCounters.complete0_1
+		],
+		[
+			"incomplete",
+			"locoregional",
+			baselineCounters.complete0_2
+		],
+		[
+			"incomplete",
+			"systemic metastases at presentation",
+			baselineCounters.complete0_3
+		]
+	];
+}
+
+
+const buildUnknownSheet = (unknownSummary: any) => {
+	const rows = [["variable", "Denominator", "% unknown"]];
+	unknownSummary.forEach((item: any) => {
+		rows.push([
+			item.field,
+			item.denominator,
+			item.percent
+		]);
+	});
+	return rows;
+};
+
+
+const buildFollowUpSheet = (timelineSummary: any) => {
+	/*
+	Questo è per mappare i dead separati nella tabella del follow up:
+	const STATUS_LABEL_MAP = {
+		"1": "Alive: no evidence of disease (NED)",
+		"2": "Alive with disease (AWD)",
+		"3": "Dead: no evidence of disease",
+		"4": "Dead: evidence of disease"
+	};
+	*/
+	const STATUS_LABEL_MAP: Record<string, string> = {
+		"1": "Alive: no evidence of disease (NED)",
+		"2": "Alive with disease (AWD)",
+		"3": "Dead",
+		"4": "Dead"
+	};
+	const diagnosisYears = [...new Set(
+		timelineSummary.map((d: any) => d.diagnosisYear)
+	)].sort();
+	const followUpYears = [...new Set(
+		timelineSummary.map((d: any) => d.statusYear)
+	)].sort();
+	// Converto subito status → label (una sola volta)
+	const rows = [];
+	// HEADER
+	rows.push([
+		"",
+		"",
+		"Diagnosis year"
+	]);
+	rows.push([
+		"Status at follow up",
+		"Year follow up",
+		...diagnosisYears
+	]);
+	// Status unici già tradotti in label
+	const statusLabels = [...new Set(
+		timelineSummary.map((d: any) =>
+			STATUS_LABEL_MAP[d.status] || "Unknown"
+		)
+	)];
+	for (const statusLabel of statusLabels) {
+		for (const fuYear of followUpYears) {
+			const row = [
+				statusLabel,
+				fuYear
+			];
+			for (const dxYear of diagnosisYears) {
+        /*
+        QUESTO FUNZIONA PER MAPPARE DEAD WITH/WITHOUT EVIDENCE OF DISEASE SEPARATI. PERO' INT LI VUOLE AGGREGATI COME 'DEAD'
+				const match = timelineSummary.find(
+					r =>
+						(STATUS_LABEL_MAP[r.status] || "Unknown") === statusLabel &&
+						r.statusYear === fuYear &&
+						r.diagnosisYear === dxYear
+				);
+				row.push(match ? match.count : "");
+        */
+				const count = timelineSummary.filter((r: any) =>
+						(STATUS_LABEL_MAP[r.status] || "Unknown") === statusLabel &&
+						r.statusYear === fuYear &&
+						r.diagnosisYear === dxYear
+				).reduce((sum: any, r: any) => sum + r.count, 0);
+				row.push(count || "");
+			}
+			rows.push(row);
+		}
+	}
+	return rows;
+};
+
+
+const buildDiseaseExtensionSheet = (diseaseExtensionCounters: any) => {
+  const rows = [
+    [
+      "Year of diagnosis",
+      "Baseline disease extension",
+      "Current disease extension",
+      "Total N of patients"
+    ]
+  ];
+  if (!diseaseExtensionCounters) {
+      return rows;
+  }
+  Object.values(diseaseExtensionCounters)
+    .sort((a: any, b: any) => {
+      if (a.diagnosisYear !== b.diagnosisYear) {
+        return a.diagnosisYear.localeCompare(b.diagnosisYear);
+      }
+      if (a.baselineDiseaseExtension !== b.baselineDiseaseExtension) {
+        return a.baselineDiseaseExtension.localeCompare(b.baselineDiseaseExtension);
+      }
+      return a.currentDiseaseExtension.localeCompare(b.currentDiseaseExtension);
+    })
+    .forEach((item: any) => {
+      // Qui modifico le label solo degli oggetti della current disease extension per i pazienti che non hanno un follow up ma solo la baseline registrata.
+      const currentDiseaseExtension = item.currentDiseaseExtension.replace(" at presentation"," without follow up");
+      rows.push([
+        item.diagnosisYear,
+        item.baselineDiseaseExtension,
+        currentDiseaseExtension,
+        item.count
+      ]);
+    });
+  return rows;
 };
