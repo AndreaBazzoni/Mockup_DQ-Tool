@@ -298,7 +298,7 @@ const buildFollowUpSheet = (timelineSummary: any) => {
 	const followUpYears = [...new Set(
 		timelineSummary.map((d: any) => d.statusYear)
 	)].sort();
-	// Converto subito status → label (una sola volta)
+	// Converto subito status -> label (una sola volta)
 	const rows = [];
 	// HEADER
 	rows.push([

@@ -1,8 +1,11 @@
-import type { REDCapRecord, REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
+import { runBranchingLogic, isVarRepeating } from "@/DoDataQuality";
+import type { REDCapRecord, REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField, DQContext } from "@/utils/types";
 
 
 // Funzione per costruire la Unknown Summary
-export function buildUnknownSummary(unknownMatrix: any) {
+export function buildUnknownSummary(
+  unknownMatrix: any
+) {
 	return Object.values(unknownMatrix).map((row: any) => {
 		let denominator = 0;
 		let matches = 0;
@@ -27,7 +30,12 @@ export function buildUnknownSummary(unknownMatrix: any) {
 
 
 // Funzione che processa gli Unknown Record
-export function processUnknownRecord(recordId: string, recordData: REDCapRecord[], unknownCodes: any[], unknownMatrix: any) {
+export function processUnknownRecord(
+  recordId: string,
+  recordData: REDCapRecord[],
+  unknownCodes: any[],
+  unknownMatrix: any
+) {
   for (const rowData of recordData) {
     unknownCodes.forEach((codeObj) => {
       const fieldName = codeObj.field_name;
@@ -65,7 +73,11 @@ export function processUnknownRecord(recordId: string, recordData: REDCapRecord[
 // Funzione per estrarre dai metadati i valori unknown di tutte le variabili che hanno una specifica al riguardo.
 // Queste specifiche si trovano nel campo select_choices_or_calculations (per i dropdown) o nel campo field_note (per variabili testuali).
 // Non mi interesso delle variabili che hanno note di tipo "if DD unknown...".
-export const extractUnknownCodes = (metadata: REDCapMetadataField[], instrumentsVsEvents: REDCapInstrVsEventsField[], repeatings: REDCapRepeatingsField[]) => {
+export const extractUnknownCodes = (
+  metadata: REDCapMetadataField[],
+  instrumentsVsEvents: REDCapInstrVsEventsField[],
+  repeatings: REDCapRepeatingsField[]
+) => {
     if (!Array.isArray(metadata)) return [];
     const results: any[] = [];
 
@@ -92,13 +104,13 @@ export const extractUnknownCodes = (metadata: REDCapMetadataField[], instruments
 
       let code = null;
 
-      // Caso 1: field_note → "... If unknown, input ##"
+      // Caso 1: field_note -> "... If unknown, input ##"
       const noteMatch = note.match(/If unknown,\s*input\s*(\d+)/i);
       if (noteMatch) {
         code = noteMatch[1];
       }
 
-      // Caso 2: select_choices_or_calculations → "...|##, Unknown|..."
+      // Caso 2: select_choices_or_calculations -> "...|##, Unknown|..."
       const selectMatch = select.match(/(?:^|\|)\s*(\d+)\s*,\s*Unknown/i);
       if (selectMatch) {
         code = selectMatch[1];
@@ -113,15 +125,145 @@ export const extractUnknownCodes = (metadata: REDCapMetadataField[], instruments
 }
 
 
-const isVarRepeating = (instr: string, event: string, repeatingInstrumentsAndEvents: REDCapRepeatingsField[]) => {
-    let eventIsRep = repeatingInstrumentsAndEvents.some(item => item.event_name === event);
-    if (eventIsRep) {
-      // La variabile è repeating se appartiene a event repeating e instrument repeating.
-      let instrIsRep = repeatingInstrumentsAndEvents.some(item => item.form_name === instr);
-      // Sintassi con "!!" -> ritorna true se instrIsRep è truthy, false se instrIsRep è falsy
-      return !!(instrIsRep);
-    } 
-    else {
-      return false;
+// Processa tutte le row di un paziente per il calcolo dei missing.
+//  - missingMetadata: metadata delle variabili che vogliamo controllare.
+//  - missingMatrix: struttura cumulativa che raccoglie i pazienti eleggibili e quelli con missing.
+//  - rowTypeMapping: mapping tra (event + instrument) e (tipoRow).
+export function processMissingRecord(
+  context: DQContext,
+  recordData: REDCapRecord[],
+  missingMetadata: REDCapMetadataField[],
+  missingMatrix: any
+) {
+  // Analizzo una row alla volta.
+  for (const row of recordData) {
+    // Determino il tipo della row.
+    const rowType = getRowType(row);
+    // Se non riesco a determinare il tipo, non posso sapere quali variabili siano attese.
+    if (!rowType) {
+      continue;
     }
+    // Prendo dal metadata solo le variabili appartenenti a questo tipo di row.
+    const expectedVariables = missingMetadata.filter(
+      metadataItem => metadataItem.form_name === rowType
+    );
+    const expectedVarBranch = getExpectedVariablesBranching(expectedVariables, context, row);
+
+    // Controllo ogni variabile attesa.
+    for (const variable of expectedVarBranch) {
+      const fieldName = variable.field_name;
+      //Inizializzo la struttura della variabile.
+      if (!missingMatrix[fieldName]) {
+        missingMatrix[fieldName] = {
+          field: fieldName,
+          // utile per debug / eventuale report futuro
+          expectedRowType: rowType,
+          // Set di recordId eleggibili (evita di contare più volte un paziente con più repeat instance)
+          denominatorPatients: new Set(),
+          // Set di recordId per i quali la variabile è risultata missing almeno una volta.
+          missingPatients: new Set()
+        };
+      }
+      // Il paziente è eleggibile per questa variabile. Anche se esistono n repeat instance, il recordId viene contato una sola volta.
+      missingMatrix[fieldName].denominatorPatients.add(recordData[0].bl_record_id);
+      // Se la variabile è vuota in questa row, il paziente viene classificato come missing. Anche qui il Set garantisce una sola occorrenza per paziente.
+      if (isMissingValue(row[fieldName])) {
+        missingMatrix[fieldName].missingPatients.add(recordData[0].bl_record_id);
+      }
+    }
+  }
+}
+
+
+const getExpectedVariablesBranching = (
+  expectedVariables: REDCapMetadataField[],
+  context: DQContext,
+  row: REDCapRecord
+) => {
+  const expectedVarBranch = [];
+  for (const variable of expectedVariables) {
+      // 1. Se non ha branching logic, la variabile è eleggibile.
+      if (!variable.branching_logic || !variable.branching_logic.trim()) {
+        expectedVarBranch.push(variable);
+        continue;
+      }
+      // 2. Determino l'istanza corrente, se presente.
+      let instance = null;
+      if (row.redcap_repeat_instance !== null && row.redcap_repeat_instance !== "") {
+        instance = Number(row.redcap_repeat_instance);
+      }
+      // 3. Valuto la branching logic.
+      const result = runBranchingLogic(context, variable, instance);
+      // 4. Mantengo solo le variabili con branching true.
+      if (result === true) {
+        expectedVarBranch.push(variable);
+      }
+  }
+  return expectedVarBranch;
 };
+
+
+// Determina il tipo di una row di recordData. Il confronto viene fatto usando:
+//  - row.redcap_event_name
+//  - row.redcap_repeat_instrument
+// [ cercando la corrispondente combinazione in ROW_TYPE_MAPPING ]
+const getRowType = (row: REDCapRecord) => {
+  const event = row.redcap_event_name || "";
+  const instrument = row.redcap_repeat_instrument || "";
+  const mapping = ROW_TYPE_MAPPING.find(item => (
+    item.event === event && item.instrument === instrument
+  ));
+  return mapping?.tipoRow || null;
+};
+
+
+// ====================
+// MISSING MANAGEMENT
+// ====================
+const ROW_TYPE_MAPPING = [
+  {
+    instrument: "",
+    event: "baseline_arm_1",
+    tipoRow: "baseline_and_treatment_at_first_presentation"
+  },
+  {
+    instrument: "unifocal_followup",
+    event: "unifocal_arm_1",
+    tipoRow: "unifocal_followup"
+  },
+  {
+    instrument: "unifocal_local_recurrence",
+    event: "unifocal_arm_1",
+    tipoRow: "unifocal_local_recurrence"
+  },
+  {
+    instrument: "",
+    event: "unifocal_arm_1",
+    tipoRow: "unifocal_distant_metastases"
+  },
+  {
+    instrument: "locoregional_followup",
+    event: "locoregional_arm_1",
+    tipoRow: "locoregional_followup"
+  },
+  {
+    instrument: "locoregional_progression",
+    event: "locoregional_arm_1",
+    tipoRow: "locoregional_progression"
+  },
+  {
+    instrument: "systemic_metastases_followup",
+    event: "systemic_metastase_arm_1",
+    tipoRow: "systemic_metastases_followup"
+  },
+  {
+    instrument: "systemic_metastases_progression",
+    event: "systemic_metastase_arm_1",
+    tipoRow: "systemic_metastases_progression"
+  },
+  {
+    instrument: "",
+    event: "life_status__clini_arm_1",
+    tipoRow: "life_status_update"
+  }
+];

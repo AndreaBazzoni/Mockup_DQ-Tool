@@ -2,7 +2,7 @@ import { dqChecks } from "@/utils/config-dqchecks";
 import type { REDCapRecord, DQRecord, DQContext, REDCapMetadataField, BranchRefVar, VariableRef, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
 
 
-export const getEventOfInstrument = (instrument: string, dqContext: DQContext) => {
+export const getEventOfInstrument = (dqContext: DQContext, instrument: string) => {
 	let instrumentsVsEvents = dqContext.instrumentsVsEvents;
 
   const found = instrumentsVsEvents.find(item => item.form === instrument);
@@ -16,9 +16,7 @@ export const getEventOfInstrument = (instrument: string, dqContext: DQContext) =
 };
 
 
-export const isVarRepeating = (instr: string, event: string | null, dqContext: DQContext) => {
-  let repeatingInstrumentsAndEvents = dqContext.repeatingInstrumentsAndEvents;
-
+export const isVarRepeating = (instr: string, event: string | null, repeatingInstrumentsAndEvents: REDCapRepeatingsField[]) => {
   const eventIsRep = repeatingInstrumentsAndEvents.some(item => item.event_name === event);
 
   if (eventIsRep) {
@@ -42,7 +40,7 @@ export const varHasBranchingLogic = (metadataElem: REDCapMetadataField) => {
 };
 
 
-export const runBranchingLogic = (metadataOfVar: REDCapMetadataField, isRepeating: boolean, instance: any, dqContext: DQContext) => {
+export const runBranchingLogic = (dqContext: DQContext, metadataOfVar: REDCapMetadataField, instance: any) => {
 	// Espressione di branching, così come specificata su REDCap
 	let branchingOrigExpr = metadataOfVar["branching_logic"];
 
@@ -50,155 +48,134 @@ export const runBranchingLogic = (metadataOfVar: REDCapMetadataField, isRepeatin
 	let branchRefVar: BranchRefVar = {
     name: metadataOfVar.field_name,
     instrument: metadataOfVar.form_name,
-    event: getEventOfInstrument(metadataOfVar.form_name, dqContext)
+    event: getEventOfInstrument(dqContext, metadataOfVar.form_name)
   };
+  // Evito errore di inutilizzo della variabile
+  console.log("Variabile Branching: ", branchRefVar);
 
-	if (!isRepeating) {
-		let evaluableBranchLogicExpr = compileBranchingLogicExpressionNonRepeating(branchingOrigExpr, branchRefVar, dqContext);
-		let result = null;
-		if (evaluableBranchLogicExpr != "") {
-			result = evalRedcap(evaluableBranchLogicExpr);
-		}
-		return result;
-	}
-
-  else if (isRepeating) {
-		let evaluableBranchLogicExpr = compileBranchingLogicExpressionRepeating(branchingOrigExpr, branchRefVar, instance, dqContext);
-		let result = null;
-		if (evaluableBranchLogicExpr != "") {
-			result = evalRedcap(evaluableBranchLogicExpr);
-		}
-		return result;
-	}
-
-	return true;
+  let evaluableBranchLogicExpr = compileBranchingLogicExpression(dqContext, branchingOrigExpr, instance);
+  let result = null;
+  if (evaluableBranchLogicExpr != "") {
+    result = evalRedcap(evaluableBranchLogicExpr);
+  }
+  return result;
 };
 
 
-export const compileBranchingLogicExpressionNonRepeating = (branchingOrigExpr: string, mainVar: BranchRefVar, dqContext: DQContext) => {
-	// Estraggo le variabili dentro la branching logic
-	// Ciascuna diventa un oggetto con 6 proprietà:
-	//   1) event -> evento della var (può essere nullo a questo punto se non è esplicitato nella branching expression)
-	//   2) field -> nome della variabile (nei check segue la sua convenzione eg "ufu_symptoms(1)")
-	//   3) instance -> instance (può essere nulla). Quando ha valore può essere:
-	//			  [current-instance] refers to the current instance
-	//			  [previous-instance] refers to the instance immediately previous
-	//			  [next-instance] refers to the instance immediately after
-	//			  [first-instance] refers back to the very first instance
-	//			  [last-instance] refers back to the very last instance
-  //      (AL MOMENTO INSTANCE NON E' GESTITO DALLA LOGICA A SEGUIRE)
-	//   4) orig -> come dichiarata in branching expression
-	//   5) realField -> nome della variabile come in redcap data (diverso da field nel caso dei checkbox)
-	//   6) realVar -> nome della variabile come in redcap metadata (diverso da field nel caso dei checkbox)
-	let varsInBranching = extractRedcapVariables(branchingOrigExpr, dqContext);
+const compileBranchingLogicExpression = (dqContext: DQContext, branchingOrigExpr: string, instance: any = null) => {
+  const ROW_TYPE_MAPPING = [
+		{ instrument: "", event: "baseline_arm_1", tipoRow: "baseline_and_treatment_at_first_presentation" },
+		{ instrument: "unifocal_followup", event: "unifocal_arm_1", tipoRow: "unifocal_followup" },
+		{ instrument: "unifocal_local_recurrence", event: "unifocal_arm_1", tipoRow: "unifocal_local_recurrence" },
+		{ instrument: "", event: "unifocal_arm_1", tipoRow: "unifocal_distant_metastases" },
+		{ instrument: "locoregional_followup", event: "locoregional_arm_1", tipoRow: "locoregional_followup" },
+		{ instrument: "locoregional_progression", event: "locoregional_arm_1", tipoRow: "locoregional_progression" },
+		{ instrument: "systemic_metastases_followup", event: "systemic_metastase_arm_1", tipoRow: "systemic_metastases_followup" },
+		{ instrument: "systemic_metastases_progression", event: "systemic_metastase_arm_1", tipoRow: "systemic_metastases_progression" },
+		{ instrument: "", event: "life_status__clini_arm_1", tipoRow: "life_status_update" },
+	];
 
-	// Espressione in cui sostituiremo valori e operatori per renderla interpretabile da JS
-	let workingBranchExpression = branchingOrigExpr;
-
-	// Per ogni variabile della branching logic
-	varsInBranching.forEach(varOfBranching => {
-		// Completare info su event mettendo quello di mainVar se non specificato
-		let completeVar = varOfBranching;
-		if (completeVar.event == null) {
-			completeVar.event = mainVar.event;
-		}
-		// Prendere riga di data che contiene la variabile (non repeating) corrente
-		let rightData4Var = getFirstEventFromDataForVar(completeVar, null, dqContext);
-		// Se quella riga esiste
-		if (rightData4Var) {
-			// Sostituisce il nome variabile con il valore preso dalla riga
-			workingBranchExpression = replaceVarWithValue(workingBranchExpression, varOfBranching, rightData4Var);
-		}
-		workingBranchExpression = translateRedcapToJs(workingBranchExpression, { strict: false });
-	});
-
-	return workingBranchExpression;
-};
-
-
-export const compileBranchingLogicExpressionRepeating = (branchingOrigExpr: string, mainVar: BranchRefVar, instance: any, dqContext: DQContext) => {
-	let metadata = dqContext.metadata;
-	// Estraggo le variabili dentro la branching logic
-	// Ciascuna diventa un oggetto con 6 proprietà:
-	//   1) event -> evento della var (può essere nullo a questo punto se non è esplicitato nella branching expression)
-	//   2) field -> nome della variabile (nei check segue la sua convenzione eg "ufu_symptoms(1)")
-	//   3) instance -> instance (può essere nulla). Quando ha valore può essere:
-	//			  [current-instance] refers to the current instance
-	//			  [previous-instance] refers to the instance immediately previous
-	//			  [next-instance] refers to the instance immediately after
-	//			  [first-instance] refers back to the very first instance
-	//			  [last-instance] refers back to the very last instance
-  //      (AL MOMENTO INSTANCE NON E' GESTITO DALLA LOGICA A SEGUIRE)
-	//   4) orig -> come dichiarata in branching expression
-	//   5) realField -> nome della variabile come in redcap data (diverso da field nel caso dei checkbox)
-	//   6) realVar -> nome della variabile come in redcap metadata (diverso da field nel caso dei checkbox)
-	let varsInBranching = extractRedcapVariables(branchingOrigExpr, dqContext);
+  // Estraggo le variabili dentro la branching logic e ciascuna diventa un oggetto con 6 proprietà:
+  //  1. event -> evento della var (può essere nullo se non è esplicitato nella branching expression).
+  //  2. field -> nome della variabile (nei check segue la sua convenzione).
+  //  3. instance -> instance (può essere nulla). Quando ha valore può essere:
+  //      A. [current-instance] = refers to the current instance.
+  //			B. [previous-instance] = refers to the instance immediately previous.
+  //			C. [next-instance] = refers to the instance immediately after.
+  //			D. [first-instance] = refers back to the very first instance.
+  //			E. [last-instance] = refers back to the very last instance.
+  //  4. orig -> come dichiarata in branching expression
+  //  5. realField -> nome della variabile come in redcap data (diverso da field nel caso dei checkbox)
+  //  6. realVar -> nome della variabile come in redcap metadata (diverso da field nel caso dei checkbox)
+  let varsInBranching = extractRedcapVariables(dqContext, branchingOrigExpr);
 
   // Espressione in cui sostituiremo valori e operatori per renderla interpretabile da JS
-	let workingBranchExpression = branchingOrigExpr;
+  let workingBranchExpression = branchingOrigExpr;
 
-	// Per ogni variabile della branching logic
-	varsInBranching.forEach(branchVar => {
-		// Completare info su event mettendo quello di mainVar se non specificato
-		let completeBranchVar = branchVar;
-		if (completeBranchVar.event == null) {
-			completeBranchVar.event = mainVar.event;
-		}
-		// Devo trovare la giusta istanza della variabile corrente per sostituire il valore nell'espressione
-		  // Metadata di branchVar
-		let metadataOfBranchVar = metadata.find(item => item.field_name === completeBranchVar.realVar);
-		  // Instrument di variabile corrente
-    if (metadataOfBranchVar === undefined) {
-      return "";
-    }
-		let instrumentOfBranchVar = metadataOfBranchVar["form_name"];
-		  // Capire se la var in questione è repeating
-    if (completeBranchVar.event === null) {
-      return "";
-    }
-		let isBranchVarRepeating = isVarRepeating(instrumentOfBranchVar, completeBranchVar.event, dqContext);
+  // Per ogni variabile della branching logic
+  varsInBranching.forEach(varOfBranching => {
+    // Completare info su event mettendo quello di mainVar se non specificato
+    let completeVar = varOfBranching;
 
-		// Estrarre la riga giusta da data
-		let rightData4Var;
-		if (isBranchVarRepeating) {
-			// Se repeating prendo la row di data corrispondente
-			let dataRows = getRowsOfDataForRepeatingVar(instrumentOfBranchVar, completeBranchVar.event, dqContext);
-      if (dataRows === false) {
-        return "";
+    if (completeVar.event == null) {
+      const metadataVar = dqContext.metadata.find(
+        item => item.field_name === completeVar.realVar
+      );
+      if (metadataVar) {
+        completeVar.instrument = metadataVar.form_name;
+        const mapping = ROW_TYPE_MAPPING.find(
+          item => item.tipoRow === metadataVar.form_name
+        );
+        if (mapping) {
+          completeVar.event = mapping.event;
+        }
       }
-			let realInstance = (instance == 0) ? "" : instance
-			// "realInstance" è instance della mainVar e assume solo valori numerici (o null che è 0)
-			let targetInstance = realInstance;
-			if (branchVar.instance == "current-instance") {
-				targetInstance = realInstance;
-			}
-      else if (branchVar.instance == "previous-instance") {
-				targetInstance = realInstance - 1;
-			}
-      else if (branchVar.instance == "next-instance") {
-				targetInstance = realInstance + 1;
-			}
-      else if (branchVar.instance == "first-instance") {
-				targetInstance = 0;
-			}
-      else if (branchVar.instance == "previous-instance") {
-				targetInstance = realInstance - 1;
-			}
-			rightData4Var = dataRows.find(row => row.redcap_repeat_instance === targetInstance)
-		}
+    }
+
+    // Istruzione per fermare esecuzione quando instance della variabile estratta dalla branching è last-intance
+    if (typeof varOfBranching.instance === "string" && varOfBranching.instance.includes("-instance")) {
+      const availableInstances = dqContext.data
+        .filter(row =>
+          row.redcap_event_name === completeVar.event &&
+          row.redcap_repeat_instrument === completeVar.instrument &&
+          row.redcap_repeat_instance !== null &&
+          row.redcap_repeat_instance !== ""
+        )
+        .map(row => Number(row.redcap_repeat_instance))
+        .filter(Number.isFinite)
+        .sort((a, b) => a - b);
+      const currentIndex = availableInstances.indexOf(Number(instance));
+      let targetInstance = null;
+      switch (varOfBranching.instance) {
+        case "current-instance":
+          targetInstance = (currentIndex >= 0)
+            ? availableInstances[currentIndex]
+            : null;
+          break;
+        case "previous-instance":
+          targetInstance = (currentIndex > 0)
+            ? availableInstances[currentIndex - 1]
+            : null;
+          break;
+        case "next-instance":
+          targetInstance = (currentIndex >= 0 && currentIndex < availableInstances.length - 1)
+            ? availableInstances[currentIndex + 1]
+            : null;
+          break;
+        case "first-instance":
+          targetInstance = availableInstances.length > 0
+            ? availableInstances[0]
+            : null;
+          break;
+
+        case "last-instance":
+          targetInstance = availableInstances.length > 0
+            ? availableInstances[availableInstances.length - 1]
+            : null;
+          break;
+      }
+      completeVar.targetInstance = targetInstance;
+    }
+
+    // Prendere Data row che contiene la variabile (non repeating) corrente
+    let rightData4Var = getFirstEventFromDataForVar(dqContext, completeVar, instance );
+
+    // Se quella riga esiste...
+    if (rightData4Var) {
+      // Sostituisce il nome variabile con il valore preso dalla riga
+      workingBranchExpression = replaceVarWithValue(workingBranchExpression, varOfBranching, rightData4Var);
+    }
+    // ... altrimenti ...
     else {
-			rightData4Var = getFirstEventFromDataForVar(completeBranchVar, null, dqContext);
-		}
+      workingBranchExpression = workingBranchExpression.replaceAll(varOfBranching.orig, "\'\'");
+    }
 
-		// Se quella riga esiste
-		if (rightData4Var) {
-			// Sostituisce il nome variabile con il valore preso dalla riga
-			workingBranchExpression = replaceVarWithValue(workingBranchExpression, branchVar, rightData4Var);
-		}
-		workingBranchExpression = translateRedcapToJs(workingBranchExpression, { strict: false });
-	});
+    // Sostituire operatori e operandi
+    workingBranchExpression = translateRedcapToJs(workingBranchExpression, { strict: false });
 
-	return workingBranchExpression;
+  });
+  
+  return workingBranchExpression;
 };
 
 
@@ -228,7 +205,7 @@ export const evalRedcap = (jsExpr: string, { fallback = false } = {}) => {
 };
 
 
-export const extractRedcapVariables = (logic: string, dqContext: DQContext) => {
+export const extractRedcapVariables = (dqContext: DQContext, logic: string) => {
 	// matcha sequenze tipo: [xxx][yyy][zzz] (token completo)
 	const tokenRegex = /(\[[^\]]+\])+/g;
 	// matcha singole [parte]
@@ -259,7 +236,7 @@ export const extractRedcapVariables = (logic: string, dqContext: DQContext) => {
 			orig: token,
 			realField: "",
 			realVar: "",
-      raw: null
+      raw: null,
 		};
 
 		if (parts.length === 1) {
@@ -328,7 +305,7 @@ export const extractRedcapVariables = (logic: string, dqContext: DQContext) => {
 };
 
 
-export const getFirstEventFromDataForVar = (variable: VariableRef, contextInstance: string | null, dqContext: DQContext) => {
+export const getFirstEventFromDataForVar = (dqContext: DQContext, variable: VariableRef, contextInstance: string | null) => {
 	let allData = dqContext.data;
 
 	const isValidInstrument = dqContext.repeatingInstrumentsAndEvents.some(
@@ -549,7 +526,7 @@ const missingParams = (recordData: REDCapRecord[], parameters: any[] | null, dqC
 
 		let instrumentOfV = metadataOfV["form_name"];
 		// Vista ipotesi Intrument appartiene a 1 solo Event: ok questa funzione (prende il primo evento).
-		let eventOfV = getEventOfInstrument(instrumentOfV, dqContext);
+		let eventOfV = getEventOfInstrument(dqContext, instrumentOfV);
 
 		let myInstr = instrumentOfV;
 		const iter = recordData.length;
@@ -558,7 +535,7 @@ const missingParams = (recordData: REDCapRecord[], parameters: any[] | null, dqC
 			let instr = data["redcap_repeat_instrument"];
 			let event = data["redcap_event_name"];
 			if (event === eventOfV) {
-				if (!(isVarRepeating(instrumentOfV, eventOfV, dqContext))){
+				if (!(isVarRepeating(instrumentOfV, eventOfV, dqContext.repeatingInstrumentsAndEvents))){
 					instrumentOfV = "";
 				}
 				if (instr === instrumentOfV){
@@ -666,7 +643,7 @@ export const DoDataQuality = async (
 			let instrumentOfMainVar = metadataOfMainVar["form_name"];
 
       //Vista ipotesi Intrument apparteiene a 1 solo Event: ok questa funzione (prende il primo evento)
-			let eventOfMainVar = getEventOfInstrument(instrumentOfMainVar, dqContext);
+			let eventOfMainVar = getEventOfInstrument(dqContext, instrumentOfMainVar);
       if (eventOfMainVar === null) {
         return null;
       }
@@ -682,7 +659,7 @@ export const DoDataQuality = async (
 				console.log("Stop here!");
 			}
 
-			let isRepeating = isVarRepeating(instrumentOfMainVar, eventOfMainVar, dqContext);
+			let isRepeating = isVarRepeating(instrumentOfMainVar, eventOfMainVar, dqContext.repeatingInstrumentsAndEvents);
 
 			let varsArray = check.vars;
 			
@@ -709,7 +686,7 @@ export const DoDataQuality = async (
 							branchingPassed = true;
 						}
 						// Visto che uso && eseguo branching solo se quelle prima sono passate
-						branchingPassed = branchingPassed && runBranchingLogic(metadataElem, isRepeating, null, dqContext);
+						branchingPassed = branchingPassed && runBranchingLogic(dqContext, metadataElem, null);
 					}
 				})
 				bLogicPassed = branchingPassed || noBranchingInCheck;
@@ -764,7 +741,7 @@ export const DoDataQuality = async (
 								branchingPassed = true;
 							}
 							// Visto che uso && eseguo branching solo se quelle prima sono passate
-							branchingPassed = branchingPassed && runBranchingLogic(metadataElem, isRepeating, instanceNum, dqContext);
+							branchingPassed = branchingPassed && runBranchingLogic(dqContext, metadataElem, instanceNum);
 						}
 					})
 					bLogicPassed = branchingPassed || noBranchingInCheck;

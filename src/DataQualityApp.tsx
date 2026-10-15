@@ -10,7 +10,8 @@ import ShareModal from "@/ShareModal";
 import { ListOfCenters, CurrentAnalysis } from "@/ManageCenters";
 import { ManageCohort } from "@/ManageCohort";
 import { getMetadata, getInstrVsEvents, getRepeatings } from "@/fetch/dq-fetch";
-import type { Center, REDCapRecord, DQRecord, REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
+import { processMissingRecord } from "@/fetch/mgmt-unknown";
+import type { Center, REDCapRecord, DQRecord, REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField, DQContext } from "@/utils/types";
 
 
 export default function DataQualityApp() {
@@ -131,6 +132,26 @@ export default function DataQualityApp() {
         setMetadata(metadataAPI);
         setInstrumentsVsEvents(instrumentsVsEventsAPI);
         setRepeatingInstrumentsAndEvents(repeatingInstrumentsAndEventsAPI);
+
+        // Processo ogni record la prima volta per i fogli accessori
+        const missingMetadata = metadata.filter(
+          item =>
+            item.field_type !== "descriptive" &&
+            item.field_name !== "bl_record_id" &&
+            !item.field_name.endsWith("_complete")
+        );
+        const missingMatrix = {}
+        for (let i = 0; i < cohort.length; i++) {
+          const context: DQContext = {
+						'data': recordData[i],
+						'metadata': metadata,
+						'instrumentsVsEvents': instrumentsVsEvents,
+						'repeatingInstrumentsAndEvents': repeatingInstrumentsAndEvents
+					};
+          console.log("AaAaAaAaAaAaAaAa: ", recordData[i][0].bl_record_id);
+          processMissingRecord(context, recordData[i], missingMetadata, missingMatrix);
+        }
+
         // Inizio cicli DQ
         for (let i = 0; i < cohort.length; i++) {
           let dq = await DoDataQuality(recordData[i], metadataAPI, instrumentsVsEventsAPI, repeatingInstrumentsAndEventsAPI);

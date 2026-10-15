@@ -1469,7 +1469,8 @@ REPLACED BY multiOR on the 4 variables (see below)
 		func:multiVarHasValueOR,
 		params:[["bl_molec_test_wwtr1", 1], ["bl_molec_test_wwtr1", 2], ["bl_molec_test_camta1", 1], ["bl_molec_test_camta1", 2], ["bl_molec_test_yap", 1], ["bl_molec_test_yap", 2], ["bl_molec_test_tfe3", 1], ["bl_molec_test_tfe3", 2]],
 		vars:["bl_molec_test_wwtr1", "bl_molec_test_camta1", "bl_molec_test_yap", "bl_molec_test_tfe3"]
-	},
+	}
+,
 	{
 		name:'dq_2_1',
 		desc:'Date of follow-up ("ufu_date") must be subsequent to Date of diagnosis ("bl_1st_pathol_ddiag")',

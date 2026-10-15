@@ -112,4 +112,5 @@ export interface VariableRef {
   realField: string;
   realVar: string;
   raw: string[] | null;
+  targetInstance?: number | null;
 }
