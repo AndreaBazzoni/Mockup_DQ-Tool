@@ -13,6 +13,11 @@ export const ListOfCenters: Center[] = [
     id: "biomeris-new",
     url: "https://redcap-new.labmedinfo.org/api/",
   },
+  {
+    name: "INT",
+    id: "int",
+    url: "https://redcap-int.istitutotumori.mi.it/api/",
+  },
 ];
 
 export const CurrentAnalysis: string = "2026";
