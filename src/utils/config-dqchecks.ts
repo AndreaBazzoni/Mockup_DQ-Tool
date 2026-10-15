@@ -6,38 +6,26 @@ import {
 	dateCompareWithDateString,
 	dateCompareWithDelta,
 	dateWithinIntervalWithDeltas,
-	varHasValueRepInstr,
-	varHasValueWithPreviousSelfRepInstr,
-	multiVarHasValueRepInstr,
-	multiVarHasValueFirstVsLastInstRepInstr,  //1:1
-	multiVarHasValueFixedVsLastInstRepInstr,  //1:1
-	multiDateCompareFirstVsLastInstRepInstr,  //1:1
-	multiDateCompareFixedVsLastInstRepInstr,  //1:1
-	uniqueDateCompareToMaxDateRepInstr,  //1:1
-	varWithinIntervalRepInstr,
-	compareAllDatesToFixed,
-	dateCompareWithDeltaRepInstr,
-	dateCompareWithPreviousSelfRepInstr,	
-	dateCompareToFixedDateRepInstr,  //n:1
-	uniqueDateCompareToFixedDateRepInstr,  //1:1  (in realtà n:1, ma si presume che le n siano tutte uguali)
+	//varHasValueRepInstr,
+	//varHasValueWithPreviousSelfRepInstr,
+	//multiVarHasValueRepInstr,
+	//multiVarHasValueFirstVsLastInstRepInstr,  //1:1
+	//multiVarHasValueFixedVsLastInstRepInstr,  //1:1
+	//multiDateCompareFirstVsLastInstRepInstr,  //1:1
+	//multiDateCompareFixedVsLastInstRepInstr,  //1:1
+	//uniqueDateCompareToMaxDateRepInstr,  //1:1
+	//varWithinIntervalRepInstr,
+	//compareAllDatesToFixed,
+	//dateCompareWithDeltaRepInstr,
+	//dateCompareWithPreviousSelfRepInstr,	
+	//dateCompareToFixedDateRepInstr,  //n:1
+	//uniqueDateCompareToFixedDateRepInstr,  //1:1  (in realtà n:1, ma si presume che le n siano tutte uguali)
 } from '@/utils/function-dqchecks';
 import type { QualCheck } from './types';
 
 
 // Define a mapping of check names to function references and parameters
 export const dqChecks: QualCheck[] = [
-/*	
-	{
-		name:'dq_1_0',
-		desc:'Test of BL for ("bl_status_loco") with preCheck',
-		prec:varHasValue,
-		precParams:["bl_123_sys_ther_set", 1],
-		func:varWithinInterval,
-		params:["bl_status_loco", 0, 10],
-		vars:["bl_123_sys_ther_set","bl_status_loco"]
-	}
-,
-*/
 	{
 		name:'dq_1_1',
 		desc:'Year of birth ("bl_dob") must be between 1900 and 2025',
@@ -94,8 +82,8 @@ export const dqChecks: QualCheck[] = [
 		prec:null,
 		precParams:null,
 		func:varWithinInterval,
-		params:["bl_123_age_diag_man", 18, 100],
-		vars:["bl_123_age_diag_man"]
+		params:["bl_weight", 20, 250],
+		vars:["bl_weight"]
 	}
 ,
 	{
@@ -104,8 +92,8 @@ export const dqChecks: QualCheck[] = [
 		prec:null,
 		precParams:null,
 		func:varWithinInterval,
-		params:["bl_weight", 60, 250],
-		vars:["bl_weight"]
+		params:["bl_height", 60, 250],
+		vars:["bl_height"]
 	}
 ,
 	{
@@ -264,8 +252,8 @@ export const dqChecks: QualCheck[] = [
 		prec:null,
 		precParams:null,
 		func:varWithinInterval,
-		params:["bl_23_dis_ext_base_soft_les_abdo", 1, 100],
-		vars:["bl_23_dis_ext_base_soft_les_abdo"]
+		params:["bl_23_dis_ext_base_soft_les_thor", 1, 100],
+		vars:["bl_23_dis_ext_base_soft_les_thor"]
 	}
 ,
 	{
@@ -274,8 +262,8 @@ export const dqChecks: QualCheck[] = [
 		prec:null,
 		precParams:null,
 		func:varWithinInterval,
-		params:["bl_23_dis_ext_base_soft_les_abdo", 1, 100],
-		vars:["bl_23_dis_ext_base_soft_les_abdo"]
+		params:["bl_23_dis_ext_base_soft_les_hn", 1, 100],
+		vars:["bl_23_dis_ext_base_soft_les_hn"]
 	}
 ,
 	{
@@ -284,8 +272,8 @@ export const dqChecks: QualCheck[] = [
 		prec:null,
 		precParams:null,
 		func:varWithinInterval,
-		params:["bl_23_dis_ext_base_soft_les_abdo", 1, 100],
-		vars:["bl_23_dis_ext_base_soft_les_abdo"]
+		params:["bl_23_dis_ext_base_oth", 1, 100],
+		vars:["bl_23_dis_ext_base_oth"]
 	}
 ,
 	{
@@ -680,7 +668,7 @@ export const dqChecks: QualCheck[] = [
 ,
 	{
 		name:'dq_1_64',
-		desc:'Bone - Radiotherapy Setting Preoperative ("bl_23_bone_radio_set")=1 - Bone - Date of surgery ("bl_23_surg_dsurg_bone") must be subsequent to Bone - Radiotherapy - Ending date ("bl_23_radio_liv_dend")',
+		desc:'Bone - Radiotherapy Setting Preoperative ("bl_23_bone_radio_set")=1 - Bone - Date of surgery ("bl_23_surg_dsurg_bone") must be subsequent to Bone - Radiotherapy - Ending date ("bl_23_radio_bone_dend")',
 		prec:varHasValue,
 		precParams:["bl_23_bone_radio_set", 1],
 		func:dateCompareWithDelta,
@@ -690,7 +678,7 @@ export const dqChecks: QualCheck[] = [
 ,
 	{
 		name:'dq_1_65',
-		desc:'Bone - Radiotherapy Setting Postoperative ("bl_23_bone_radio_set")=2 - Bone - Radiotherapy - Starting date ("bl_23_radio_liv_dstart") must be subsequent to Bone - Date of surgery ("bl_23_surg_dsurg_bone")',
+		desc:'Bone - Radiotherapy Setting Postoperative ("bl_23_bone_radio_set")=2 - Bone - Radiotherapy - Starting date ("bl_23_radio_bone_dstart") must be subsequent to Bone - Date of surgery ("bl_23_surg_dsurg_bone")',
 		prec:varHasValue,
 		precParams:["bl_23_bone_radio_set", 2],
 		func:dateCompareWithDelta,
@@ -720,7 +708,7 @@ export const dqChecks: QualCheck[] = [
 ,
 	{
 		name:'dq_1_68',
-		desc:'Soft tissues - Radiotherapy - Starting date ("bl_23_radio_liv_dstart") must be subsequent to Date of diagnosis ("bl_1st_pathol_ddiag")',
+		desc:'Soft tissues - Radiotherapy - Starting date ("bl_23_radio_soft_dstart") must be subsequent to Date of diagnosis ("bl_1st_pathol_ddiag")',
 		prec:null,
 		precParams:null,
 		func:dateCompareWithDelta,
@@ -730,7 +718,7 @@ export const dqChecks: QualCheck[] = [
 ,
 	{
 		name:'dq_1_69',
-		desc:'Soft tissues - Radiotherapy - Ending date ("bl_23_radio_liv_dend") must be subsequent to Soft tissues - Radiotherapy - Starting date ("bl_23_radio_liv_dstart")',
+		desc:'Soft tissues - Radiotherapy - Ending date ("bl_23_radio_soft_dend") must be subsequent to Soft tissues - Radiotherapy - Starting date ("bl_23_radio_soft_dstart")',
 		prec:null,
 		precParams:null,
 		func:dateCompareWithDelta,
@@ -740,7 +728,7 @@ export const dqChecks: QualCheck[] = [
 ,
 	{
 		name:'dq_1_70',
-		desc:'Soft tissues - Radiotherapy Setting Preoperative ("bl_23_soft_radio_set")=1 - Soft tissues - Date of surgery ("bl_23_surg_dsurg_soft") must be subsequent to Soft tissues - Radiotherapy - Ending date ("bl_23_radio_liv_dend")',
+		desc:'Soft tissues - Radiotherapy Setting Preoperative ("bl_23_soft_radio_set")=1 - Soft tissues - Date of surgery ("bl_23_surg_dsurg_soft") must be subsequent to Soft tissues - Radiotherapy - Ending date ("bl_23_radio_soft_dend")',
 		prec:varHasValue,
 		precParams:["bl_23_soft_radio_set", 1],
 		func:dateCompareWithDelta,
@@ -750,7 +738,7 @@ export const dqChecks: QualCheck[] = [
 ,
 	{
 		name:'dq_1_71',
-		desc:'Soft tissues - Radiotherapy Setting Postoperative ("bl_23_soft_radio_set")=2 - Soft tissues - Radiotherapy - Starting date ("bl_23_radio_liv_dstart") must be subsequent to Soft tissues - Date of surgery ("bl_23_surg_dsurg_soft")',
+		desc:'Soft tissues - Radiotherapy Setting Postoperative ("bl_23_soft_radio_set")=2 - Soft tissues - Radiotherapy - Starting date ("bl_23_radio_soft_dstart") must be subsequent to Soft tissues - Date of surgery ("bl_23_surg_dsurg_soft")',
 		prec:varHasValue,
 		precParams:["bl_23_soft_radio_set", 2],
 		func:dateCompareWithDelta,
@@ -844,8 +832,8 @@ export const dqChecks: QualCheck[] = [
 		prec:null,
 		precParams:null,
 		func:dateCompareWithDelta,
-		params:["bl_23_radio_lymph_dstart", "bl_1st_pathol_ddiag", 0, ">="],
-		vars:["bl_23_radio_lymph_dstart", "bl_1st_pathol_ddiag"]
+		params:["bl_23_radio_sero_dstart", "bl_1st_pathol_ddiag", 0, ">="],
+		vars:["bl_23_radio_sero_dstart", "bl_1st_pathol_ddiag"]
 	}
 ,
 	{
@@ -854,8 +842,8 @@ export const dqChecks: QualCheck[] = [
 		prec:null,
 		precParams:null,
 		func:dateCompareWithDelta,
-		params:["bl_23_radio_lymph_dend", "bl_23_radio_lymph_dstart", 0, ">="],
-		vars:["bl_23_radio_lymph_dend", "bl_23_radio_lymph_dstart"]
+		params:["bl_23_radio_sero_dend", "bl_23_radio_sero_dstart", 0, ">="],
+		vars:["bl_23_radio_sero_dend", "bl_23_radio_sero_dstart"]
 	}
 ,
 	{
@@ -864,8 +852,8 @@ export const dqChecks: QualCheck[] = [
 		prec:varHasValue,
 		precParams:["bl_23_sero_radio_set", 1],
 		func:dateCompareWithDelta,
-		params:["bl_23_surg_dsurg_lymph", "bl_23_radio_lymph_dend", 0, ">="],
-		vars:["bl_23_sero_radio_set", "bl_23_surg_dsurg_lymph", "bl_23_radio_lymph_dend"]
+		params:["bl_23_surg_dsurg_sero", "bl_23_radio_sero_dend", 0, ">="],
+		vars:["bl_23_sero_radio_set", "bl_23_surg_dsurg_sero", "bl_23_radio_sero_dend"]
 	}
 ,
 	{
@@ -874,8 +862,8 @@ export const dqChecks: QualCheck[] = [
 		prec:varHasValue,
 		precParams:["bl_23_sero_radio_set", 2],
 		func:dateCompareWithDelta,
-		params:["bl_23_radio_lymph_dstart", "bl_23_surg_dsurg_lymph", 0, ">="],
-		vars:["bl_23_sero_radio_set", "bl_23_radio_lymph_dstart", "bl_23_surg_dsurg_lymph"]
+		params:["bl_23_radio_sero_dstart", "bl_23_surg_dsurg_sero", 0, ">="],
+		vars:["bl_23_sero_radio_set", "bl_23_radio_sero_dstart", "bl_23_surg_dsurg_sero"]
 	}
 ,
 	{
@@ -884,8 +872,8 @@ export const dqChecks: QualCheck[] = [
 		prec:varHasValue,
 		precParams:["bl_23_sero_radio_set", 4],
 		func:dateCompareWithDelta,
-		params:["bl_23_radio_lymph_dstart", "bl_1st_pathol_ddiag", 0, ">="],
-		vars:["bl_23_sero_radio_set", "bl_23_radio_lymph_dstart", "bl_1st_pathol_ddiag"]
+		params:["bl_23_radio_sero_dstart", "bl_1st_pathol_ddiag", 0, ">="],
+		vars:["bl_23_sero_radio_set", "bl_23_radio_sero_dstart", "bl_1st_pathol_ddiag"]
 	}
 ,
 	{
@@ -894,8 +882,8 @@ export const dqChecks: QualCheck[] = [
 		prec:varHasValue,
 		precParams:["bl_23_sero_radio_set", 3],
 		func:dateCompareWithDelta,
-		params:["bl_23_radio_lymph_dstart", "bl_1st_pathol_ddiag", 0, ">="],
-		vars:["bl_23_sero_radio_set", "bl_23_radio_lymph_dstart", "bl_1st_pathol_ddiag"]
+		params:["bl_23_radio_sero_dstart", "bl_1st_pathol_ddiag", 0, ">="],
+		vars:["bl_23_sero_radio_set", "bl_23_radio_sero_dstart", "bl_1st_pathol_ddiag"]
 	}
 ,
 	{
@@ -1418,49 +1406,6 @@ export const dqChecks: QualCheck[] = [
 		vars:["bl_1st_pathol_ddiag"]
 	}
 ,
-/*
-REPLACED BY multiOR on the 4 variables (see below)
-	{
-		name:'dq_1_138',
-		desc:'Molecular testing for WWTR1 ("bl_molec_test_wwtr1") must be 1 (positive) or 2 (negative)',
-		prec:null,
-		precParams:null,
-		func:multiVarHasValueOR,
-		params:[["bl_molec_test_wwtr1", 1], ["bl_molec_test_wwtr1", 2]],
-		vars:["bl_molec_test_wwtr1"]
-	}
-,
-	{
-		name:'dq_1_139',
-		desc:'Molecular testing for CAMTA1 ("bl_molec_test_camta1") must be 1 (positive) or 2 (negative)',
-		prec:null,
-		precParams:null,
-		func:multiVarHasValueOR,
-		params:[["bl_molec_test_camta1", 1], ["bl_molec_test_camta1", 2]],
-		vars:["bl_molec_test_camta1"]
-	}
-,
-	{
-		name:'dq_1_140',
-		desc:'Molecular testing for YAP ("bl_molec_test_yap") must be 1 (positive) or 2 (negative)',
-		prec:null,
-		precParams:null,
-		func:multiVarHasValueOR,
-		params:[["bl_molec_test_yap", 1], ["bl_molec_test_yap", 2]],
-		vars:["bl_molec_test_yap"]
-	}
-,
-	{
-		name:'dq_1_141',
-		desc:'Molecular testing for TFE3 ("bl_molec_test_tfe3") must be 1 (positive) or 2 (negative)',
-		prec:null,
-		precParams:null,
-		func:multiVarHasValueOR,
-		params:[["bl_molec_test_tfe3", 1], ["bl_molec_test_tfe3", 2]],
-		vars:["bl_molec_test_tfe3"],
-	}
-,
-*/
 	{
 		name:'dq_1_138',
 		desc:'At least one of the molecular testings ("bl_molec_test_wwtr1", "bl_molec_test_camta1", "bl_molec_test_yap", "bl_molec_test_tfe3") must be 1 (positive) or 2 (negative)',
@@ -1469,7 +1414,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 		func:multiVarHasValueOR,
 		params:[["bl_molec_test_wwtr1", 1], ["bl_molec_test_wwtr1", 2], ["bl_molec_test_camta1", 1], ["bl_molec_test_camta1", 2], ["bl_molec_test_yap", 1], ["bl_molec_test_yap", 2], ["bl_molec_test_tfe3", 1], ["bl_molec_test_tfe3", 2]],
 		vars:["bl_molec_test_wwtr1", "bl_molec_test_camta1", "bl_molec_test_yap", "bl_molec_test_tfe3"]
-	},
+	}	
+/*
+,
 	{
 		name:'dq_2_1',
 		desc:'Date of follow-up ("ufu_date") must be subsequent to Date of diagnosis ("bl_1st_pathol_ddiag")',
@@ -2080,7 +2027,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		params:["ulr_dod", "bl_dor", 0, ">=", 1],
 		vars:["ulr_dod", "bl_dor"]
 	}
-,
+	,
 	{
 		name:'dq_4_1',
 		desc:'Date of distant metastases ("udm_date") must be subsequent to Previous Date of Local Recurrence ("ulr_date")',
@@ -2593,7 +2540,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 ,
 	{
 		name:'dq_5_1',
-		desc:'Date of follow-up ("lfu_date") must be subsequent to Date of diagnosis ("bl_1st_pathol_ddiag") or Surveillance Ending Date ("bl_123_surv_dend") or Systemic therapy - Preoperative - Ending date ("bl_123_sys_ther_pre_dend") or Systemic therapy - Postoperative - Ending date ("bl_123_sys_ther_post_dend") or Systemic therapy - Palliative - Ending date ("bl_123_sys_ther_pal_dend") or Radiotherapy - Ending date ("bl_1_radio_set_dend") or Isolated limb perfusion - Procedure date ("bl_123_limb_dproc") or Local ablative techniques - Procedure date ("bl_1_abla_dproc") or Date of surgery ("bl_1_surg_dsurg")',
+		desc:'Date of follow-up ("lfu_date") must be subsequent to Date of diagnosis ("bl_1st_pathol_ddiag")',
 		prec:null,
 		precParams:null,
 		func:dateCompareToFixedDateRepInstr,
@@ -2700,7 +2647,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		func:uniqueDateCompareToFixedDateRepInstr,
 		params:["lfu_dod", "bl_dor", 0, ">", 1],
 		vars:["lfu_dod", "bl_dor"]
-	}
+	}	
 ,
 	{
 		name:'dq_6_1',
@@ -3779,7 +3726,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["lpr_radio_liver_set", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["lpr_radio_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_radio_liver_set"]
+		vars:["lpr_radio_liver_set","lpr_radio_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -3849,7 +3796,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["lpr_radio_bone_set", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["lpr_radio_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_radio_bone_set"]
+		vars:["lpr_radio_bone_set", "lpr_radio_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -3919,7 +3866,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["lpr_radio_soft_set", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["lpr_radio_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_radio_soft_set"]
+		vars:["lpr_radio_soft_set", "lpr_radio_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -3989,7 +3936,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["lpr_radio_lymph_set", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["lpr_radio_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_radio_lymph_set"]
+		vars:["lpr_radio_lymph_set", "lpr_radio_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -4059,7 +4006,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["lpr_radio_sero_set", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["lpr_radio_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_radio_sero_set"]
+		vars:["lpr_radio_sero_set", "lpr_radio_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -4129,7 +4076,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["lpr_radio_oth_set", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["lpr_radio_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_radio_oth_set"]
+		vars:["lpr_radio_oth_set", "lpr_radio_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -4369,7 +4316,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["lpr_abla_set_lung", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["lpr_abla_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_abla_set_lung"]
+		vars:["lpr_abla_set_lung", "lpr_abla_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -4379,7 +4326,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["lpr_abla_set_liver", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["lpr_abla_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_abla_set_liver"]
+		vars:["lpr_abla_set_liver", "lpr_abla_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -4389,7 +4336,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["lpr_abla_set_bone", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["lpr_abla_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_abla_set_bone"]
+		vars:["lpr_abla_set_bone", "lpr_abla_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -4399,7 +4346,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["lpr_abla_set_soft", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["lpr_abla_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_abla_set_soft"]
+		vars:["lpr_abla_set_soft", "lpr_abla_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -4409,7 +4356,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["lpr_abla_set_serosal", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["lpr_abla_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_abla_set_serosal"]
+		vars:["lpr_abla_set_serosal", "lpr_abla_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -4419,7 +4366,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["lpr_abla_set_lymph", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["lpr_abla_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_abla_set_lymph"]
+		vars:["lpr_abla_set_lymph", "lpr_abla_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -4429,7 +4376,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["lpr_abla_set_oth", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["lpr_abla_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_abla_set_oth"]
+		vars:["lpr_abla_set_oth", "lpr_abla_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -5962,7 +5909,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["spr_radio_liver_set", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["spr_radio_yn", 1], ["spr_surg_yn", 0]],
-		vars:["spr_radio_liver_set"]
+		vars:["spr_radio_liver_set", "spr_radio_yn", "spr_surg_yn"]
 	}
 ,
 	{
@@ -6032,7 +5979,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["spr_radio_bone_set", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["spr_radio_yn", 1], ["spr_surg_yn", 0]],
-		vars:["spr_radio_bone_set"]
+		vars:["spr_radio_bone_set", "spr_radio_yn", "spr_surg_yn"]
 	}
 ,
 	{
@@ -6102,7 +6049,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["spr_radio_soft_set", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["spr_radio_yn", 1], ["spr_surg_yn", 0]],
-		vars:["spr_radio_soft_set"]
+		vars:["spr_radio_soft_set", "spr_radio_yn", "spr_surg_yn"]
 	}
 ,
 	{
@@ -6172,7 +6119,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["spr_radio_lymph_set", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["spr_radio_yn", 1], ["spr_surg_yn", 0]],
-		vars:["spr_radio_lymph_set"]
+		vars:["spr_radio_lymph_set", "spr_radio_yn", "spr_surg_yn"]
 	}
 ,
 	{
@@ -6242,7 +6189,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["spr_radio_sero_set", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["spr_radio_yn", 1], ["spr_surg_yn", 0]],
-		vars:["spr_radio_sero_set"]
+		vars:["spr_radio_sero_set", "spr_radio_yn", "spr_surg_yn"]
 	}
 ,
 	{
@@ -6312,7 +6259,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		precParams:[[["spr_radio_oth_set", 4]]],
 		func:multiVarHasValueRepInstr,
 		params:[["spr_radio_yn", 1], ["spr_surg_yn", 0]],
-		vars:["spr_radio_oth_set"]
+		vars:["spr_radio_oth_set", "spr_radio_yn", "spr_surg_yn"]
 	}
 ,
 	{
@@ -6437,9 +6384,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 ,
 	{
 		name:'dq_8_95',
-		desc:'Liver - Local ablative techniques - Procedure date ("spr_abla_date_liv") must be subsequent to Date of progression ("spr_date")',
+		desc:'Liver - Local ablative techniques - Procedure date ("spr_abla_date_liver") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
-		precParams:[null],
+		precParams:null,
 		func:dateCompareWithDeltaRepInstr,
 		params:["spr_abla_date_liver", "spr_date", 0, ">"],
 		vars:["spr_abla_date_liver", "spr_date"]
@@ -6447,7 +6394,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 ,
 	{
 		name:'dq_8_96',
-		desc:'Liver - Local ablative techniques Setting Preoperative ("spr_abla_set_liv"))=1 - Liver - Date of surgery ("spr_surg_date_liv") must be subsequent to Liver - Local ablative techniques - Procedure date ("spr_abla_date_liv")',
+		desc:'Liver - Local ablative techniques Setting Preoperative ("spr_abla_set_liv"))=1 - Liver - Date of surgery ("spr_surg_date_liv") must be subsequent to Liver - Local ablative techniques - Procedure date ("spr_abla_date_liver")',
 		prec:multiVarHasValueRepInstr,
 		precParams:[[["spr_abla_set_liver", 1]]],
 		func:dateCompareWithDeltaRepInstr,
@@ -6457,7 +6404,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 ,
 	{
 		name:'dq_8_97',
-		desc:'Liver - Local ablative techniques - Setting Definitive ("spr_abla_set_liv")=4 - Liver - Local ablative techniques - Procedure date ("spr_abla_date_liv") must be subsequent to Date of progression ("spr_date")',
+		desc:'Liver - Local ablative techniques - Setting Definitive ("spr_abla_set_liv")=4 - Liver - Local ablative techniques - Procedure date ("spr_abla_date_liver") must be subsequent to Date of progression ("spr_date")',
 		prec:multiVarHasValueRepInstr,
 		precParams:[[["spr_abla_set_liver", 4]]],
 		func:dateCompareWithDeltaRepInstr,
@@ -6469,7 +6416,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		name:'dq_8_98',
 		desc:'Bone - Local ablative techniques - Procedure date ("spr_abla_date_bone") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
-		precParams:[null],
+		precParams:null,
 		func:dateCompareWithDeltaRepInstr,
 		params:["spr_abla_date_bone", "spr_date", 0, ">"],
 		vars:["spr_abla_date_bone", "spr_date"]
@@ -6499,7 +6446,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		name:'dq_8_101',
 		desc:'Soft tissues - Local ablative techniques - Procedure date ("spr_abla_date_soft") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
-		precParams:[null],
+		precParams:null,
 		func:dateCompareWithDeltaRepInstr,
 		params:["spr_abla_date_soft", "spr_date", 0, ">"],
 		vars:["spr_abla_date_soft", "spr_date"]
@@ -6529,7 +6476,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		name:'dq_8_104',
 		desc:'Lymph nodes - Local ablative techniques - Procedure date ("spr_abla_date_lymph") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
-		precParams:[null],
+		precParams:null,
 		func:dateCompareWithDeltaRepInstr,
 		params:["spr_abla_date_lymph", "spr_date", 0, ">"],
 		vars:["spr_abla_date_lymph", "spr_date"]
@@ -6559,7 +6506,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		name:'dq_8_107',
 		desc:'Serosal - Local ablative techniques - Procedure date ("spr_abla_date_serosal") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
-		precParams:[null],
+		precParams:null,
 		func:dateCompareWithDeltaRepInstr,
 		params:["spr_abla_date_serosal", "spr_date", 0, ">"],
 		vars:["spr_abla_date_serosal", "spr_date"]
@@ -6589,7 +6536,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		name:'dq_8_110',
 		desc:'Other - Local ablative techniques - Procedure date ("spr_abla_date_oth") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
-		precParams:[null],
+		precParams:null,
 		func:dateCompareWithDeltaRepInstr,
 		params:["spr_abla_date_oth", "spr_date", 0, ">"],
 		vars:["spr_abla_date_oth", "spr_date"]
@@ -7044,5 +6991,5 @@ REPLACED BY multiOR on the 4 variables (see below)
 		params:["sfu_sys_ther_br", 2, "!="],
 		vars:["lsu_status", "sfu_sys_ther_br"],
 	}
-
+*/
 ];
