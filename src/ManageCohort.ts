@@ -1,14 +1,14 @@
 import { fetchFileRepository, fetchCohort, getCohort, createFileCohort, createDirectory } from "@/fetch/redcap-fetch";
 import type { Center, REDCapRecord } from "@/utils/types";
 import { createTxtFile } from "@/utils/createFile";
-import { achieveRecordData } from "@/utils/achieveRecordData";
+import { achieveAllRecordData } from "@/utils/achieveAllRecordData";
 
 
 export const ManageCohort = async (
   center: Center,
   token: string,
   currentAnalysis: string
-): Promise<{ cohort: string[] | null; recordData: REDCapRecord[][] | null }> => {
+): Promise<{ cohort: string[] | null; allRecordData: REDCapRecord[][] | null }> => {
 
   // ---- GESTIONE COMPILAZIONE ---- //
   const nameDirectory = "EHE-Federated";
@@ -39,7 +39,7 @@ export const ManageCohort = async (
     cohort = recordIds;
   }
 
-  const recordData = await achieveRecordData(center.url, token, cohort);
+  const allRecordData = await achieveAllRecordData(center.url, token, cohort);
 
-  return { cohort, recordData };
+  return { cohort, allRecordData };
 };

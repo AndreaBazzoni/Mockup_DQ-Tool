@@ -21,7 +21,7 @@ export const anonymazeData = (
 
 
 export const DoAnonymizedData = async (
-  recordDataResults: REDCapRecord[][]
+  allRecordDataResults: REDCapRecord[][]
 ) => {
   // Inizializzo il vettore risultante e il conteggio dei pazienti
   let anonymizedResults: Record<number, REDCapRecord[]> = {};
@@ -31,11 +31,11 @@ export const DoAnonymizedData = async (
   let secret = "prova_segreto";
 
   try {
-    // Faccio una copia di recordDataResult così non lo sovrascrivo
-    const anonymousRecordData = JSON.parse(JSON.stringify(recordDataResults));
+    // Faccio una copia di allRecordDataResult così non lo sovrascrivo
+    const anonymousAllRecordData = JSON.parse(JSON.stringify(allRecordDataResults));
 
     // Process each record
-    anonymousRecordData.forEach((recordRows: REDCapRecord[]) => {
+    anonymousAllRecordData.forEach((recordRows: REDCapRecord[]) => {
       const recordId = recordRows[0].bl_record_id;
       if (!recordId) {
         console.error("Record senza bl_record_id.");

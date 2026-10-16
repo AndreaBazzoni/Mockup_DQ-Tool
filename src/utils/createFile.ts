@@ -15,10 +15,10 @@ export const createTxtFile = (
 
 // Create generic .xlsx file
 export const createXlsxFile = (
-  recordData: REDCapRecord[][]
+  allRecordData: REDCapRecord[][]
 ) => {
-  // recordData è un oggetto che facciamo diventare array di oggetti
-  const rows = Object.values(recordData).flat();
+  // allRecordData è un oggetto che facciamo diventare array di oggetti
+  const rows = Object.values(allRecordData).flat();
 
   // Create a new workbook and a worksheet
   const workbook = XLSX.utils.book_new();

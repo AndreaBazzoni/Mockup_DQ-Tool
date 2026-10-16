@@ -1,7 +1,7 @@
-import { getRecordData } from "@/fetch/redcap-fetch";
+import { getAllRecordData } from "@/fetch/redcap-fetch";
 import type { REDCapRecord } from "@/utils/types";
 
-export const achieveRecordData = async (
+export const achieveAllRecordData = async (
   centerUrl: string,
   token: string,
   cohort: string[]
@@ -11,7 +11,7 @@ export const achieveRecordData = async (
   try {
     // Process each record
     for (const recordId of cohort) {
-      let recordData = await getRecordData(centerUrl, token, recordId);
+      let recordData = await getAllRecordData(centerUrl, token, recordId);
       recordDataTotal.push(recordData);
     }
     return recordDataTotal;
@@ -24,7 +24,7 @@ export const achieveRecordData = async (
 
 // Versione con Promise.all (più veloce, ma più instabile)
 /*
-export const achieveRecordData = async (centerUrl: string, token: string, cohort: string[]) => {
+export const achieveAllRecordData = async (centerUrl: string, token: string, cohort: string[]) => {
   try {
     const recordDataTotal = await Promise.all(
       cohort.map((recordId) => getRecordData(centerUrl, token, recordId))

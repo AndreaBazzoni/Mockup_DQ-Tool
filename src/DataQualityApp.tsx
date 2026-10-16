@@ -20,7 +20,7 @@ export default function DataQualityApp() {
   const [showToken, setShowToken] = useState(false);
   const [loading, setLoading] = useState(false);
   const [cohortResults, setCohortResults] = useState<string[] | null>(null);
-  const [recordDataResults, setRecordDataResults] = useState<REDCapRecord[][] | null>(null);
+  const [allRecordDataResults, setAllRecordDataResults] = useState<REDCapRecord[][] | null>(null);
   const [resultQuality, setResultQuality] = useState<Record<string, DQRecord> | null>(null);
   const [resultAnonymous, setResultAnonymous] = useState<REDCapRecord[][] | null>(null);
   const [showShareQuality, setShowShareQuality] = useState(false);
@@ -57,7 +57,7 @@ export default function DataQualityApp() {
     // Resetto token e risultati
     setToken("");
     setCohortResults(null);
-    setRecordDataResults(null);
+    setAllRecordDataResults(null);
     setResultQuality(null);
     setResultAnonymous(null);
   };
@@ -67,7 +67,7 @@ export default function DataQualityApp() {
     setToken(value);
     // Invalido la cache: il nuovo token potrebbe corrispondere a permessi/dati diversi
     setCohortResults(null);
-    setRecordDataResults(null);
+    setAllRecordDataResults(null);
     setResultQuality(null);
     setResultAnonymous(null);
   };
@@ -84,7 +84,7 @@ export default function DataQualityApp() {
 
     setLoading(true);
     let cohort: string[] | null;
-    let recordData: REDCapRecord[][] | null;
+    let allRecordData: REDCapRecord[][] | null;
 
     try {
       const center = ListOfCenters.find((c) => c.id === selectedCenter.id);
@@ -92,25 +92,25 @@ export default function DataQualityApp() {
         throw new Error("Problems finding the center.");
       }
 
-      // Verifico se ho già caricato cohort e recordData
-      if (cohortResults !== null && recordDataResults !== null) {
+      // Verifico se ho già caricato cohort e allRecordData
+      if (cohortResults !== null && allRecordDataResults !== null) {
         cohort = cohortResults;
-        recordData = recordDataResults;
+        allRecordData = allRecordDataResults;
       }
       else {
-        const { cohort: cohortFetched, recordData: recordDataFetched } = await ManageCohort(center, token, CurrentAnalysis);
+        const { cohort: cohortFetched, allRecordData: allRecordDataFetched } = await ManageCohort(center, token, CurrentAnalysis);
         setCohortResults(cohortFetched);
-        setRecordDataResults(recordDataFetched);
+        setAllRecordDataResults(allRecordDataFetched);
         cohort = cohortFetched;
-        recordData = recordDataFetched;
+        allRecordData = allRecordDataFetched;
       }
       
-      if ((cohort === null) || (recordData === null)) {
+      if ((cohort === null) || (allRecordData === null)) {
         throw new Error("Failed to fetch data.");
       }
 
       console.log("Cohort: ", cohort);
-      console.log("RecordData: ", recordData);
+      console.log("AllRecordData: ", allRecordData);
 
       // ---- BRANCH ----
 
@@ -143,17 +143,17 @@ export default function DataQualityApp() {
         const missingMatrix = {}
         for (let i = 0; i < cohort.length; i++) {
           const context: DQContext = {
-						'data': recordData[i],
+						'data': allRecordData[i],
 						'metadata': metadata,
 						'instrumentsVsEvents': instrumentsVsEvents,
 						'repeatingInstrumentsAndEvents': repeatingInstrumentsAndEvents
 					};
-          processMissingRecord(context, recordData[i], missingMetadata, missingMatrix);
+          processMissingRecord(context, allRecordData[i], missingMetadata, missingMatrix);
         }
 
         // Inizio cicli DQ
         for (let i = 0; i < cohort.length; i++) {
-          let dq = await DoDataQuality(recordData[i], metadataAPI, instrumentsVsEventsAPI, repeatingInstrumentsAndEventsAPI);
+          let dq = await DoDataQuality(allRecordData[i], metadataAPI, instrumentsVsEventsAPI, repeatingInstrumentsAndEventsAPI);
           if (dq === null) {
             throw new Error("Failed during Data Quality.");
           }
@@ -164,7 +164,7 @@ export default function DataQualityApp() {
       
       else {
         // ---- Anonymous Data ----
-        const anonymousResult = await DoAnonymizedData(recordData);
+        const anonymousResult = await DoAnonymizedData(allRecordData);
         if (anonymousResult === null) {
           throw new Error("Failed during Data Anonymization.");
         }
@@ -353,7 +353,7 @@ export default function DataQualityApp() {
                 {!dimMobile && <span>✅</span>}
               </div>
               {
-                (selectedCenter!==null && cohortResults!==null && recordDataResults!==null) &&
+                (selectedCenter!==null && cohortResults!==null && allRecordDataResults!==null) &&
                 <div>
                   <ul className="infoResults">
                     <li className="scrollText"><b>Name: </b> {CurrentAnalysis} - {selectedCenter.name}</li>
@@ -391,7 +391,7 @@ export default function DataQualityApp() {
                 </div>
               }
               {
-                (selectedCenter === null || cohortResults === null || recordDataResults === null) &&
+                (selectedCenter === null || cohortResults === null || allRecordDataResults === null) &&
                 <ul className="infoResults">
                   <li className="scrollText">
                     <b>
@@ -420,7 +420,7 @@ export default function DataQualityApp() {
                 {!dimMobile && <span>✅</span>}
               </div>
               {
-                (selectedCenter!==null && cohortResults!==null && recordDataResults!==null) &&
+                (selectedCenter!==null && cohortResults!==null && allRecordDataResults!==null) &&
                 <div>
                   <ul className="infoResults">
                     <li className="scrollText"><b>Name: </b> {CurrentAnalysis} - {selectedCenter.name}</li>
@@ -454,7 +454,7 @@ export default function DataQualityApp() {
                 </div>
               }
               {
-                (selectedCenter === null || cohortResults === null || recordDataResults === null) &&
+                (selectedCenter === null || cohortResults === null || allRecordDataResults === null) &&
                 <ul className="infoResults">
                   <li className="scrollText">
                     <b>

@@ -1,5 +1,5 @@
 import { fetchRecords } from "@/fetch/dq-fetch";
-import { getRecordData } from "@/fetch/redcap-fetch";
+import { getAllRecordData } from "@/fetch/redcap-fetch";
 import { initializeBaselineCounters,	processBaselineRecord } from '@/fetch/mgmt-complete-patients';
 import { buildDiseaseExtensionTimeline, updateDiseaseExtensionPatients, updateDiseaseExtensionCounters, aggregateDiseaseExtensionCounters } from '@/fetch/mgmt-disease-extension';
 import { initializeFollowupStats, buildStatusTimeline, buildTimelineSummary, analyzeFollowupCompleteness } from '@/fetch/mgmt-followup';
@@ -72,7 +72,7 @@ export const obtainParamsExcelDQ = async(
     for (const recordId of fetchedRecords) {
       // Per limitare esecuzione a record selezionati
       if (whiteRecords && (whiteRecords.length === 0 || whiteRecords.includes(recordId))) {
-        let recordData = await getRecordData(centerUrl, token, recordId);
+        let recordData = await getAllRecordData(centerUrl, token, recordId);
         
         const timeline = buildStatusTimeline(recordId, recordData);
         allTimeline.push(...timeline);
