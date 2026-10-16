@@ -89,7 +89,7 @@ export const extractUnknownCodes = (
       if (found === undefined) return [];
       let eventName = found.unique_event_name;
 
-      if (!(isVarRepeating(instrumentName, eventName, repeatings))){
+      if (!(isVarRepeating(repeatings, instrumentName, eventName))){
         instrumentName = "";
       }
       
@@ -147,7 +147,7 @@ export function processMissingRecord(
     const expectedVariables = missingMetadata.filter(
       metadataItem => metadataItem.form_name === rowType
     );
-    const expectedVarBranch = getExpectedVariablesBranching(expectedVariables, context, row);
+    const expectedVarBranch = getExpectedVariablesBranching(context, expectedVariables, row);
 
     // Controllo ogni variabile attesa.
     for (const variable of expectedVarBranch) {
@@ -176,8 +176,8 @@ export function processMissingRecord(
 
 
 const getExpectedVariablesBranching = (
-  expectedVariables: REDCapMetadataField[],
   context: DQContext,
+  expectedVariables: REDCapMetadataField[],
   row: REDCapRecord
 ) => {
   const expectedVarBranch = [];
@@ -203,11 +203,26 @@ const getExpectedVariablesBranching = (
 };
 
 
+// Stabilisce se il valore di una variabile è missing.
+// [ NOTA: 0 e "0" = NON sono missing ]
+const isMissingValue = (
+  value: string
+) => {
+    return (
+        value === null ||
+        value === undefined ||
+        value === ""
+    );
+};
+
+
 // Determina il tipo di una row di recordData. Il confronto viene fatto usando:
 //  - row.redcap_event_name
 //  - row.redcap_repeat_instrument
 // [ cercando la corrispondente combinazione in ROW_TYPE_MAPPING ]
-const getRowType = (row: REDCapRecord) => {
+const getRowType = (
+  row: REDCapRecord
+) => {
   const event = row.redcap_event_name || "";
   const instrument = row.redcap_repeat_instrument || "";
   const mapping = ROW_TYPE_MAPPING.find(item => (

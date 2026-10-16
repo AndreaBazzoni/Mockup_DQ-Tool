@@ -16,7 +16,7 @@ export const getEventOfInstrument = (dqContext: DQContext, instrument: string) =
 };
 
 
-export const isVarRepeating = (instr: string, event: string | null, repeatingInstrumentsAndEvents: REDCapRepeatingsField[]) => {
+export const isVarRepeating = (repeatingInstrumentsAndEvents: REDCapRepeatingsField[], instr: string, event: string | null) => {
   const eventIsRep = repeatingInstrumentsAndEvents.some(item => item.event_name === event);
 
   if (eventIsRep) {
@@ -379,7 +379,7 @@ export const getFirstEventFromDataForVar = (dqContext: DQContext, variable: Vari
 };
 
 
-export const getRowsOfDataForRepeatingVar = (instr: string, event: string, dqContext: DQContext) => {
+export const getRowsOfDataForRepeatingVar = (dqContext: DQContext, instr: string, event: string) => {
 	let repeatingInstrumentsAndEvents = dqContext.repeatingInstrumentsAndEvents;
 	let allData = dqContext.data;
 
@@ -438,7 +438,7 @@ export const translateRedcapToJs = (expr: string, { strict = true } = {}) => {
 };
 
 
-const nonexistentVars = (varsArray: string[], dqContext: DQContext) => {
+const nonexistentVars = (dqContext: DQContext, varsArray: string[]) => {
 	const vars = new Set();
 	const walk = (value: any) => {
 		// Eseguo ricorsivamente finché il type dell'espressione esaminata è un array (per la lista delle var non dovrebbe accadere). 
@@ -494,7 +494,7 @@ function findVarsInStructure(value: any[], varsSet: Set<string>, foundSet: Set<a
 };
 
 
-const missingParams = (recordData: REDCapRecord[], parameters: any[] | null, dqContext: DQContext) => {
+const missingParams = (dqContext: DQContext, recordData: REDCapRecord[], parameters: any[] | null) => {
 	let result: any[] = [];
 	let missingCount = 0;
 
@@ -504,7 +504,7 @@ const missingParams = (recordData: REDCapRecord[], parameters: any[] | null, dqC
 	}
 
 	// Estraggo tutti i nomi variabile da "params" o "precParams" (che non ha type fisso).
-	const vars = extractVarsFromParams(parameters, dqContext);
+	const vars = extractVarsFromParams(dqContext, parameters);
 		
 	// Se arrivo qui ho un check/precheck da eseguire e params/precParams non nullo, quindi vars (array delle variabili da verificare) non dovrebbe mai essere null.
 	if (vars.length === 0){
@@ -535,7 +535,7 @@ const missingParams = (recordData: REDCapRecord[], parameters: any[] | null, dqC
 			let instr = data["redcap_repeat_instrument"];
 			let event = data["redcap_event_name"];
 			if (event === eventOfV) {
-				if (!(isVarRepeating(instrumentOfV, eventOfV, dqContext.repeatingInstrumentsAndEvents))){
+				if (!(isVarRepeating(dqContext.repeatingInstrumentsAndEvents, instrumentOfV, eventOfV))){
 					instrumentOfV = "";
 				}
 				if (instr === instrumentOfV){
@@ -555,7 +555,7 @@ const missingParams = (recordData: REDCapRecord[], parameters: any[] | null, dqC
 };
 
 
-const extractVarsFromParams = (parameters: any[], dqContext: DQContext) => {
+const extractVarsFromParams = (dqContext: DQContext, parameters: any[]) => {
 	// Funzione per riconoscere quali sono le variabili dentro a params e precParams.
 	// NOTA: arrivare qui dopo aver eseguito checkVarsConsistency dovrebbe garantire che non ci siano typo/nomi sbagliati tra quelli inclusi in precParams e params.
 	// La funzione legge precParam ricorsivamente, qualsiasi sia la sua struttura, fino ad arrivare ai singoli token di tipo stringa.
@@ -659,7 +659,7 @@ export const DoDataQuality = async (
 				console.log("Stop here!");
 			}
 
-			let isRepeating = isVarRepeating(instrumentOfMainVar, eventOfMainVar, dqContext.repeatingInstrumentsAndEvents);
+			let isRepeating = isVarRepeating(dqContext.repeatingInstrumentsAndEvents, instrumentOfMainVar, eventOfMainVar);
 
 			let varsArray = check.vars;
 			
@@ -715,7 +715,7 @@ export const DoDataQuality = async (
       // Se repeating => esecuzione multipla
 			else if (isRepeating) {
 				// Valuto ogni istanza di mainVar separatamente
-				let rowsOfDataForMainVar = getRowsOfDataForRepeatingVar(instrumentOfMainVar, eventOfMainVar, dqContext);
+				let rowsOfDataForMainVar = getRowsOfDataForRepeatingVar(dqContext, instrumentOfMainVar, eventOfMainVar);
         if (rowsOfDataForMainVar === false) {
           return null;
         }
@@ -761,7 +761,7 @@ export const DoDataQuality = async (
 				else if (bLogicPassed) {
 					// Lavoro basandomi su vars perché è l'unico elenco variabili che ha struttura fissa (array di stringhe); precParams e params hanno struttura variabile.
 					// Verifico che tutte le vars elencate nel json di per quel DQ check esistano nei metadata. Solo se è così proseguo. Mi aspetto nonExistingVars vuoto.
-					let nonExistingVars = nonexistentVars(check.vars, dqContext);
+					let nonExistingVars = nonexistentVars(dqContext, check.vars);
 					if(nonExistingVars.length > 0){
 						console.log("Error in the vars list for check " + check.name + ": ");
 						nonExistingVars.forEach(function (v) {
@@ -787,7 +787,7 @@ export const DoDataQuality = async (
 							if (check.prec != null && typeof check.prec === "function") {
 								// Prima del precheck effettivo verifico se una o più variabili del precheck è nulla; se sì, non passo nemmeno a eseguire i precheck perché la regola non è rilevante.
                 // precVarNull è true se almeno una delle variabili del precheck è nulla.
-								const precVarIsNull = missingParams(recordData, check.precParams, dqContext);
+								const precVarIsNull = missingParams(dqContext, recordData, check.precParams);
 								if (precVarIsNull === undefined || precVarIsNull.length === 0) {
 									console.log("Problem case: precParam are not specified for function prec or REDCap variables are not recognized in precParam.");
 									//return precVarIsNull;
@@ -864,7 +864,7 @@ export const DoDataQuality = async (
 								// Prima di valutare i check, verifico se ho variabili nulle (come ho fatto nei precheck).
                 // In questo caso, però, se ho dei null imposto il check a FAIL e passo al prossimo DQ check.
 								// "anyVarNull" è true se almeno una delle variabili del check è nulla.
-								const anyVarIsNull = missingParams(recordData, check.params, dqContext);
+								const anyVarIsNull = missingParams(dqContext, recordData, check.params);
 								console.log("Any params variable is null = " + anyVarIsNull);
 								if (anyVarIsNull === undefined || anyVarIsNull.length === 0){
 									console.log("Problem case: params are not specified for function main or REDCap variables are not recognized in params.");

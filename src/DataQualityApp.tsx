@@ -148,7 +148,6 @@ export default function DataQualityApp() {
 						'instrumentsVsEvents': instrumentsVsEvents,
 						'repeatingInstrumentsAndEvents': repeatingInstrumentsAndEvents
 					};
-          console.log("AaAaAaAaAaAaAaAa: ", recordData[i][0].bl_record_id);
           processMissingRecord(context, recordData[i], missingMetadata, missingMatrix);
         }
 

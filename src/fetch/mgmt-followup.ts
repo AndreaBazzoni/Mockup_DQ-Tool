@@ -2,7 +2,8 @@ import type { REDCapRecord } from "@/utils/types";
 
 
 // Funzione per inizializzare le FollowUp Stats
-export function initializeFollowupStats() {
+export function initializeFollowupStats(
+) {
   return {
     unifocal_complete: {
       follow_up: 0,
@@ -35,7 +36,10 @@ export function initializeFollowupStats() {
 
 
 // Funzione per analizzare il FollowUp
-export function analyzeFollowupCompleteness (recordData: REDCapRecord[], followupStats: any) {
+export function analyzeFollowupCompleteness (
+  recordData: REDCapRecord[],
+  followupStats: any
+) {
 	const FOLLOWUP_CHECKS = [
 		////////////////////////////////
 		// UNIFOCAL
@@ -124,7 +128,9 @@ export function analyzeFollowupCompleteness (recordData: REDCapRecord[], followu
 
 
 // Funzione per costruire la Timeline Summary
-export function buildTimelineSummary(timeline: any) {
+export function buildTimelineSummary(
+  timeline: any
+) {
   const map = new Map();
   for (const item of timeline) {
     // Escludo date e status lasciati null
@@ -151,7 +157,10 @@ export function buildTimelineSummary(timeline: any) {
 
 
 // Funzione per costruire la Status Timeline
-export function buildStatusTimeline(recordId: string, recordData: REDCapRecord[]) {
+export function buildStatusTimeline(
+  recordId: string,
+  recordData: REDCapRecord[]
+) {
 	const rowTypeMap = buildRowTypeMap();
 
 	const baselineRow = recordData.find(
@@ -197,41 +206,42 @@ export function buildStatusTimeline(recordId: string, recordData: REDCapRecord[]
 }
 
 const STATUS_VARIABLES_MAP = {
-    unifocal_followup: {
-        date: "ufu_date",
-        status: "ufu_status",
-    },
-    unifocal_local_recurrence: {
-        date: "ulr_date",
-        status: "ulr_status",
-    },
-    unifocal_distant_metastases: {
-        date: "udm_date",
-        status: "udm_status",
-    },
-    locoregional_followup: {
-        date: "lfu_date",
-        status: "lfu_status",
-    },
-    locoregional_progression: {
-        date: "lpr_date",
-        status: "lpr_status",
-    },
-    systemic_metastases_followup: {
-        date: "sfu_date",
-        status: "sfu_status",
-    },
-    systemic_metastases_progression: {
-        date: "spr_date",
-        status: "spr_status",
-    },
-    life_status_update: {
-        date: "lsu_status_date",
-        status: "lsu_status",
-    },
+  unifocal_followup: {
+    date: "ufu_date",
+    status: "ufu_status",
+  },
+  unifocal_local_recurrence: {
+    date: "ulr_date",
+    status: "ulr_status",
+  },
+  unifocal_distant_metastases: {
+    date: "udm_date",
+    status: "udm_status",
+  },
+  locoregional_followup: {
+    date: "lfu_date",
+    status: "lfu_status",
+  },
+  locoregional_progression: {
+    date: "lpr_date",
+    status: "lpr_status",
+  },
+  systemic_metastases_followup: {
+    date: "sfu_date",
+    status: "sfu_status",
+  },
+  systemic_metastases_progression: {
+    date: "spr_date",
+    status: "spr_status",
+  },
+  life_status_update: {
+    date: "lsu_status_date",
+    status: "lsu_status",
+  },
 } as const;
 
-function buildRowTypeMap() {
+function buildRowTypeMap(
+) {
 	const ROW_TYPE_MAPPING = [
 		{ instrument: "", event: "baseline_arm_1", tipoRow: "baseline_and_treatment_at_first_presentation" },
 		{ instrument: "unifocal_followup", event: "unifocal_arm_1", tipoRow: "unifocal_followup" },
@@ -243,6 +253,7 @@ function buildRowTypeMap() {
 		{ instrument: "systemic_metastases_progression", event: "systemic_metastase_arm_1", tipoRow: "systemic_metastases_progression" },
 		{ instrument: "", event: "life_status__clini_arm_1", tipoRow: "life_status_update" },
 	];
+  
 	const map = new Map();
 	for (const item of ROW_TYPE_MAPPING) {
 		const key = `${item.event}||${item.instrument}`;
@@ -251,7 +262,9 @@ function buildRowTypeMap() {
 	return map;
 }
 
-function getYear(dateValue: any) {
+function getYear(
+  dateValue: any
+) {
 	if (!dateValue) return null;
 	// Se è già un numero tipo "2020"
 	if (/^\d{4}$/.test(dateValue)) {

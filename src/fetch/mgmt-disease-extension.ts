@@ -19,7 +19,10 @@ type DiseaseExtensionPatients = Record<string,DiseaseExtensionPatient>;
 
 
 // Funzione per aggiornare la Disease Extension Patients
-export function updateDiseaseExtensionPatients(diseaseExtensionPatients: DiseaseExtensionPatients, timeline: any) {
+export function updateDiseaseExtensionPatients(
+  diseaseExtensionPatients: DiseaseExtensionPatients,
+  timeline: any
+) {
   if (!timeline.length) {
     return null;
   }
@@ -57,7 +60,10 @@ export function updateDiseaseExtensionPatients(diseaseExtensionPatients: Disease
 
 
 // Funzione per aggiornare la Disease Extension Counters
-export function updateDiseaseExtensionCounters(diseaseExtensionCounters: DiseaseExtensionCounters, timeline: any) {
+export function updateDiseaseExtensionCounters(
+  diseaseExtensionCounters: DiseaseExtensionCounters,
+  timeline: any
+) {
   if (!timeline.length) {
     return null;
   }
@@ -100,7 +106,9 @@ export function updateDiseaseExtensionCounters(diseaseExtensionCounters: Disease
 }
 
 
-export function aggregateDiseaseExtensionCounters(diseaseExtensionCounters: DiseaseExtensionCounters) {
+export function aggregateDiseaseExtensionCounters(
+  diseaseExtensionCounters: DiseaseExtensionCounters
+) {
 
   const aggregated: DiseaseExtensionCounters = {};
 
@@ -142,7 +150,11 @@ export function aggregateDiseaseExtensionCounters(diseaseExtensionCounters: Dise
 
 
 // Funzione per costruire la Disease Extension Timeline
-export function buildDiseaseExtensionTimeline(recordId: string, recordData: REDCapRecord[], baselineDiseaseExtensionMap: any) {
+export function buildDiseaseExtensionTimeline(
+  recordId: string,
+  recordData: REDCapRecord[],
+  baselineDiseaseExtensionMap: any
+) {
 	const timeline = [];
 
 	const baselineRow = recordData.find(
@@ -258,7 +270,9 @@ const DISEASE_EXTENSION_MAP = {
   }
 };
 
-function getYear(dateValue: any) {
+function getYear(
+  dateValue: any
+) {
 	if (!dateValue) return null;
 	// Se è già un numero tipo "2020"
 	if (/^\d{4}$/.test(dateValue)) {
