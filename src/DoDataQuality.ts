@@ -51,7 +51,9 @@ export const runBranchingLogic = (dqContext: DQContext, metadataOfVar: REDCapMet
     event: getEventOfInstrument(dqContext, metadataOfVar.form_name)
   };
   // Evito errore di inutilizzo della variabile
-  console.log("Variabile Branching: ", branchRefVar);
+  if (branchRefVar === null) {
+    console.log("Variabile Branching: ", branchRefVar);
+  }
 
   let evaluableBranchLogicExpr = compileBranchingLogicExpression(dqContext, branchingOrigExpr, instance);
   let result = null;
@@ -180,20 +182,16 @@ const compileBranchingLogicExpression = (dqContext: DQContext, branchingOrigExpr
 
 
 export const evalRedcap = (jsExpr: string, { fallback = false } = {}) => {
-	console.log('[evalRedcap] jsExpr =', jsExpr);
-
 	try {
 		// Coerzione e trimming minimi: non trasformo altro
 		const s = String(jsExpr ?? '').trim();
 
 		// Se vuoto, ritorno il fallback (evita "return ()" -> SyntaxError)
 		if (!s) {
-			console.warn('[evalRedcap] Espressione vuota: ritorno fallback');
 			return fallback;
 		}
 
 		// Valutazione come espressione
-		console.log('branching is ' + Function(`"use strict"; return (${s});`)());
 		return Function(`"use strict"; return (${s});`)();
 
 	} catch (err) {
@@ -453,7 +451,7 @@ const nonexistentVars = (dqContext: DQContext, varsArray: string[]) => {
 			let metadata = dqContext.metadata;
 			let metadataOfValue = metadata.find(item => item.field_name === value);
 			if (typeof metadataOfValue === "undefined") {
-				console.log("***" + value + "*** should be a variable but is not found in metadata!!");
+				//console.log("***" + value + "*** should be a variable but is not found in metadata!!");
 				vars.add(value);
 			}
 		}
@@ -520,7 +518,7 @@ const missingParams = (dqContext: DQContext, recordData: REDCapRecord[], paramet
 		let metadataOfV = metadata.find(item => item.field_name === v);
 
 		if (typeof metadataOfV === "undefined") {
-			console.log("***" + v + "*** is not a variable in metadata");
+			//console.log("***" + v + "*** is not a variable in metadata");
 			return
 		}
 
@@ -575,7 +573,7 @@ const extractVarsFromParams = (dqContext: DQContext, parameters: any[]) => {
 			let metadata = dqContext.metadata;
 			let metadataOfValue = metadata.find(item => item.field_name === value);
 			if (typeof metadataOfValue !== "undefined") {
-				console.log("***" + value + "*** is a variable to be checked");
+				//console.log("***" + value + "*** is a variable to be checked");
 				foundVars.add(value);
 			}
 		}
@@ -636,7 +634,7 @@ export const DoDataQuality = async (
 
 			// Gestisco il caso in cui ci siano delle variabili che non sono in metadata.
 			if (typeof metadataOfMainVar === "undefined") {
-				console.log("***" + mainVar + "*** is not a variable in metadata.");
+				//console.log("***" + mainVar + "*** is not a variable in metadata.");
 				return null;
 			}
 
@@ -656,7 +654,7 @@ export const DoDataQuality = async (
 
 			const stopDq1 = ['dq_1_12', 'dq_1_27', 'dq_1_28','dq_3_1','dq_4_1','dq_9_1'];
 			if (stopDq1.includes(check.name)) {
-				console.log("Stop here!");
+				//console.log("Stop here!");
 			}
 
 			let isRepeating = isVarRepeating(dqContext.repeatingInstrumentsAndEvents, instrumentOfMainVar, eventOfMainVar);
@@ -676,7 +674,7 @@ export const DoDataQuality = async (
 					let metadataElem = metadata.find(item => item.field_name === checkVarName);
 					// Gestisco il caso in cui ci siano delle variabili che non sono in metadata
 					if (typeof metadataElem === "undefined") {
-						console.log("***" + checkVarName + "*** is not a variable in metadata");
+						//console.log("***" + checkVarName + "*** is not a variable in metadata");
 						return null;
 					}
 					if (varHasBranchingLogic(metadataElem)) {
@@ -731,7 +729,7 @@ export const DoDataQuality = async (
 					varsArray.forEach(checkVarName => {
 						let metadataElem = metadata.find(item => item.field_name === checkVarName);
 						if (typeof metadataElem === "undefined") {
-							console.log("***" + checkVarName + "*** is not a variable in metadata");
+							//console.log("***" + checkVarName + "*** is not a variable in metadata");
 							return null;
 						}
 						if (varHasBranchingLogic(metadataElem)) {
@@ -763,7 +761,7 @@ export const DoDataQuality = async (
 					// Verifico che tutte le vars elencate nel json di per quel DQ check esistano nei metadata. Solo se è così proseguo. Mi aspetto nonExistingVars vuoto.
 					let nonExistingVars = nonexistentVars(dqContext, check.vars);
 					if(nonExistingVars.length > 0){
-						console.log("Error in the vars list for check " + check.name + ": ");
+						//console.log("Error in the vars list for check " + check.name + ": ");
 						nonExistingVars.forEach(function (v) {
 							console.log(v);
 						});
@@ -777,7 +775,7 @@ export const DoDataQuality = async (
             // Se sì proseguo, Se no mi fermo. Cosa faccio coi results? Tecnicamente non è un fail dei dati, ma un problema nella struttura della regola.
 						let varConsistency = checkVarsConsistency(check.precParams, check.params, check.vars);
 						if(!varConsistency){
-							console.log("There are errors in precParams or params definition.");
+							//console.log("There are errors in precParams or params definition.");
 							return null;
 						}
 						else if(varConsistency) {
@@ -789,7 +787,7 @@ export const DoDataQuality = async (
                 // precVarNull è true se almeno una delle variabili del precheck è nulla.
 								const precVarIsNull = missingParams(dqContext, recordData, check.precParams);
 								if (precVarIsNull === undefined || precVarIsNull.length === 0) {
-									console.log("Problem case: precParam are not specified for function prec or REDCap variables are not recognized in precParam.");
+									//console.log("Problem case: precParam are not specified for function prec or REDCap variables are not recognized in precParam.");
 									//return precVarIsNull;
                   return null;
 								}
@@ -810,12 +808,12 @@ export const DoDataQuality = async (
                     // Store "PASS" or "FAIL" based on the result
                     // results[check.name + " - " + check.desc] = result ? "PASS" : "FAIL";
 									if (typeof result === "boolean") {
-										console.log("The precheck result is a boolean.");
+										//console.log("The precheck result is a boolean.");
 										if (!result) {
 											//se il precheck non è verificato, il DQ check attuale non è applicabile (results 0) e salto al prossimo (return).
 											precheckPass = false;
 											results[check.name + " - " + check.desc] = 0;
-											console.log("The precheck failed. Next DQ check");
+											//console.log("The precheck failed. Next DQ check");
 									      // allResults[0] = results;
 											  // allResults[1] = missings;
 											  // return allResults;
@@ -824,9 +822,9 @@ export const DoDataQuality = async (
 										//results[check.name + ' - ' + check.desc] = result ? '' : '1';
 									}
                   else if (typeof result === "object" && result !== null) {
-										console.log("The precheck result is an object.");
+										//console.log("The precheck result is an object.");
 										const errored = Object.values(result).filter(value => value === false).length;
-										console.log(" - nr of errors in the precheck = " + errored);
+										//console.log(" - nr of errors in the precheck = " + errored);
 										if (errored == 0) {
 											//results[check.name + " - " + check.desc] = "";
 											results[check.name + " - " + check.desc] = 0;
@@ -850,7 +848,7 @@ export const DoDataQuality = async (
 							if(!precheckPass) {
 								// Se ho avuto fail nel precheck fisso results (#fail) a 1
 								results[check.name + " - " + check.desc] = 0;
-								console.log("Failed precheck. go to next DQ check");
+								//console.log("Failed precheck. go to next DQ check");
 								  // allResults[0] = results;
 								  // allResults[1] = missings;
 								  // return allResults;
@@ -865,9 +863,9 @@ export const DoDataQuality = async (
                 // In questo caso, però, se ho dei null imposto il check a FAIL e passo al prossimo DQ check.
 								// "anyVarNull" è true se almeno una delle variabili del check è nulla.
 								const anyVarIsNull = missingParams(dqContext, recordData, check.params);
-								console.log("Any params variable is null = " + anyVarIsNull);
+								//console.log("Any params variable is null = " + anyVarIsNull);
 								if (anyVarIsNull === undefined || anyVarIsNull.length === 0){
-									console.log("Problem case: params are not specified for function main or REDCap variables are not recognized in params.");
+									//console.log("Problem case: params are not specified for function main or REDCap variables are not recognized in params.");
 									//return anyVarIsNull;
                   return null;
 								}
@@ -888,14 +886,14 @@ export const DoDataQuality = async (
                   // Store "PASS" or "FAIL" based on the result.
                   // results[check.name + " - " + check.desc] = result ? "PASS" : "FAIL";
 								if (typeof result === "boolean") {
-									console.log("The result is a boolean.");
+									//console.log("The result is a boolean.");
 									if (!result) {
 										results[check.name + " - " + check.desc] = 1;
 									}
 								} else if (typeof result === "object" && result !== null) {
-									console.log("The result is an object.");
+									//console.log("The result is an object.");
 									const errored = Object.values(result).filter(value => value === false).length;
-									console.log(" - nr of errors = " + errored);
+									//console.log(" - nr of errors = " + errored);
 									if (errored == 0) {
 										results[check.name + " - " + check.desc] = 0;
 									}
@@ -927,15 +925,15 @@ export const DoDataQuality = async (
             // Store "PASS" or "FAIL" based on the result
             // results[check.name + " - " + check.desc] = result ? "PASS" : "FAIL";
 					if (typeof result === "boolean") {
-						console.log("The result is a boolean.");
+						//console.log("The result is a boolean.");
 						let resVal = results[check.name + " - " + check.desc];
 						if (!result) {
 							results[check.name + " - " + check.desc] = resVal + 1;
 						}
 					} else if (typeof result === "object" && result !== null) {
-						console.log("The result is an object.");
+						//console.log("The result is an object.");
 						const errored = Object.values(result).filter(value => value === false).length;
-						console.log(" - nr of errors = " + errored);
+						//console.log(" - nr of errors = " + errored);
 						if (errored == 0) {
 							results[check.name + " - " + check.desc] = "";
 						}

@@ -158,7 +158,7 @@ export const obtainParamsExcelDQ = async(
   }
     
   catch (err) {
-    console.log("Failed to obtain parameters of Data Quality: ", err);
+    console.error("Failed to obtain parameters of Data Quality: ", err);
     throw new Error("Failed to obtain parameters of Data Quality.");
   } 
     
