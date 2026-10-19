@@ -1,11 +1,13 @@
 import { createExcelDQ } from "@/utils/createFile";
 import { obtainParamsExcelDQ } from "@/utils/obtainParamsExcelDQ";
-import type { Center, DQRecord, REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
+import type { Center, REDCapRecord, DQRecord, REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
 
 
 export async function DownloadDataQuality(
   center: Center,
   token: string,
+  allRecordData: REDCapRecord[][],
+  cohort: string[],
   metadata: REDCapMetadataField[],
   instrumentsVsEvents: REDCapInstrVsEventsField[],
   repeatings: REDCapRepeatingsField[],
@@ -30,11 +32,11 @@ export async function DownloadDataQuality(
   const fileName = `${CurrentAnalysis}_${center.id}_${timestamp}.xlsx`;
 
   // Obtain parameters for file building
-  const rslt = await obtainParamsExcelDQ(center.url, token, metadata, instrumentsVsEvents, repeatings);
-  const {unknownSummaryState, timelineSummaryState, baselineCountersState, diseaseExtensionCountersState} = rslt;
+  const rslt = await obtainParamsExcelDQ(center.url, token, allRecordData, cohort, metadata, instrumentsVsEvents, repeatings);
+  const {unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState} = rslt;
 
   // Creation of the Blob (Binary Large Object)
-  const dataBlob = createExcelDQ(resultQuality, metadata, unknownSummaryState, timelineSummaryState, baselineCountersState, diseaseExtensionCountersState);
+  const dataBlob = createExcelDQ(resultQuality, metadata, unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState);
 
   // Create a link element to download the file
   const urlBlob = window.URL.createObjectURL(dataBlob);

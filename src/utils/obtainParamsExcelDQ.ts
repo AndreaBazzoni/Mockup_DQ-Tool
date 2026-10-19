@@ -1,21 +1,23 @@
 import { fetchRecords } from "@/fetch/dq-fetch";
-import { getAllRecordData } from "@/fetch/redcap-fetch";
 import { initializeBaselineCounters,	processBaselineRecord } from '@/fetch/mgmt-complete-patients';
 import { buildDiseaseExtensionTimeline, updateDiseaseExtensionPatients, updateDiseaseExtensionCounters, aggregateDiseaseExtensionCounters } from '@/fetch/mgmt-disease-extension';
-import { initializeFollowupStats, buildStatusTimeline, buildTimelineSummary, analyzeFollowupCompleteness } from '@/fetch/mgmt-followup';
-import { buildUnknownSummary, processUnknownRecord, extractUnknownCodes } from '@/fetch/mgmt-unknown';
-import type { REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
+import { initializeFollowupStats, buildStatusTimeline, buildTimelineSummary, analyzeFollowupCompleteness, classifyPatients } from '@/fetch/mgmt-followup';
+import { buildUnknownSummary, processUnknownRecord, extractUnknownCodes, processMissingRecord } from '@/fetch/mgmt-unknown';
+import type { REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField, REDCapRecord, DQContext } from "@/utils/types";
 
 
 export const obtainParamsExcelDQ = async(
   centerUrl: string,
   token: string,
+  allRecordData: REDCapRecord[][],
+  cohort: string[],
   metadata: REDCapMetadataField[],
   instrumentsVsEvents: REDCapInstrVsEventsField[],
   repeatings: REDCapRepeatingsField[]
 ) => {
   // Valori che devo ritornare (NON USARE useState!)
-  let unknownSummaryState, timelineSummaryState, baselineCountersState, diseaseExtensionCountersState;
+  let unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState;
+  let lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState;
 
   try {
     let fetchedRecords = await fetchRecords(centerUrl, token, 'bl_record_id');
@@ -23,19 +25,26 @@ export const obtainParamsExcelDQ = async(
     // Vettore per l'esecuzione di record selezionati.
     // Se vuoto, l'esecuzione avviene su tutti i record presenti.
     let whiteRecords: string[] = [];
+
+    const patientNr = fetchedRecords.length;
+    console.log("Total nr of patients = " + patientNr);
     
     // Leggo i record estratti per due volte.
     // La prima per gestire tutti i conteggi descrittivi (disease extent, diagnosi per anno, ecc.) e compilare i fogli excel relativi.
     // La seconda per gestire tutti i DQ check e salvarli nel foglio relativo.
-    
-    const patientNr = fetchedRecords.length;
-    console.log("Total nr of patients = " + patientNr);
 
     // Estraggo a partire dal data dictionary un elenco delle variabili (con rispettivi instrument ed event).
     // Alle variabili è stato definito un codice numerico corrispondente a "unknown".
     const unknownCodes = extractUnknownCodes(metadata, instrumentsVsEvents, repeatings);
+    const missingMetadata = metadata.filter(item =>
+      item.field_type !== "descriptive" &&
+      item.field_name !== "bl_record_id" &&
+      !item.field_name.endsWith("_complete")
+    );
     const unknownMatrix = {};
+    const missingMatrix = {};
     const allTimeline = [];
+    const allPatientClassification = [];
 
     // Inizializzo i counter per il foglio "complete patients" (conteggi delle disease extension).
     const baselineCounters = initializeBaselineCounters();
@@ -68,36 +77,84 @@ export const obtainParamsExcelDQ = async(
       }
     }
 
-    // Process each record
-    for (const recordId of fetchedRecords) {
+    // Processo ogni record la prima volta per le variabili accessorie
+    for (let i = 0; i < cohort.length; i++) {
       // Per limitare esecuzione a record selezionati
-      if (whiteRecords && (whiteRecords.length === 0 || whiteRecords.includes(recordId))) {
-        let recordData = await getAllRecordData(centerUrl, token, recordId);
-        
-        const timeline = buildStatusTimeline(recordId, recordData);
+      if (whiteRecords && (whiteRecords.length === 0 || whiteRecords.includes(cohort[i]))) {
+        const context: DQContext = {
+          'data': allRecordData[i],
+          'metadata': metadata,
+          'instrumentsVsEvents': instrumentsVsEvents,
+          'repeatingInstrumentsAndEvents': repeatings
+        };
+        processMissingRecord(context, allRecordData[i], missingMetadata, missingMatrix);
+
+        const timeline = buildStatusTimeline(cohort[i], allRecordData[i]);
         allTimeline.push(...timeline);
+
+        const patientClassification = classifyPatients(cohort[i], allRecordData[i]);
+        allPatientClassification.push(...patientClassification);
         
-        const diseaseExtensionTimeline = buildDiseaseExtensionTimeline(recordId, recordData, baselineDiseaseExtensionMap);
+        const diseaseExtensionTimeline = buildDiseaseExtensionTimeline(cohort[i], allRecordData[i], baselineDiseaseExtensionMap);
         updateDiseaseExtensionPatients(diseaseExtensionPatients, diseaseExtensionTimeline);
         updateDiseaseExtensionCounters(diseaseExtensionCounters, diseaseExtensionTimeline);
         
-        processBaselineRecord(recordData, baselineCounters);
-        analyzeFollowupCompleteness(recordData, followupStats);
+        processBaselineRecord(allRecordData[i], baselineCounters);
+        analyzeFollowupCompleteness(allRecordData[i], followupStats);
 
-        processUnknownRecord(recordId, recordData, unknownCodes, unknownMatrix);
+        processUnknownRecord(cohort[i], allRecordData[i], unknownCodes, unknownMatrix);
+      }
+    }
+
+    // Mappa di associazione record -> allPatientClassification (velocità maggiore)
+    const classificationByRecord = new Map(
+      allPatientClassification.map(p => [p.record, p])
+    );
+
+    const lifeStatusTimeline = [];
+    const noLifeStatusUnifocalTimeline = [];
+    const noLifeStatusLocoregionalTimeline = [];
+    const noLifeStatusSystemicTimeline = [];
+
+    // Ciclo su Timeline per calcolare le variabili legate al Life Status
+    for (const item of allTimeline) {
+      const classification = classificationByRecord.get(item.record);
+      if (!classification) {
+        continue;
+      }
+      // LIFE STATUS UPDATE
+      if (classification.hasLifeStatusUpdate) {
+        lifeStatusTimeline.push(item);
+        continue;
+      }
+      // NESSUN LIFE STATUS UPDATE:
+        // classifico in base all'ultima disease row
+      if (classification.lastDiseaseCategory === "unifocal") {
+        noLifeStatusUnifocalTimeline.push(item);
+      }
+      if (classification.lastDiseaseCategory === "locoregional") {
+        noLifeStatusLocoregionalTimeline.push(item);
+      }
+      if (classification.lastDiseaseCategory === "systemic_metastases") {
+        noLifeStatusSystemicTimeline.push(item);
       }
     }
 
     const unknownSummary = buildUnknownSummary(unknownMatrix);
     unknownSummaryState = unknownSummary;
 
-    const timelineSummary = buildTimelineSummary(allTimeline);
-    timelineSummaryState = timelineSummary;
+    const allTimelineSummary = buildTimelineSummary(allTimeline);
+    allTimelineSummaryState = allTimelineSummary;
 
     baselineCountersState = baselineCounters;
 
     const aggregatedDiseaseExtensionCounters = aggregateDiseaseExtensionCounters(diseaseExtensionCounters);
-    diseaseExtensionCountersState = aggregatedDiseaseExtensionCounters;
+    aggregatedDiseaseExtensionCountersState = aggregatedDiseaseExtensionCounters;
+
+    lifeStatusTimelineState = lifeStatusTimeline;
+    noLifeStatusUnifocalTimelineState = noLifeStatusUnifocalTimeline;
+    noLifeStatusLocoregionalTimelineState = noLifeStatusLocoregionalTimeline;
+    noLifeStatusSystemicTimelineState = noLifeStatusSystemicTimeline;
   }
     
   catch (err) {
@@ -106,6 +163,6 @@ export const obtainParamsExcelDQ = async(
   } 
     
   finally {
-    return {unknownSummaryState, timelineSummaryState, baselineCountersState, diseaseExtensionCountersState};
+    return {unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState};
   }
 }

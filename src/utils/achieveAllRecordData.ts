@@ -1,4 +1,4 @@
-import { getAllRecordData } from "@/fetch/redcap-fetch";
+import { getRecordData } from "@/fetch/redcap-fetch";
 import type { REDCapRecord } from "@/utils/types";
 
 export const achieveAllRecordData = async (
@@ -11,7 +11,7 @@ export const achieveAllRecordData = async (
   try {
     // Process each record
     for (const recordId of cohort) {
-      let recordData = await getAllRecordData(centerUrl, token, recordId);
+      let recordData = await getRecordData(centerUrl, token, recordId);
       recordDataTotal.push(recordData);
     }
     return recordDataTotal;

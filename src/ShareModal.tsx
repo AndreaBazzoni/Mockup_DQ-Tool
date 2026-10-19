@@ -17,15 +17,17 @@ const handleShareResultQuality = async (
   token: string,
   metadata: REDCapMetadataField[],
   instrumentsVsEvents: REDCapInstrVsEventsField[],
-  repeatings: REDCapRepeatingsField[]
+  repeatings: REDCapRepeatingsField[],
+  allRecordData: REDCapRecord[][],
+  cohort: string[]
 ): Promise<void> => {
   try {
     // Costruisco la URL
     const presignedUrl = `https://test-ehedq-upload-public.s3.amazonaws.com/DQ_${CurrentAnalysis}_${center.id}_${timestamp}.xlsx`;
     // File creation
-    const rslt = await obtainParamsExcelDQ(center.url, token, metadata, instrumentsVsEvents, repeatings);
-    const {unknownSummaryState, timelineSummaryState, baselineCountersState, diseaseExtensionCountersState} = rslt;
-    const file = createExcelDQ(result, metadata, unknownSummaryState, timelineSummaryState, baselineCountersState, diseaseExtensionCountersState);
+    const rslt = await obtainParamsExcelDQ(center.url, token, allRecordData, cohort, metadata, instrumentsVsEvents, repeatings);
+    const {unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState} = rslt;
+    const file = createExcelDQ(result, metadata, unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState);
     // ------------------------
     // Upload diretto su S3
     await shareResultsToS3(presignedUrl, file);
@@ -99,8 +101,8 @@ export default function ShareModal(props: ShareModalProps) {
     try {
       // Data Quality
       if (title === "quality") {
-        const { token, metadata, instrumentsVsEvents, repeatings } = props;
-        await handleShareResultQuality(center, title, result, timestamp, token, metadata, instrumentsVsEvents, repeatings);
+        const { token, metadata, instrumentsVsEvents, repeatings, allRecordData, cohort } = props;
+        await handleShareResultQuality(center, title, result, timestamp, token, metadata, instrumentsVsEvents, repeatings, allRecordData, cohort);
       }
 
       // Anonymous Data

@@ -10,8 +10,7 @@ import ShareModal from "@/ShareModal";
 import { ListOfCenters, CurrentAnalysis } from "@/ManageCenters";
 import { ManageCohort } from "@/ManageCohort";
 import { getMetadata, getInstrVsEvents, getRepeatings } from "@/fetch/dq-fetch";
-import { processMissingRecord } from "@/fetch/mgmt-unknown";
-import type { Center, REDCapRecord, DQRecord, REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField, DQContext } from "@/utils/types";
+import type { Center, REDCapRecord, DQRecord, REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
 
 
 export default function DataQualityApp() {
@@ -132,25 +131,6 @@ export default function DataQualityApp() {
         setMetadata(metadataAPI);
         setInstrumentsVsEvents(instrumentsVsEventsAPI);
         setRepeatingInstrumentsAndEvents(repeatingInstrumentsAndEventsAPI);
-
-        // Processo ogni record la prima volta per i fogli accessori
-        const missingMetadata = metadata.filter(
-          item =>
-            item.field_type !== "descriptive" &&
-            item.field_name !== "bl_record_id" &&
-            !item.field_name.endsWith("_complete")
-        );
-        const missingMatrix = {}
-        for (let i = 0; i < cohort.length; i++) {
-          const context: DQContext = {
-						'data': allRecordData[i],
-						'metadata': metadata,
-						'instrumentsVsEvents': instrumentsVsEvents,
-						'repeatingInstrumentsAndEvents': repeatingInstrumentsAndEvents
-					};
-          processMissingRecord(context, allRecordData[i], missingMetadata, missingMatrix);
-        }
-
         // Inizio cicli DQ
         for (let i = 0; i < cohort.length; i++) {
           let dq = await DoDataQuality(allRecordData[i], metadataAPI, instrumentsVsEventsAPI, repeatingInstrumentsAndEventsAPI);
@@ -202,7 +182,17 @@ export default function DataQualityApp() {
       // Implementazione del download
       if (!isAnonymous && resultQuality !== null) {
         // ---- Data Quality ----
-        await DownloadDataQuality(selectedCenter, token, metadata, instrumentsVsEvents, repeatingInstrumentsAndEvents, CurrentAnalysis, resultQuality);
+        if (allRecordDataResults === null) {
+          console.error("The list of Record Data is null.");
+          toast.error("The list of Record Data is null.");
+        }
+        else if (cohortResults === null) {
+          console.error("The Cohort is null.");
+          toast.error("The Cohort is null.");
+        }
+        else {
+          await DownloadDataQuality(selectedCenter, token, allRecordDataResults, cohortResults, metadata, instrumentsVsEvents, repeatingInstrumentsAndEvents, CurrentAnalysis, resultQuality);
+        }
       }
       else if (isAnonymous && resultAnonymous !== null) {
         // ---- Anonymous Data ----
@@ -211,7 +201,6 @@ export default function DataQualityApp() {
       else {
         console.error("Error during the download.");
         toast.error("Error during the download.");
-        return;
       }
     }
     finally {
@@ -386,6 +375,8 @@ export default function DataQualityApp() {
                       metadata={metadata}
                       instrumentsVsEvents={instrumentsVsEvents}
                       repeatings={repeatingInstrumentsAndEvents}
+                      allRecordData={allRecordDataResults}
+                      cohort={cohortResults}
                     />
                   )}
                 </div>

@@ -44,6 +44,8 @@ interface ShareModalQualityProps {
   metadata: REDCapMetadataField[];
   instrumentsVsEvents: REDCapInstrVsEventsField[];
   repeatings: REDCapRepeatingsField[];
+  allRecordData: REDCapRecord[][];
+  cohort: string[];
 }
 
 interface ShareModalAnonymousProps {

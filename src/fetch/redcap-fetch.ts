@@ -238,7 +238,7 @@ export const createDirectory = async (
 };
 
 
-export const getAllRecordData = async (
+export const getRecordData = async (
   centerUrl: string,
   token: string,
   recordId: string
