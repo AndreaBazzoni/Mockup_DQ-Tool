@@ -23,6 +23,8 @@ export const ListOfCenters: Center[] = [
 ];
 
 export const CurrentAnalysis: string = "2026";
+
+export const BucketAWS: string = "ehe-public-617528855295-eu-south-1-an";
 // ------------------------------- //
 // ------------------------------- //
 // ------------------------------- //
