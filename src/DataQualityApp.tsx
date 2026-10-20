@@ -336,8 +336,9 @@ export default function DataQualityApp() {
                 (selectedCenter!==null && cohortResults!==null && recordDataResults!==null) &&
                 <div>
                   <ul className="infoResults">
-                    <li className="scrollText"><b>Name: </b> {CurrentAnalysis} - {selectedCenter.name}</li>
-                    <li className="scrollText"><b>Cohort: </b> {cohortResults.join(", ")}</li>
+                    <li className="scrollText"><b>Center name: </b>{selectedCenter.name}</li>
+                    <li className="scrollText"><b>Current Analysis: </b> {CurrentAnalysis}</li>
+                    <li className="scrollText"><b>Cohort size: </b> {cohortResults.length}</li>
                   </ul>
                   <button
                     id="downloadResults"
@@ -403,8 +404,9 @@ export default function DataQualityApp() {
                 (selectedCenter!==null && cohortResults!==null && recordDataResults!==null) &&
                 <div>
                   <ul className="infoResults">
-                    <li className="scrollText"><b>Name: </b> {CurrentAnalysis} - {selectedCenter.name}</li>
-                    <li className="scrollText"><b>Cohort: </b> {cohortResults.join(", ")}</li>
+                    <li className="scrollText"><b>Center name: </b>{selectedCenter.name}</li>
+                    <li className="scrollText"><b>Current Analysis: </b> {CurrentAnalysis}</li>
+                    <li className="scrollText"><b>Cohort size: </b> {cohortResults.length}</li>
                   </ul>
                   <button
                     id="downloadResults"
@@ -447,6 +449,17 @@ export default function DataQualityApp() {
           )}
         </div>
       </div>
+
+      {/* LOADING */}
+      {/* sr-only = screen-reader accessibility */}
+      <div role="status" className="sr-only">
+        {loading ? 'Caricamento in corso...' : ''}
+      </div>
+      {loading && (
+        <div className="loading-overlay" aria-hidden="true">
+          <div className="spinner" />
+        </div>
+      )}
 
     </div>
   );

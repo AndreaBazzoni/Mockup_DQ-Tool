@@ -35,15 +35,24 @@ export const elapsedDays = (recordData: any, dateTarget: any, dateList: any) => 
       dateList.forEach((date: any) => {
 			// Controllo ci sia un valore
       if (item[date]) {
+        let diffDays;
+
+        // -- Gestione data null -> return NA --
         // Estraggo la data
         const currentDate = new Date(item[date]);
         // Gestione delle date se sono null
-        const targetTime = targetDate === null ? 0 : targetDate.getTime();
-        const currentTime = currentDate === null ? 0 : currentDate.getTime();
-        // Faccio la differenza con la data target in giorni
-        let diffDays;
-        diffDays = Math.round((currentTime - targetTime) / (1000 * 60 * 60 * 24));
+        if (targetDate === null || currentDate === null) {
+          diffDays = "NA";
+        }
+        else {
+          const targetTime = targetDate.getTime();
+          const currentTime = currentDate.getTime();
+          // Faccio la differenza con la data target in giorni
+          diffDays = Math.round((currentTime - targetTime) / (1000 * 60 * 60 * 24));
+        }
+
         /*
+        // -- Gestione data null -> date = 0 --
 				// Estraggo la data
         const currentDate = new Date(item[date]);
         // Gestione delle date se sono null
@@ -53,6 +62,7 @@ export const elapsedDays = (recordData: any, dateTarget: any, dateList: any) => 
         let diffDays;
         diffDays = Math.round((currentTime - targetTime) / (1000 * 60 * 60 * 24));
         */
+
 				// Lo setto nella cella corrispondente
 				item[date] = diffDays;
       }
