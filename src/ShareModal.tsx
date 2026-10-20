@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { shareResultsToS3 } from "@/fetch/share-results";
 import { obtainParamsExcelDQ } from "@/utils/obtainParamsExcelDQ";
 import { createXlsxFile, createExcelDQ } from "@/utils/createFile";
-import { CurrentAnalysis, BucketAWS } from "@/ManageCenters";
+import { CurrentAnalysis, S3_Bucket, S3_Region } from "@/ManageCenters";
 import type { Center, REDCapRecord, DQRecord, ShareModalProps } from "@/utils/types";
 import type { REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
 
@@ -21,7 +21,7 @@ const handleShareResultQuality = async (
 ): Promise<void> => {
   try {
     // Costruisco la URL
-    const presignedUrl = `https://${BucketAWS}.s3.amazonaws.com/DQ_${CurrentAnalysis}_${center.id}_${timestamp}.xlsx`;
+    const presignedUrl = `https://${S3_Bucket}.s3${S3_Region}.amazonaws.com/DQ_${CurrentAnalysis}_${center.id}_${timestamp}.xlsx`;
     // File creation
     const rslt = await obtainParamsExcelDQ(center.url, token, metadata, instrumentsVsEvents, repeatings);
     const {unknownSummaryState, timelineSummaryState, baselineCountersState, diseaseExtensionCountersState} = rslt;
@@ -52,7 +52,7 @@ const handleShareResultAnonymous = async (
 ): Promise<void> => {
   try {
     // Costruisco la URL
-    const presignedUrl = `https://${BucketAWS}.s3.amazonaws.com/EXPORT_${CurrentAnalysis}_${center.id}_${timestamp}.xlsx`;
+    const presignedUrl = `https://${S3_Bucket}.s3${S3_Region}.amazonaws.com/EXPORT_${CurrentAnalysis}_${center.id}_${timestamp}.xlsx`;
     // File creation
     const file = createXlsxFile(result);
     // Upload diretto su S3
