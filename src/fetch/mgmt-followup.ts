@@ -75,12 +75,12 @@ function getYear(
   dateValue: any
 ) {
 	if (!dateValue) return null;
-	// Se è già un numero tipo "2020"
+	// If it is a number yet
 	if (/^\d{4}$/.test(dateValue)) {
 		return dateValue;
 	}
 	const date = new Date(dateValue);
-	// Controllo validità
+  // Validate check
 	if (isNaN(date.getTime())) {
 		return null;
 	}
@@ -88,7 +88,7 @@ function getYear(
 }
 
 
-// Funzione per inizializzare le FollowUp Stats
+// Function to initialize the FollowUp Stats
 export function initializeFollowupStats(
 ) {
   return {
@@ -122,7 +122,7 @@ export function initializeFollowupStats(
 }
 
 
-// Funzione per analizzare il FollowUp
+// Function to analyze the FollowUp
 export function analyzeFollowupCompleteness (
   recordData: REDCapRecord[],
   followupStats: any
@@ -214,13 +214,13 @@ export function analyzeFollowupCompleteness (
 }
 
 
-// Funzione per costruire la Timeline Summary
+// Function to build the Timeline Summary
 export function buildTimelineSummary(
   timeline: any
 ) {
   const map = new Map();
   for (const item of timeline) {
-    // Escludo date e status lasciati null
+    // I exclude dates and status that are null
     if (!item.statusYear || item.status === undefined || item.status === null || item.status === "") {
       continue;
     }
@@ -243,7 +243,7 @@ export function buildTimelineSummary(
 }
 
 
-// Funzione per costruire la Status Timeline
+// Function to build the Status Timeline
 export function buildStatusTimeline(
   recordId: string,
   recordData: REDCapRecord[]
@@ -318,12 +318,12 @@ export function classifyPatients(
     item.tipoRow === "life_status_update"
   );
     
-  // Prendo solo le row che rappresentano un'evoluzione della malattia.
+  // I take only the rows that represent an evolution of the disease.
   const diseaseRows = rowsWithType.filter(item =>
     isDiseaseRowType(item.tipoRow)
   );
 
-  // Ordino le disease row per data.
+  // Sorting the disease rows by date.
   diseaseRows.sort((a, b) => {
     if (!isStatusRowType(a.tipoRow) || !isStatusRowType(b.tipoRow)) {
       return 0;

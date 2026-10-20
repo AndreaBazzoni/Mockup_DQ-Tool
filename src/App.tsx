@@ -7,9 +7,9 @@ export default function App() {
     <>
       <DataQualityApp />
       <Toaster
-        // Aggiungo la X
+        // I add the X
         closeButton
-        // Scomparsa dopo 3000ms (default = 4000)
+        // Disappear after 3000ms (default = 4000)
         duration={3000}
       />
       <Footer />

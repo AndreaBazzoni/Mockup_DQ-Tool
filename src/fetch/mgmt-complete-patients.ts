@@ -1,7 +1,7 @@
 import type { REDCapRecord } from "@/utils/types";
 
 
-// Funzione per inizializzare la Baseline Counters
+// Function to initialize the Baseline Counters
 export function initializeBaselineCounters(
 ) {
 	return {
@@ -17,7 +17,7 @@ export function initializeBaselineCounters(
 }
 
 
-// Funzione per processare la Baseline
+// Funtion to process the Baseline
 export function processBaselineRecord(
   recordData: REDCapRecord[],
   baselineCounters: any

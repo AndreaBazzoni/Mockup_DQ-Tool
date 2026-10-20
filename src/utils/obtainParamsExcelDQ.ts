@@ -15,26 +15,26 @@ export const obtainParamsExcelDQ = async(
   instrumentsVsEvents: REDCapInstrVsEventsField[],
   repeatings: REDCapRepeatingsField[]
 ) => {
-  // Valori che devo ritornare (NON USARE useState!)
+  // Values ​​that I need to return (DO NOT USE useState!)
   let unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState;
   let lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState;
 
   try {
     let fetchedRecords = await fetchRecords(centerUrl, token, 'bl_record_id');
 
-    // Vettore per l'esecuzione di record selezionati.
-    // Se vuoto, l'esecuzione avviene su tutti i record presenti.
+    // Vector for the processing of selected records.
+    // If empty, processing is performed on all existing records.
     let whiteRecords: string[] = [];
 
     const patientNr = fetchedRecords.length;
     console.log("Total nr of patients = " + patientNr);
     
-    // Leggo i record estratti per due volte.
-    // La prima per gestire tutti i conteggi descrittivi (disease extent, diagnosi per anno, ecc.) e compilare i fogli excel relativi.
-    // La seconda per gestire tutti i DQ check e salvarli nel foglio relativo.
+    // I process the extracted records twice. 
+    // First pass -> for handling all descriptive counts and populating the corresponding Excel sheets.
+    // Second pass -> for performing all Data Quality (DQ) checks and saving the results to the relevant sheet.
 
-    // Estraggo a partire dal data dictionary un elenco delle variabili (con rispettivi instrument ed event).
-    // Alle variabili è stato definito un codice numerico corrispondente a "unknown".
+    // I extract a list of variables (along with their respective instruments and events) from the Data Dictionary.
+    // A numeric code corresponding to "unknown" has been defined for these variables.
     const unknownCodes = extractUnknownCodes(metadata, instrumentsVsEvents, repeatings);
     const missingMetadata = metadata.filter(item =>
       item.field_type !== "descriptive" &&
@@ -46,7 +46,7 @@ export const obtainParamsExcelDQ = async(
     const allTimeline = [];
     const allPatientClassification = [];
 
-    // Inizializzo i counter per il foglio "complete patients" (conteggi delle disease extension).
+    // I initialize the counters for the "complete patients" sheet (counts of disease extensions).
     const baselineCounters = initializeBaselineCounters();
     const followupStats = initializeFollowupStats();
 
@@ -77,9 +77,9 @@ export const obtainParamsExcelDQ = async(
       }
     }
 
-    // Processo ogni record la prima volta per le variabili accessorie
+    // I process each record the first time for the auxiliary variables.
     for (let i = 0; i < cohort.length; i++) {
-      // Per limitare esecuzione a record selezionati
+      // To limit execution to selected record.
       if (whiteRecords && (whiteRecords.length === 0 || whiteRecords.includes(cohort[i]))) {
         const context: DQContext = {
           'data': allRecordData[i],
@@ -106,7 +106,7 @@ export const obtainParamsExcelDQ = async(
       }
     }
 
-    // Mappa di associazione record -> allPatientClassification (velocità maggiore)
+    // "Record -> allPatientClassification" association map (more speed)
     const classificationByRecord = new Map(
       allPatientClassification.map(p => [p.record, p])
     );
@@ -116,7 +116,7 @@ export const obtainParamsExcelDQ = async(
     const noLifeStatusLocoregionalTimeline = [];
     const noLifeStatusSystemicTimeline = [];
 
-    // Ciclo su Timeline per calcolare le variabili legate al Life Status
+    // Loop through the Timeline to calculate variables related to Life Status
     for (const item of allTimeline) {
       const classification = classificationByRecord.get(item.record);
       if (!classification) {
@@ -127,8 +127,8 @@ export const obtainParamsExcelDQ = async(
         lifeStatusTimeline.push(item);
         continue;
       }
-      // NESSUN LIFE STATUS UPDATE:
-        // classifico in base all'ultima disease row
+      // NO LIFE STATUS UPDATE:
+        // Classification about the last disease row.
       if (classification.lastDiseaseCategory === "unifocal") {
         noLifeStatusUnifocalTimeline.push(item);
       }

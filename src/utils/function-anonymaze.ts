@@ -2,17 +2,17 @@ import CryptoJS from "crypto-js";
 
 
 export const removeFieldCheck = (recordData: any, attribute: any, pazienteId: any) => {
-	// Per ogni elemento estratto, cerco l'attributo da eliminare, lo elimino e aggiungo una numerazione per i pazienti
+	// For each extracted item, I locate the attribute to be removed, I delete it, and I add a numbering for the patients.
 	recordData.forEach((item: any) => {
     delete item[attribute];
     
-		// Metto come prima colonna il counter dei pazienti (colonna "paziente")
+		// I set the patient counter as the first column (column "patient").
 		const newItem = {
       paziente: pazienteId,
       ...item
 		};
 
-		// Elimino le colonne doppie
+		// I delete the duplicate columns.
 		Object.keys(item).forEach(k => delete item[k]);
 		Object.assign(item, newItem);
 	});
@@ -24,7 +24,7 @@ export const removeFieldCheck = (recordData: any, attribute: any, pazienteId: an
 export const elapsedDays = (recordData: any, dateTarget: any, dateList: any) => {
   let targetDate: Date | null = null;
 
-	// Recupero la data target da usare per le differenze e la converto in Date (targetDate) poi setto a 0 la colonna
+	// I retrieve the target date to be used for calculating differences, convert it into a Date object (targetDate), and then set the column to 0.
 	recordData.forEach((item: any) => {
     if (item[dateTarget]) {
       targetDate = new Date(item[dateTarget]);
@@ -33,39 +33,39 @@ export const elapsedDays = (recordData: any, dateTarget: any, dateList: any) => 
   });
 
 	recordData.forEach((item: any) => {
-		// Ciclo su tutte le variabili della lista
+		// Loop through all variables in the list.
       dateList.forEach((date: any) => {
-			// Controllo ci sia un valore
+			// Check for a value.
       if (item[date]) {
         let diffDays;
 
-        // -- Gestione data null -> return NA --
-        // Estraggo la data
+        // -- How manage null date -> return NA --
+        // I extract the date
         const currentDate = new Date(item[date]);
-        // Gestione delle date se sono null
+        // Dates management if null.
         if (targetDate === null || currentDate === null) {
           diffDays = "NA";
         }
         else {
           const targetTime = targetDate.getTime();
           const currentTime = currentDate.getTime();
-          // Faccio la differenza con la data target in giorni
+          // Difference in days relative to the target date.
           diffDays = Math.round((currentTime - targetTime) / (1000 * 60 * 60 * 24));
         }
 
         /*
-        // -- Gestione data null -> date = 0 --
-				// Estraggo la data
+        // -- How manage null date -> date = 0 --
+				// I extract the date
         const currentDate = new Date(item[date]);
-        // Gestione delle date se sono null
+        // Dates management if null.
         const targetTime = targetDate === null ? 0 : targetDate.getTime();
         const currentTime = currentDate === null ? 0 : currentDate.getTime();
-        // Faccio la differenza con la data target in giorni
+        // Difference in days relative to the target date.
         let diffDays;
         diffDays = Math.round((currentTime - targetTime) / (1000 * 60 * 60 * 24));
         */
 
-				// Lo setto nella cella corrispondente
+				// I set it in the corresponding cell.
 				item[date] = diffDays;
       }
     });
@@ -77,13 +77,13 @@ export const elapsedDays = (recordData: any, dateTarget: any, dateList: any) => 
 
 export const hmacHash = (recordData: any, attributeList: any, patientId: any, secret: any) => {
 
-  // N.B.: "patientId" non viene usata in questa funzione, ma serve per la struttura del codice. NON RIMUOVERE!
+  // NOTE: "patientId" is not used in this function, but it is required for the code structure. DO NOT REMOVE!
   if (patientId === -1) {
-    console.log("ID paziente: ", patientId);  // Evito il warning di inutilizzo stampando in console.
+    console.log("ID paziente: ", patientId);  // To avoid an "unused variable" error.
   }
 
   recordData.forEach((item: any) => {
-  // Ciclo su tutte le variabili della lista
+  // Loop through all variables in the list.
     attributeList.forEach((attr: any) => {
       if (item[attr]) {
         item[attr] = CryptoJS.HmacSHA256(item[attr], secret).toString();

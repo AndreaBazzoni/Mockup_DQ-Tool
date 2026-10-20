@@ -20,9 +20,9 @@ export const isVarRepeating = (repeatingInstrumentsAndEvents: REDCapRepeatingsFi
   const eventIsRep = repeatingInstrumentsAndEvents.some(item => item.event_name === event);
 
   if (eventIsRep) {
-    // La variabile è repeating se appartiene a event repeating e instrument repeating
+    // La variabile è repeating se appartiene a event repeating e instrument repeating.
     let instrIsRep = repeatingInstrumentsAndEvents.some(item => item.form_name === instr);
-    // Sintassi con !! ritorna true se instrIsRep è truthy, false se è falsy
+    // Sintassi con !! ritorna "true" se instrIsRep è truthy, "false" se instrIsRep è falsy.
     return !!(instrIsRep);
   } 
   else {
@@ -41,16 +41,16 @@ export const varHasBranchingLogic = (metadataElem: REDCapMetadataField) => {
 
 
 export const runBranchingLogic = (dqContext: DQContext, metadataOfVar: REDCapMetadataField, instance: any) => {
-	// Espressione di branching, così come specificata su REDCap
+	// Branching logic, così come specificata su REDCap.
 	let branchingOrigExpr = metadataOfVar["branching_logic"];
 
-	// La variabile di riferimento per la branching
+	// La variabile di riferimento per la branching.
 	let branchRefVar: BranchRefVar = {
     name: metadataOfVar.field_name,
     instrument: metadataOfVar.form_name,
     event: getEventOfInstrument(dqContext, metadataOfVar.form_name)
   };
-  // Evito errore di inutilizzo della variabile
+  // Evito errore di inutilizzo della variabile.
   if (branchRefVar === null) {
     console.log("Variabile Branching: ", branchRefVar);
   }
@@ -86,17 +86,17 @@ const compileBranchingLogicExpression = (dqContext: DQContext, branchingOrigExpr
   //			C. [next-instance] = refers to the instance immediately after.
   //			D. [first-instance] = refers back to the very first instance.
   //			E. [last-instance] = refers back to the very last instance.
-  //  4. orig -> come dichiarata in branching expression
-  //  5. realField -> nome della variabile come in redcap data (diverso da field nel caso dei checkbox)
-  //  6. realVar -> nome della variabile come in redcap metadata (diverso da field nel caso dei checkbox)
+  //  4. orig -> come dichiarata in branching expression.
+  //  5. realField -> nome della variabile come in redcap data (diverso da field nel caso dei checkbox).
+  //  6. realVar -> nome della variabile come in redcap metadata (diverso da field nel caso dei checkbox).
   let varsInBranching = extractRedcapVariables(dqContext, branchingOrigExpr);
 
-  // Espressione in cui sostituiremo valori e operatori per renderla interpretabile da JS
+  // Espressione in cui sostituiremo valori e operatori per renderla interpretabile da JS.
   let workingBranchExpression = branchingOrigExpr;
 
-  // Per ogni variabile della branching logic
+  // Per ogni variabile della branching logic.
   varsInBranching.forEach(varOfBranching => {
-    // Completare info su event mettendo quello di mainVar se non specificato
+    // Completare info su event mettendo quello di mainVar se non specificato.
     let completeVar = varOfBranching;
 
     if (completeVar.event == null) {
@@ -114,7 +114,7 @@ const compileBranchingLogicExpression = (dqContext: DQContext, branchingOrigExpr
       }
     }
 
-    // Istruzione per fermare esecuzione quando instance della variabile estratta dalla branching è last-intance
+    // Istruzione per fermare esecuzione quando instance della variabile estratta dalla branching è last-intance.
     if (typeof varOfBranching.instance === "string" && varOfBranching.instance.includes("-instance")) {
       const availableInstances = dqContext.data
         .filter(row =>
@@ -159,20 +159,19 @@ const compileBranchingLogicExpression = (dqContext: DQContext, branchingOrigExpr
       completeVar.targetInstance = targetInstance;
     }
 
-    // Prendere Data row che contiene la variabile (non repeating) corrente
+    // Prendere Data row che contiene la variabile (non repeating) corrente.
     let rightData4Var = getFirstEventFromDataForVar(dqContext, completeVar, instance );
 
     // Se quella riga esiste...
     if (rightData4Var) {
-      // Sostituisce il nome variabile con il valore preso dalla riga
       workingBranchExpression = replaceVarWithValue(workingBranchExpression, varOfBranching, rightData4Var);
     }
-    // ... altrimenti ...
+    // ..., altrimenti:
     else {
       workingBranchExpression = workingBranchExpression.replaceAll(varOfBranching.orig, "\'\'");
     }
 
-    // Sostituire operatori e operandi
+    // Sostituire operatori e operandi.
     workingBranchExpression = translateRedcapToJs(workingBranchExpression, { strict: false });
 
   });
@@ -183,10 +182,10 @@ const compileBranchingLogicExpression = (dqContext: DQContext, branchingOrigExpr
 
 export const evalRedcap = (jsExpr: string, { fallback = false } = {}) => {
 	try {
-		// Coerzione e trimming minimi: non trasformo altro
+		// Coerzione e trimming minimi: non trasformo altro.
 		const s = String(jsExpr ?? '').trim();
 
-		// Se vuoto, ritorno il fallback (evita "return ()" -> SyntaxError)
+		// Se vuoto, ritorno il fallback (evita "return ()" -> SyntaxError).
 		if (!s) {
 			return fallback;
 		}
@@ -195,7 +194,7 @@ export const evalRedcap = (jsExpr: string, { fallback = false } = {}) => {
 		return Function(`"use strict"; return (${s});`)();
 
 	} catch (err) {
-		// Log chiaro e callback opzionale
+		// Log chiaro e callback opzionale.
 		console.error('[evalRedcap] Errore durante la valutazione:', err);
 		console.error('[evalRedcap] Espressione non valutabile:', jsExpr);
 		return fallback;
@@ -212,7 +211,7 @@ export const extractRedcapVariables = (dqContext: DQContext, logic: string) => {
 	const results = [];
 	const seen = new Set();  // evita duplicati "per variabile" (non per posizione)
 
-	// regex per estrarre "nomeCampo(numero)" alla fine del nome campo
+	// regex per estrarre "nomeCampo(numero)" alla fine del nome campo.
 	// ATTENZIONE: indice SOLO numerico. Se servono codici non numerici, bisogna estendere a ([^)]+).
 	const fieldWithIndexRegex = /^(.*)\((\d+)\)$/;
 
@@ -285,7 +284,7 @@ export const extractRedcapVariables = (dqContext: DQContext, logic: string) => {
 			}
 		}
 
-		// De-duplicazione basata su event/field/instance
+		// De-duplicazione basata su event/field/instance.
 		const key = JSON.stringify({
 			event: variable.event,
 			instrument: variable.instrument,
@@ -324,7 +323,7 @@ export const getFirstEventFromDataForVar = (dqContext: DQContext, variable: Vari
   // CASO 1: NO INSTANCE LOGIC
   // =========================
   if (!instKeyword || !String(instKeyword).includes('-instance')) {
-    // NON repeating instrument (baseline rows)
+    // NO repeating instrument (baseline rows)
     const nonRepeating = eventRows.find(
       r =>
         (!r.redcap_repeat_instrument || r.redcap_repeat_instrument === '')
@@ -466,12 +465,12 @@ function checkVarsConsistency(precParams: any[] | null, params: any[], vars: str
 	var foundInPrecParams = new Set();
 	var foundInParams = new Set();
 
-	// precParams può essere nullo
+	// precParams può essere nullo.
 	if (precParams !== null) {
 		findVarsInStructure(precParams, varsSet, foundInPrecParams);
 	}
 
-	// params non è mai nullo
+	// params non è mai nullo.
 	findVarsInStructure(params, varsSet, foundInParams);
 
 	var totalFound = foundInPrecParams.size + foundInParams.size;
@@ -509,7 +508,7 @@ const missingParams = (dqContext: DQContext, recordData: REDCapRecord[], paramet
 		return result;
 	}
 
-	// Esclusi i casi problematici, result parte a false (passa a true quando una variabile è nulla, ovvero devo skippare il DQ check)
+	// Esclusi i casi problematici, result parte a false (passa a true quando una variabile è nulla, ovvero devo skippare il DQ check).
 	result[0] = false;
 	for (const element of vars) {
 		// Per ogni variabile da controllare ne definisco instrument ed event per focalizzare il check solo sui record di dati corretti e non trovare falsi positivi nel check dei nulli.
@@ -538,7 +537,7 @@ const missingParams = (dqContext: DQContext, recordData: REDCapRecord[], paramet
 				}
 				if (instr === instrumentOfV){
 					let valueOfV = data[v];
-					// Se la seguente condizione è vera esiste un problema per la variabile v	
+					// Se la seguente condizione è vera esiste un problema per la variabile "v".
 					if (valueOfV === ""){
 						result[0] = true;
 						missingCount = missingCount + 1;
@@ -569,7 +568,7 @@ const extractVarsFromParams = (dqContext: DQContext, parameters: any[]) => {
 		else if (
 			typeof value === "string"
 		) {
-			// Verifico se value è una variabile esistente nei metadata REDCap; se sì la aggiungo alla lista di variabili da verificare
+			// Verifico se value è una variabile esistente nei metadata REDCap; se sì la aggiungo alla lista di variabili da verificare.
 			let metadata = dqContext.metadata;
 			let metadataOfValue = metadata.find(item => item.field_name === value);
 			if (typeof metadataOfValue !== "undefined") {
@@ -594,7 +593,7 @@ export const DoDataQuality = async (
   instrumentsVsEvents: REDCapInstrVsEventsField[],
   repeatingInstrumentsAndEvents: REDCapRepeatingsField[]
 ): Promise<DQRecord | null> => {
-  // Creo l'oggetto dqContext, il quale specifica il contesto su cui eseguirò la Data Quality
+  // Creo l'oggetto dqContext, il quale specifica il contesto su cui eseguirò la Data Quality.
   const dqContext: DQContext = {
     data: recordData,
     metadata: metadata,
@@ -617,7 +616,7 @@ export const DoDataQuality = async (
 	// Qui inserisco il check dei missing (deve essere fatto una sola volta per ogni riga analizzata, per tutte le variabili del REDCap).
 	// Il criterio è la branching logic soddisfatta. Se sì, mi aspetto che var sia valorizzata. Se no, var va conteggiata come missing.
 
-	// Dynamically execute each check based on the configuration
+	// Eseguire dinamicamente ogni controllo in base alla configurazione.
 	dqChecks.forEach(check => {
 
 		// Per limitare esecuzione a record selezionati
@@ -640,13 +639,13 @@ export const DoDataQuality = async (
 
 			let instrumentOfMainVar = metadataOfMainVar["form_name"];
 
-      //Vista ipotesi Intrument apparteiene a 1 solo Event: ok questa funzione (prende il primo evento)
+      // Vista ipotesi Intrument apparteiene a 1 solo Event: ok questa funzione (prende il primo evento).
 			let eventOfMainVar = getEventOfInstrument(dqContext, instrumentOfMainVar);
       if (eventOfMainVar === null) {
         return null;
       }
 
-			// Un check è repeating se la mainVar è repeating
+			// Un check è repeating se la mainVar è repeating.
 			// Quindi, sotto le nostre ipotesi:
 			//	0 - Instrument REP senza eventi (Non Longitudinale)
 			//	1 - Instrument REP in Event NON_REP
@@ -690,7 +689,7 @@ export const DoDataQuality = async (
 				bLogicPassed = branchingPassed || noBranchingInCheck;
 
         // 2 - Pre-check
-				// Se tutte le var interessate passano la branching
+				// Se tutte le var interessate passano la branching...
 				if (noBranchingInCheck || branchingPassed) {
 					let precheckAvailable;
 					let precheckPassed;
@@ -722,7 +721,7 @@ export const DoDataQuality = async (
 					let instanceNum = (dataInstance["redcap_repeat_instance"] ? dataInstance["redcap_repeat_instance"] : 0);
 
 					// 1 - Controlla branching
-					// Calcola branching logic di ciascuna: true se tutte true (quindi in AND) 
+					// Calcola branching logic di ciascuna: true se tutte true (quindi in AND)
 					let branchingPassed: any;
 					let noBranchingInCheck = true;
 					//per ogni variabile interessata dal check corrente...
@@ -810,7 +809,7 @@ export const DoDataQuality = async (
 									if (typeof result === "boolean") {
 										//console.log("The precheck result is a boolean.");
 										if (!result) {
-											//se il precheck non è verificato, il DQ check attuale non è applicabile (results 0) e salto al prossimo (return).
+											// Se il precheck non è verificato, il DQ check attuale non è applicabile (results 0) e salto al prossimo (return).
 											precheckPass = false;
 											results[check.name + " - " + check.desc] = 0;
 											//console.log("The precheck failed. Next DQ check");
@@ -907,7 +906,7 @@ export const DoDataQuality = async (
 				} // end if(bLogicPassed) 
 			}
 			else {
-				// Se è un repeating instrument fisso momentaneamente a -1000
+				// Se è un repeating instrument fisso momentaneamente a -1000.
 				results[check.name + " - " + check.desc] = -1000;
 			}
 

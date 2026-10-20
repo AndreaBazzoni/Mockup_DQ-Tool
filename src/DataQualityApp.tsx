@@ -29,7 +29,7 @@ export default function DataQualityApp() {
   const [repeatingInstrumentsAndEvents, setRepeatingInstrumentsAndEvents] = useState<REDCapRepeatingsField[]>([]);
 
 
-  // Dimensioni finestra
+  // Window size
   const [dimMobile, setDimMobile] = useState(window.innerWidth < 1024);
   useEffect(() => {
     const handleResize = () => {
@@ -41,10 +41,11 @@ export default function DataQualityApp() {
     };
   }, []);
 
-  // Insieme dei centri, ma ordinato in ordine alfabetico
+  // List of centers, but arranged in alphabetical order.
   const sortedCenters = [...ListOfCenters].sort((a, b) => a.name.localeCompare(b.name));
 
-  // Cambio il centro selezionato
+
+  // Selected center changed
   const handleCenterChange = (centerId: string) => {
     const center = ListOfCenters.find(center => (center.id === centerId));
     if (!center) {
@@ -53,7 +54,7 @@ export default function DataQualityApp() {
     else {
       setSelectedCenter(center);
     }
-    // Resetto token e risultati
+    // I reset token and results.
     setToken("");
     setCohortResults(null);
     setAllRecordDataResults(null);
@@ -61,10 +62,11 @@ export default function DataQualityApp() {
     setResultAnonymous(null);
   };
 
-  // Modifico il token scritto
+
+  // Entered token modified
   const handleTokenChange = (value: string) => {
     setToken(value);
-    // Invalido la cache: il nuovo token potrebbe corrispondere a permessi/dati diversi
+    // Cache invalid: the new token could correspond to different permissions/Data.
     setCohortResults(null);
     setAllRecordDataResults(null);
     setResultQuality(null);
@@ -91,7 +93,7 @@ export default function DataQualityApp() {
         throw new Error("Problems finding the center.");
       }
 
-      // Verifico se ho già caricato cohort e allRecordData
+      // Check if I have already uploaded cohort and allRecordData.
       if (cohortResults !== null && allRecordDataResults !== null) {
         cohort = cohortResults;
         allRecordData = allRecordDataResults;
@@ -116,22 +118,22 @@ export default function DataQualityApp() {
       if (!isAnonymous) {
         // ---- Data Quality ----
         const qualityResult: Record<string, DQRecord> = {};
-        // Chiamate API per ottenere i dati che mi servono
+        // API calls to get Data.
           // Metadata
         let metadataAPI = await getMetadata(selectedCenter.url, token);
           // Instrument vs Event
         let instrumentsVsEventsAPI = await getInstrVsEvents(selectedCenter.url, token);
           // Repeatings
         let repeatingInstrumentsAndEventsAPI = await getRepeatings(selectedCenter.url, token);
-        // Verifico che nessuno dei valori necessari sia nullo
+        // I verify that none of the required values are null.
         if (metadataAPI === null || instrumentsVsEventsAPI === null || repeatingInstrumentsAndEventsAPI === null) {
           throw new Error("Failed to fetch information for Data Quality.");
         }
-        // Se nessuno dei valori è nullo, li salvo
+        // If none of the values ​​are null, I save them.
         setMetadata(metadataAPI);
         setInstrumentsVsEvents(instrumentsVsEventsAPI);
         setRepeatingInstrumentsAndEvents(repeatingInstrumentsAndEventsAPI);
-        // Inizio cicli DQ
+        // Start DQ cycles.
         for (let i = 0; i < cohort.length; i++) {
           let dq = await DoDataQuality(allRecordData[i], metadataAPI, instrumentsVsEventsAPI, repeatingInstrumentsAndEventsAPI);
           if (dq === null) {
@@ -168,7 +170,7 @@ export default function DataQualityApp() {
   // -------------
 
 
-  // Scaricamento (Data Quality o Anonymous Data)
+  // Download (Data Quality or Anonymous Data)
   const downloadResult = async (isAnonymous: boolean) => {
     if (!selectedCenter) {
       console.error("Error during the download.");
@@ -179,7 +181,7 @@ export default function DataQualityApp() {
     setLoading(true);
 
     try {
-      // Implementazione del download
+      // Download implementation
       if (!isAnonymous && resultQuality !== null) {
         // ---- Data Quality ----
         if (allRecordDataResults === null) {
@@ -209,12 +211,12 @@ export default function DataQualityApp() {
   }
 
 
-  // Condivisione dei risultati (Data Quality o Anonymous Data)
+  // Result sharing (Data Quality o Anonymous Data)
   const shareResult = (isAnonymous: boolean) => {
     const result = isAnonymous ? resultAnonymous : resultQuality;
     if (!result) return;
 
-    // Implementazione della condivisione
+    // Sharing implementation
     if (!isAnonymous) {
       setShowShareQuality(true);
     }
@@ -224,7 +226,7 @@ export default function DataQualityApp() {
   }
 
 
-  // VERIFICA: assenza di duplicati
+  // TO VERIFY: absence of duplicates
   const hasDuplicatesNames = new Set(ListOfCenters.map(center => center.name)).size != ListOfCenters.length
   const hasDuplicatesIds = new Set(ListOfCenters.map(center => center.id)).size != ListOfCenters.length
   if (hasDuplicatesNames || hasDuplicatesIds) {
@@ -242,12 +244,12 @@ export default function DataQualityApp() {
   return (
     <div className="container">
 
-      {/* Titolo */}
+      {/* Title */}
       <div className="DQ_Title">
         <h1>Data Quality Tool</h1>
       </div>
 
-      {/* Centro e Token */}
+      {/* Center and Token */}
       <div className="raw">
         <div className="partofRaw">
           <Select
@@ -293,7 +295,7 @@ export default function DataQualityApp() {
         </div>
       </div>
 
-      {/* Bottoni */}
+      {/* Buttons */}
       <div className="raw">
         <div className="partofRaw">
           <button
@@ -323,10 +325,10 @@ export default function DataQualityApp() {
         </div>
       </div>
 
-      {/* Successo */}
+      {/* Success */}
       <div className="raw">
         <div className="partofRaw">
-          {/* Non anonimi */}
+          {/* NO Anonymous */}
           {resultQuality && (
             <div className="containerResults">
               <button
@@ -396,7 +398,7 @@ export default function DataQualityApp() {
           )}
         </div>
         <div className="partofRaw">
-          {/* Anonimizzati */}
+          {/* YES Anonymous */}
           {resultAnonymous && (
             <div className="containerResults">
               <button
@@ -461,6 +463,16 @@ export default function DataQualityApp() {
         </div>
       </div>
 
+      {/* LOADING */}
+      {/* sr-only = screen-reader accessibility */}
+      <div role="status" className="sr-only">
+        {loading ? 'Caricamento in corso...' : ''}
+      </div>
+      {loading && (
+        <div className="loading-overlay" aria-hidden="true">
+          <div className="spinner" />
+        </div>
+      )}
     </div>
   );
 }

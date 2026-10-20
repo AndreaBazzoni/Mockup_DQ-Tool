@@ -22,16 +22,16 @@ const handleShareResultQuality = async (
   cohort: string[]
 ): Promise<void> => {
   try {
-    // Costruisco la URL
+    // I construct the URL
     const presignedUrl = `https://test-ehedq-upload-public.s3.amazonaws.com/DQ_${CurrentAnalysis}_${center.id}_${timestamp}.xlsx`;
     // File creation
     const rslt = await obtainParamsExcelDQ(center.url, token, allRecordData, cohort, metadata, instrumentsVsEvents, repeatings);
     const {unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState} = rslt;
     const file = createExcelDQ(result, metadata, unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState);
     // ------------------------
-    // Upload diretto su S3
+    // Direct Upload to S3
     await shareResultsToS3(presignedUrl, file);
-    // Conferma all'utente
+    // User confirm
     if (title === "quality") {
       toast.success("Sharing di Data Quality avvenuta con successo!");
     }
@@ -53,13 +53,13 @@ const handleShareResultAnonymous = async (
   timestamp: string,
 ): Promise<void> => {
   try {
-    // Costruisco la URL
+    // I construct the URL
     const presignedUrl = `https://test-ehedq-upload-public.s3.amazonaws.com/EXPORT_${CurrentAnalysis}_${center.id}_${timestamp}.xlsx`;
     // File creation
     const file = createXlsxFile(result);
-    // Upload diretto su S3
+    // Direct Upload to S3
     await shareResultsToS3(presignedUrl, file);
-    // Conferma all'utente
+    // User confirm
     if (title === "quality") {
       toast.success("Sharing di Data Quality avvenuta con successo!");
     }
@@ -81,13 +81,13 @@ export default function ShareModal(props: ShareModalProps) {
   const handleEURACAN = async () => {
     setIsSharing(true);
 
-    // -- Generazione Data/Ora per nome del file --
+    // -- Date/Time generation for the file name --
     // Generate a timestamp for the file name
     const now = new Date();
 
-    // Anno = presente
+    // Year = presence
     const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    // Anno = assente
+    // Year = absence
     //const dateString = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
     const hourString = `${String(now.getHours()).padStart(2, '0')}`;

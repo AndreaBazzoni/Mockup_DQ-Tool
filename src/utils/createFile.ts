@@ -30,7 +30,7 @@ export const createTxtFile = (
 export const createXlsxFile = (
   allRecordData: REDCapRecord[][]
 ) => {
-  // allRecordData è un oggetto che facciamo diventare array di oggetti
+  // allRecordData is an Object that becomes an Object Array.
   const rows = Object.values(allRecordData).flat();
 
   // Create a new workbook and a worksheet
@@ -333,7 +333,7 @@ const buildUnknownSheet = (
 		]
 	];
 	unknownSummary
-		// Ultimo filtro: mantengo solo le variabili che hanno almeno un missing oppure almeno un unknown
+		// Last filter: I keep only the variables that have at least one missing or one unknown value.
 		.filter((item: any) =>
 			item.percentMissing > 0 ||
 			item.percentUnknown > 0
@@ -420,7 +420,7 @@ const buildFollowUpSheet = (
 
   return rows;
 
-  // Questo è per mappare i dead separati nella tabella del follow up:
+  // This is for mapping the separate "dead" entries in the follow-up table:
 	/*
 	const STATUS_LABEL_MAP = {
 		"1": "Alive: no evidence of disease (NED)",
@@ -518,7 +518,7 @@ const buildDiseaseExtensionSheet = (
       return a.currentDiseaseExtension.localeCompare(b.currentDiseaseExtension);
     })
     .forEach((item: any) => {
-      // Qui modifico le label solo degli oggetti della current disease extension per i pazienti che non hanno un follow up ma solo la baseline registrata.
+      // Here, I modify the labels only for the objects within the current disease extension, specifically for patients who have no follow-up data and only a baseline record.
       const currentDiseaseExtension = item.currentDiseaseExtension.replace(" at presentation"," without follow up");
       rows.push([
         item.diagnosisYear,
@@ -588,12 +588,12 @@ const buildFollowUpTable = (
   const rows = [];
 
   // ============================================================
-  // TITOLO
+  // TITLE
   // ============================================================
   rows.push([title]);
 
   // ============================================================
-  // PRIMA RIGA HEADER
+  // FIRST ROW - HEADER
   // ============================================================
   const firstHeaderRow = [
     "",
@@ -610,7 +610,7 @@ const buildFollowUpTable = (
   rows.push(firstHeaderRow);
 
   // ============================================================
-  // SECONDA RIGA HEADER
+  // SECOND ROW - HEADER
   // ============================================================
   const secondHeaderRow = [
     "",
@@ -618,7 +618,7 @@ const buildFollowUpTable = (
   ];
 
   for (const statusLabel of statusLabels) {
-    // Stampa per rimozione warning (statusLabel inutilizzato)
+    // To avoid an "unused variable" error.
     if (statusLabel === null) {
       console.log("statusLabel = null");
     }
@@ -630,7 +630,7 @@ const buildFollowUpTable = (
   rows.push(secondHeaderRow);
 
   // ============================================================
-  // DATI
+  // DATA
   // ============================================================
 
   for (const followUpYear of followUpYears) {

@@ -31,7 +31,7 @@ export const fetchFileRepository = async (
   }
   const resultText = await response.text();
 
-  // N.B.: { response.ok = true } solo se status = 200÷299
+  // NOTE: { response.ok = true } only if status = 200÷299
   if (!response.ok) {
     if (response.status === 403) {
       throw new Error("Invalid token or insufficient permissions.");
@@ -79,7 +79,7 @@ export const getCohort = async (
   }
   const resultText = await response.text();
 
-  // N.B.: { response.ok = true } solo se status = 200÷299
+  // NOTE: { response.ok = true } only if status = 200÷299
   if (!response.ok) {
     if (response.status === 403) {
       throw new Error("Invalid token or insufficient permissions.");
@@ -89,12 +89,12 @@ export const getCohort = async (
 
   let result;
   try {
-    // Testo semplice (un id per riga)
+    // Simple text (one ID for row)
     result = resultText
       .split("\n")
       .map((line) => line.trim())
       .filter((line) => line.length > 0);
-      // dividi le righe in elementi, li ripulisci, togli gli elementi vuoti.
+      // I divide rows in elements, I clean them, I remove empty elements.
   } catch {
     throw new Error("Impossible to read the cohort.");
   }
@@ -137,7 +137,7 @@ export const fetchCohort = async (
   }
   const resultText = await response.text();
 
-  // N.B.: { response.ok = true } solo se status = 200÷299
+  // NOTE: { response.ok = true } only if status = 200÷299
   if (!response.ok) {
     if (response.status === 403) {
       throw new Error("Invalid token or insufficient permissions.");
@@ -187,7 +187,7 @@ export const createFileCohort = async (
   }
   const resultText = await response.text();
 
-  // N.B.: { response.ok = true } solo se status = 200÷299
+  // NOTE: { response.ok = true } only if status = 200÷299
   if (!response.ok) {
     if (response.status === 403) {
       throw new Error("Invalid token or insufficient permissions.");
@@ -228,7 +228,7 @@ export const createDirectory = async (
   }
   const resultText = await response.text();
 
-  // N.B.: { response.ok = true } solo se status = 200÷299
+  // NOTE: { response.ok = true } only if status = 200÷299
   if (!response.ok) {
     if (response.status === 403) {
       throw new Error("Invalid token or insufficient permissions.");
@@ -274,7 +274,7 @@ export const getRecordData = async (
   }
   const resultText = await response.text();
 
-  // N.B.: { response.ok = true } solo se status = 200÷299
+  // NOTE: { response.ok = true } only if status = 200÷299
   if (!response.ok) {
     if (response.status === 403) {
       throw new Error("Invalid token or insufficient permissions.");

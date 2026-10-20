@@ -2,7 +2,7 @@ import { runBranchingLogic, isVarRepeating } from "@/DoDataQuality";
 import type { REDCapRecord, REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField, DQContext } from "@/utils/types";
 
 
-// Funzione per costruire la Unknown Summary
+// Function to build the Unknown Summary
 export function buildUnknownSummary(
   unknownMatrix: any
 ) {
@@ -29,7 +29,7 @@ export function buildUnknownSummary(
 }
 
 
-// Funzione che processa gli Unknown Record
+// Function to process the Unknown Records
 export function processUnknownRecord(
   recordId: string,
   recordData: REDCapRecord[],
@@ -70,9 +70,9 @@ export function processUnknownRecord(
 }
 
 
-// Funzione per estrarre dai metadati i valori unknown di tutte le variabili che hanno una specifica al riguardo.
-// Queste specifiche si trovano nel campo select_choices_or_calculations (per i dropdown) o nel campo field_note (per variabili testuali).
-// Non mi interesso delle variabili che hanno note di tipo "if DD unknown...".
+// Function to extract "unknown" values ​​from the metadata for all variables that have a specification regarding this.
+// These specifications are found in the "select_choices_or_calculations" field (for dropdowns) or in the "field_note" field (for text variables).
+// I am not concerned with variables that have notes such as "if DD unknown...".
 export const extractUnknownCodes = (
   metadata: REDCapMetadataField[],
   instrumentsVsEvents: REDCapInstrVsEventsField[],
@@ -96,7 +96,7 @@ export const extractUnknownCodes = (
       const note = block.field_note || "";
       const select = block.select_choices_or_calculations || "";
 
-      // Escludo il caso "DD unknown" / "DD Unknown" che può comparire in field_note
+      // I exclude the case "DD unknown" / "DD Unknown" (that can appear in field_note).
       const hasDDUnknown =
       /DD\s+unknown/.test(note);
 
@@ -104,13 +104,13 @@ export const extractUnknownCodes = (
 
       let code = null;
 
-      // Caso 1: field_note -> "... If unknown, input ##"
+      // Case 1: field_note -> "... If unknown, input ##"
       const noteMatch = note.match(/If unknown,\s*input\s*(\d+)/i);
       if (noteMatch) {
         code = noteMatch[1];
       }
 
-      // Caso 2: select_choices_or_calculations -> "...|##, Unknown|..."
+      // Case 2: select_choices_or_calculations -> "...|##, Unknown|..."
       const selectMatch = select.match(/(?:^|\|)\s*(\d+)\s*,\s*Unknown/i);
       if (selectMatch) {
         code = selectMatch[1];
@@ -125,48 +125,48 @@ export const extractUnknownCodes = (
 }
 
 
-// Processa tutte le row di un paziente per il calcolo dei missing.
-//  - missingMetadata: metadata delle variabili che vogliamo controllare.
-//  - missingMatrix: struttura cumulativa che raccoglie i pazienti eleggibili e quelli con missing.
-//  - rowTypeMapping: mapping tra (event + instrument) e (tipoRow).
+// Processes all rows for a patient to calculate missing values.
+//  - missingMetadata: metadata for the variables to be checked.
+//  - missingMatrix: a cumulative structure that tracks eligible patients and those with missing values.
+//  - rowTypeMapping: a mapping between (event + instrument) and (rowType).
 export function processMissingRecord(
   context: DQContext,
   recordData: REDCapRecord[],
   missingMetadata: REDCapMetadataField[],
   missingMatrix: any
 ) {
-  // Analizzo una row alla volta.
+  // I analyze one row at a time.
   for (const row of recordData) {
-    // Determino il tipo della row.
+    // I determine the row type.
     const rowType = getRowType(row);
-    // Se non riesco a determinare il tipo, non posso sapere quali variabili siano attese.
+    // If I can't determine the type, I can't know which variables are expected.
     if (!rowType) {
       continue;
     }
-    // Prendo dal metadata solo le variabili appartenenti a questo tipo di row.
+    // I take from metadata only variables that belong to this type of row.
     const expectedVariables = missingMetadata.filter(
       metadataItem => metadataItem.form_name === rowType
     );
     const expectedVarBranch = getExpectedVariablesBranching(context, expectedVariables, row);
 
-    // Controllo ogni variabile attesa.
+    // I check every expected variable.
     for (const variable of expectedVarBranch) {
       const fieldName = variable.field_name;
-      //Inizializzo la struttura della variabile.
+      // I am initializing the variable structure.
       if (!missingMatrix[fieldName]) {
         missingMatrix[fieldName] = {
           field: fieldName,
-          // utile per debug / eventuale report futuro
+          // It is useful for debug / report in future
           expectedRowType: rowType,
-          // Set di recordId eleggibili (evita di contare più volte un paziente con più repeat instance)
+          // Set of eligible recordIds, avoids counting a patient multiple times due to multiple repeat instances.
           denominatorPatients: new Set(),
-          // Set di recordId per i quali la variabile è risultata missing almeno una volta.
+          //Set of recordIds for which the variable was found to be missing at least once.
           missingPatients: new Set()
         };
       }
-      // Il paziente è eleggibile per questa variabile. Anche se esistono n repeat instance, il recordId viene contato una sola volta.
+      // The patient is eligible for this variable. Even if there are n repeated instances, the recordId is counted only once.
       missingMatrix[fieldName].denominatorPatients.add(recordData[0].bl_record_id);
-      // Se la variabile è vuota in questa row, il paziente viene classificato come missing. Anche qui il Set garantisce una sola occorrenza per paziente.
+      // If the variable is empty in this row, the patient is classified as "missing." Also in this case, the Set ensures there is only one occurrence per patient.
       if (isMissingValue(row[fieldName])) {
         missingMatrix[fieldName].missingPatients.add(recordData[0].bl_record_id);
       }
@@ -182,19 +182,19 @@ const getExpectedVariablesBranching = (
 ) => {
   const expectedVarBranch = [];
   for (const variable of expectedVariables) {
-      // 1. Se non ha branching logic, la variabile è eleggibile.
+      // 1. If it does not have branching logic, the variable is eligible.
       if (!variable.branching_logic || !variable.branching_logic.trim()) {
         expectedVarBranch.push(variable);
         continue;
       }
-      // 2. Determino l'istanza corrente, se presente.
+      // 2. I determine the current instance, if present.
       let instance = null;
       if (row.redcap_repeat_instance !== null && row.redcap_repeat_instance !== "") {
         instance = Number(row.redcap_repeat_instance);
       }
-      // 3. Valuto la branching logic.
+      // 3. I evaluate the branching logic.
       const result = runBranchingLogic(context, variable, instance);
-      // 4. Mantengo solo le variabili con branching true.
+      // 4. I keep only the variables with branching set to true.
       if (result === true) {
         expectedVarBranch.push(variable);
       }
@@ -203,8 +203,8 @@ const getExpectedVariablesBranching = (
 };
 
 
-// Stabilisce se il valore di una variabile è missing.
-// [ NOTA: 0 e "0" = NON sono missing ]
+// Determines if the value of a variable is missing.
+// [ NOTE: 0 and "0" are NOT considered missing ]
 const isMissingValue = (
   value: string
 ) => {
@@ -216,10 +216,10 @@ const isMissingValue = (
 };
 
 
-// Determina il tipo di una row di recordData. Il confronto viene fatto usando:
+// Determines the type of a row from recordData. The comparison is performed using:
 //  - row.redcap_event_name
 //  - row.redcap_repeat_instrument
-// [ cercando la corrispondente combinazione in ROW_TYPE_MAPPING ]
+// [ by looking for the corresponding combination in ROW_TYPE_MAPPING ]
 const getRowType = (
   row: REDCapRecord
 ) => {

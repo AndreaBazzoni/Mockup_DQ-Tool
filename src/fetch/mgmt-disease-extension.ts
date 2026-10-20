@@ -18,7 +18,7 @@ interface DiseaseExtensionPatient {
 type DiseaseExtensionPatients = Record<string,DiseaseExtensionPatient>;
 
 
-// Funzione per aggiornare la Disease Extension Patients
+// Function to update the Disease Extension Patients
 export function updateDiseaseExtensionPatients(
   diseaseExtensionPatients: DiseaseExtensionPatients,
   timeline: any
@@ -27,25 +27,25 @@ export function updateDiseaseExtensionPatients(
     return null;
   }
 
-  // Primo elemento = baseline
+  // First element = baseline
   const baseline = timeline.find((item: any) => item.isBaseline);
 
-  // Ultimo elemento = disease extension più recente
+  // Last element = disease extension (most recent)
   const latest = timeline[timeline.length - 1];
 
-  // ---- !AGGIUNTE! ----
+  // ---- !ADDED! ----
   if (baseline === undefined || latest === undefined) {
     return null;
   }
-  // Mi è capitato che baseline fosse undefined, quindi che mi ritornasse undefined.
-  // Non posso ovviamente estrarre valori da un parametro undefined.
-  // --------------------
+  // It happened that "baseline" was undefined, which caused it to return "undefined".
+  // Naturally, I cannot extract values ​​from an "undefined" parameter.
+  // -----------------
 
   const diagnosisYear = latest.diagnosisYear;
   const baselineDiseaseExtension = baseline.diseaseExtension;
   const currentDiseaseExtension = latest.diseaseExtension;
 
-  // Salvo il paziente solo se sono disponibili sia baseline che current disease extension
+  // I only include the patient if both baseline and current disease extension are available.
   if (!diagnosisYear || !baselineDiseaseExtension || !currentDiseaseExtension) {
     return null;
   }
@@ -59,7 +59,7 @@ export function updateDiseaseExtensionPatients(
 }
 
 
-// Funzione per aggiornare la Disease Extension Counters
+// Function to update the Disease Extension Counters
 export function updateDiseaseExtensionCounters(
   diseaseExtensionCounters: DiseaseExtensionCounters,
   timeline: any
@@ -68,25 +68,25 @@ export function updateDiseaseExtensionCounters(
     return null;
   }
 
-  // Primo elemento = baseline
+  // First element = baseline
   const baseline = timeline.find((item: any) => item.isBaseline);
 
-  // Ultimo elemento = disease extension più recente
+  // Last element = disease extension (most recent)
   const latest = timeline[timeline.length - 1];
 
-  // ---- !AGGIUNTE! ----
+  // ---- !ADDED! ----
   if (baseline === undefined || latest === undefined) {
     return null;
   }
-  // Mi è capitato che baseline fosse undefined, quindi che mi ritornasse undefined.
-  // Non posso ovviamente estrarre valori da un parametro undefined.
-  // --------------------
+  // It happened that "baseline" was undefined, which caused it to return "undefined".
+  // Naturally, I cannot extract values ​​from an "undefined" parameter.
+  // -----------------
 
   const diagnosisYear = latest.diagnosisYear;
   const baselineDiseaseExtension = baseline.diseaseExtension;
   const currentDiseaseExtension = latest.diseaseExtension;
 
-  // Il paziente entra nel counter solo se sono disponibili entrambe le disease extension
+  // The patient enters the counter only if both disease extensions are available.
   if (!diagnosisYear || !baselineDiseaseExtension || !currentDiseaseExtension) {
     return null;
   }
@@ -149,7 +149,7 @@ export function aggregateDiseaseExtensionCounters(
 }
 
 
-// Funzione per costruire la Disease Extension Timeline
+// Function to build the Disease Extension Timeline
 export function buildDiseaseExtensionTimeline(
   recordId: string,
   recordData: REDCapRecord[],
@@ -197,7 +197,7 @@ export function buildDiseaseExtensionTimeline(
 			continue;
 		}
 		const dateValue = row[config.date];
-		// Follow-up senza data: non può definire l'estensione attuale.
+		// Follow-up with no date: cannot determine the current extension.
 		if (!dateValue) {
 			continue;
 		}
@@ -217,7 +217,7 @@ export function buildDiseaseExtensionTimeline(
 		});
 	}
 
-	// Ordina dal più vecchio al più recente
+	// Sorting from oldest to most recent.
 	timeline.sort(
 		(a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime()
 	);
@@ -274,12 +274,12 @@ function getYear(
   dateValue: any
 ) {
 	if (!dateValue) return null;
-	// Se è già un numero tipo "2020"
+	// If it is a number yet
 	if (/^\d{4}$/.test(dateValue)) {
 		return dateValue;
 	}
 	const date = new Date(dateValue);
-	// Controllo validità
+	// Validate check
 	if (isNaN(date.getTime())) {
 		return null;
 	}
