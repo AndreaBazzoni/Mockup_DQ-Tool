@@ -10,9 +10,13 @@ export const ManageCohort = async (
   currentAnalysis: string
 ): Promise<{ cohort: string[] | null; recordData: REDCapRecord[][] | null }> => {
 
+  // ------------------------------- //
   // ---- GESTIONE COMPILAZIONE ---- //
+  // ------------------------------- //
   const nameDirectory = "EHE-Federated";
   const nameFileCohort = `${currentAnalysis}_${center.id}_cohort.txt`;
+  // ------------------------------- //
+  // ------------------------------- //
   // ------------------------------- //
 
   const fileRepository = await fetchFileRepository(center.url, token, "");
