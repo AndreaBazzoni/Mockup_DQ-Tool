@@ -1,7 +1,9 @@
 import type { Center } from "@/utils/types";
 
 
+// ------------------------------- //
 // ---- GESTIONE COMPILAZIONE ---- //
+// ------------------------------- //
 export const ListOfCenters: Center[] = [
   {
     name: "BIOMERIS",
@@ -21,4 +23,6 @@ export const ListOfCenters: Center[] = [
 ];
 
 export const CurrentAnalysis: string = "2026";
+// ------------------------------- //
+// ------------------------------- //
 // ------------------------------- //
