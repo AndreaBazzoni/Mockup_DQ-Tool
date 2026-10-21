@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Eye, EyeOff, XCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner";
@@ -30,6 +30,7 @@ export default function DataQualityApp() {
 
 
   // Dimensioni finestra
+  /*
   const [dimMobile, setDimMobile] = useState(window.innerWidth < 1024);
   useEffect(() => {
     const handleResize = () => {
@@ -40,10 +41,12 @@ export default function DataQualityApp() {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+  */
 
   // Insieme dei centri, ma ordinato in ordine alfabetico
   const sortedCenters = [...ListOfCenters].sort((a, b) => a.name.localeCompare(b.name));
 
+  
   // Cambio il centro selezionato
   const handleCenterChange = (centerId: string) => {
     const center = ListOfCenters.find(center => (center.id === centerId));
@@ -60,6 +63,7 @@ export default function DataQualityApp() {
     setResultQuality(null);
     setResultAnonymous(null);
   };
+
 
   // Modifico il token scritto
   const handleTokenChange = (value: string) => {
@@ -235,7 +239,7 @@ export default function DataQualityApp() {
 
       {/* Titolo */}
       <div className="DQ_Title">
-        <h1>Data Quality Tool</h1>
+        <h1>EURACAN EHE Data Quality Tool</h1>
       </div>
 
       {/* Centro e Token */}
@@ -309,7 +313,7 @@ export default function DataQualityApp() {
             }}
             disabled={loading}
           >
-            Anonymous Data
+            Anonymous Data Share
           </button>
         </div>
       </div>
@@ -328,9 +332,11 @@ export default function DataQualityApp() {
                 <XCircle size={24}/>
               </button>
               <div className="titleResults">
+                {/*
                 {!dimMobile && <span>✅</span>}
                 &nbsp;<u>QUALITY</u>&nbsp;
                 {!dimMobile && <span>✅</span>}
+                */}
               </div>
               {
                 (selectedCenter!==null && cohortResults!==null && recordDataResults!==null) &&
@@ -346,7 +352,7 @@ export default function DataQualityApp() {
                     className="manageButton"
                     disabled={loading}
                   >
-                    Download Quality
+                    Download Quality Report
                   </button>
                   <button
                     id="shareResults"
@@ -354,7 +360,7 @@ export default function DataQualityApp() {
                     className="manageButton"
                     disabled={loading}
                   >
-                    Share Quality
+                    Share Quality Report
                   </button>
                   {showShareQuality && (
                     <ShareModal
@@ -396,9 +402,11 @@ export default function DataQualityApp() {
                 <XCircle size={24}/>
               </button>
               <div className="titleResults">
+                {/*
                 {!dimMobile && <span>✅</span>}
                 &nbsp;<u>ANONYMOUS</u>&nbsp;
                 {!dimMobile && <span>✅</span>}
+                */}
               </div>
               {
                 (selectedCenter!==null && cohortResults!==null && recordDataResults!==null) &&
@@ -414,7 +422,7 @@ export default function DataQualityApp() {
                     className="manageButton"
                     disabled={loading}
                   >
-                    Download Anonymous
+                    Download Anonymous Data
                   </button>
                   <button
                     id="shareResults"
@@ -422,7 +430,7 @@ export default function DataQualityApp() {
                     className="manageButton"
                     disabled={loading}
                   >
-                    Share Anonymous
+                    Share Anonymous Data
                   </button>
                   {showShareAnonymous && (
                     <ShareModal

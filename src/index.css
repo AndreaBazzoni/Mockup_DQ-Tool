@@ -9,6 +9,11 @@
 @tailwind utilities;
 
 
+/* Minimum to avoid overflow */
+body {
+  min-width: 600px;
+}
+
 :root {
   --text: black;
   --text-h: rgb(20, 20, 20, 0.9);
@@ -41,7 +46,7 @@
 }
 
 #root {
-  max-width: 96%;
+  width: 96%;
   margin: 0 auto;
   text-align: center;
   min-height: 100svh;
@@ -56,7 +61,6 @@
   width: 1000px;
   @media (max-width: 1024px) {
     width: 100%;
-    min-width: 500px;
   }
 }
 
@@ -379,9 +383,10 @@ svg {
 
 /* Footer */
 footer {
-  width: 100%;
   z-index: 10;
-  position: fixed;
+  position: sticky;
+  width: 100%;
+  margin-top: auto;
   bottom: 0;
   background-color: var(--bg);
   color: var(--text);
