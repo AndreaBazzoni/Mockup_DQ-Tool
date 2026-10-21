@@ -11,7 +11,6 @@ import type { REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsFie
 
 const handleShareResultQuality = async (
   center: Center,
-  title: string,
   result: Record<string, DQRecord>,
   timestamp: string,
   token: string,
@@ -30,12 +29,7 @@ const handleShareResultQuality = async (
     // Upload diretto su S3
     await shareResultsToS3(presignedUrl, file);
     // Conferma all'utente
-    if (title === "quality") {
-      toast.success("Sharing di Data Quality avvenuta con successo!");
-    }
-    if (title === "anonymous") {
-      toast.success("Sharing di Anonymous Data avvenuta con successo!");
-    }
+    toast.success("Data Quality sharing successfully completed!");
 
   } catch (err: any) {
     console.error(err.message || "Error during the Data Sharing.");
@@ -46,7 +40,6 @@ const handleShareResultQuality = async (
 
 const handleShareResultAnonymous = async (
   center: Center,
-  title: string,
   result: REDCapRecord[][],
   timestamp: string,
 ): Promise<void> => {
@@ -58,12 +51,7 @@ const handleShareResultAnonymous = async (
     // Upload diretto su S3
     await shareResultsToS3(presignedUrl, file);
     // Conferma all'utente
-    if (title === "quality") {
-      toast.success("Sharing di Data Quality avvenuta con successo!");
-    }
-    if (title === "anonymous") {
-      toast.success("Sharing di Anonymous Data avvenuta con successo!");
-    }
+    toast.success("Anonymous Data sharing successfully completed!");
 
   } catch (err: any) {
     console.error(err.message || "Error during the Data Sharing.");
@@ -100,12 +88,12 @@ export default function ShareModal(props: ShareModalProps) {
       // Data Quality
       if (title === "quality") {
         const { token, metadata, instrumentsVsEvents, repeatings } = props;
-        await handleShareResultQuality(center, title, result, timestamp, token, metadata, instrumentsVsEvents, repeatings);
+        await handleShareResultQuality(center, result, timestamp, token, metadata, instrumentsVsEvents, repeatings);
       }
 
       // Anonymous Data
       else if (title === "anonymous") {
-        await handleShareResultAnonymous(center, title, result, timestamp);
+        await handleShareResultAnonymous(center, result, timestamp);
       }
 
       // Unknown title

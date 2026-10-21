@@ -157,7 +157,7 @@ export default function DataQualityApp() {
       }
 
       // -- Completed --
-      toast.success(isAnonymous ? "Anonimizzazione completata!" : "Data Quality completata!");
+      toast.success(isAnonymous ? "Anonymization completed!" : "Data Quality completed!");
 
     } catch (err: any) {
       console.error(err.message || "Error during the operation.");

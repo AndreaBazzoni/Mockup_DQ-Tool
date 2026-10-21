@@ -123,7 +123,7 @@ export const varHasValueOLD = (recordData: any, varPath: any, targetValue: any, 
 
   // N.B.: "operator" non viene usata in questa funzione, ma serve per la struttura del codice. NON RIMUOVERE!
   if (recordData === null) {
-    console.log("Operatore: ", operator);  // Evito il warning di inutilizzo stampando in console.
+    console.log("Operator: ", operator);  // Evito il warning di inutilizzo stampando in console.
   }
 
 	return (results);

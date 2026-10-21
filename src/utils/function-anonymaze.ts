@@ -77,7 +77,7 @@ export const hmacHash = (recordData: any, attributeList: any, patientId: any, se
 
   // N.B.: "patientId" non viene usata in questa funzione, ma serve per la struttura del codice. NON RIMUOVERE!
   if (patientId === -1) {
-    console.log("ID paziente: ", patientId);  // Evito il warning di inutilizzo stampando in console.
+    console.log("Patient ID: ", patientId);  // Evito il warning di inutilizzo stampando in console.
   }
 
   recordData.forEach((item: any) => {
