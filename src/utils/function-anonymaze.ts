@@ -79,7 +79,7 @@ export const hmacHash = (recordData: any, attributeList: any, patientId: any, se
 
   // NOTE: "patientId" is not used in this function, but it is required for the code structure. DO NOT REMOVE!
   if (patientId === -1) {
-    console.log("ID paziente: ", patientId);  // To avoid an "unused variable" error.
+    console.log("Patient ID: ", patientId);  // To avoid an "unused variable" error.
   }
 
   recordData.forEach((item: any) => {

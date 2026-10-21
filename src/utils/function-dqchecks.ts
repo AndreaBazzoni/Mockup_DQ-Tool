@@ -123,7 +123,7 @@ export const varHasValueOLD = (recordData: any, varPath: any, targetValue: any, 
 
   // NOTE: "patientId" is not used in this function, but it is required for the code structure. DO NOT REMOVE!
   if (recordData === null) {
-    console.log("Operatore: ", operator);  // To avoid an "unused variable" error.
+    console.log("Operator: ", operator);  // To avoid an "unused variable" error.
   }
 
 	return (results);

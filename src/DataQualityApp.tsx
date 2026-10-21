@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Eye, EyeOff, XCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner";
@@ -30,6 +30,7 @@ export default function DataQualityApp() {
 
 
   // Window size
+  /*
   const [dimMobile, setDimMobile] = useState(window.innerWidth < 1024);
   useEffect(() => {
     const handleResize = () => {
@@ -40,6 +41,7 @@ export default function DataQualityApp() {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+  */
 
   // List of centers, but arranged in alphabetical order.
   const sortedCenters = [...ListOfCenters].sort((a, b) => a.name.localeCompare(b.name));
@@ -155,7 +157,7 @@ export default function DataQualityApp() {
       }
 
       // -- Completed --
-      toast.success(isAnonymous ? "Anonimizzazione completata!" : "Data Quality completata!");
+      toast.success(isAnonymous ? "Anonymization completed!" : "Data Quality completed!");
 
     } catch (err: any) {
       console.error(err.message || "Error during the operation.");
@@ -234,8 +236,8 @@ export default function DataQualityApp() {
     console.log("Duplicates Ids: ", hasDuplicatesIds);
     return (
       <div className="errorMessage">
-        Errore grave: presenti due ospedali con lo stesso nome o lo stesso id.<br/>
-        Contattare un amministratore per risolvere il problema.
+        Serious error: two hospitals with same name or same ID are present.<br/>
+        Please contact an administrator to resolve the issue.
       </div>
     )
   }
@@ -246,7 +248,7 @@ export default function DataQualityApp() {
 
       {/* Title */}
       <div className="DQ_Title">
-        <h1>Data Quality Tool</h1>
+        <h1>EURACAN EHE Data Quality Tool</h1>
       </div>
 
       {/* Center and Token */}
@@ -320,7 +322,7 @@ export default function DataQualityApp() {
             }}
             disabled={loading}
           >
-            Anonymous Data
+            Anonymous Data Share
           </button>
         </div>
       </div>
@@ -339,9 +341,11 @@ export default function DataQualityApp() {
                 <XCircle size={24}/>
               </button>
               <div className="titleResults">
+                {/*
                 {!dimMobile && <span>✅</span>}
                 &nbsp;<u>QUALITY</u>&nbsp;
                 {!dimMobile && <span>✅</span>}
+                */}
               </div>
               {
                 (selectedCenter!==null && cohortResults!==null && allRecordDataResults!==null) &&
@@ -357,7 +361,7 @@ export default function DataQualityApp() {
                     className="manageButton"
                     disabled={loading}
                   >
-                    Download Quality
+                    Download Quality Report
                   </button>
                   <button
                     id="shareResults"
@@ -365,7 +369,7 @@ export default function DataQualityApp() {
                     className="manageButton"
                     disabled={loading}
                   >
-                    Share Quality
+                    Share Quality Report
                   </button>
                   {showShareQuality && (
                     <ShareModal
@@ -389,7 +393,7 @@ export default function DataQualityApp() {
                 <ul className="infoResults">
                   <li className="scrollText">
                     <b>
-                      Errore nel caricamento dei dati.<br/>Contatta un amministratore.
+                      Error during Data loading.<br/>Please contact an administrator.
                     </b> 
                   </li>
                 </ul>
@@ -409,9 +413,11 @@ export default function DataQualityApp() {
                 <XCircle size={24}/>
               </button>
               <div className="titleResults">
+                {/*
                 {!dimMobile && <span>✅</span>}
                 &nbsp;<u>ANONYMOUS</u>&nbsp;
                 {!dimMobile && <span>✅</span>}
+                */}
               </div>
               {
                 (selectedCenter!==null && cohortResults!==null && allRecordDataResults!==null) &&
@@ -427,7 +433,7 @@ export default function DataQualityApp() {
                     className="manageButton"
                     disabled={loading}
                   >
-                    Download Anonymous
+                    Download Anonymous Data
                   </button>
                   <button
                     id="shareResults"
@@ -435,7 +441,7 @@ export default function DataQualityApp() {
                     className="manageButton"
                     disabled={loading}
                   >
-                    Share Anonymous
+                    Share Anonymous Data
                   </button>
                   {showShareAnonymous && (
                     <ShareModal
@@ -453,7 +459,7 @@ export default function DataQualityApp() {
                 <ul className="infoResults">
                   <li className="scrollText">
                     <b>
-                      Errore nel caricamento dei dati.<br/>Contatta un amministratore.
+                      Error during Data loading.<br/>Please contact an administrator.
                     </b> 
                   </li>
                 </ul>
