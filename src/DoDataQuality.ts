@@ -2,7 +2,10 @@ import { dqChecks } from "@/utils/config-dqchecks";
 import type { REDCapRecord, DQRecord, DQContext, REDCapMetadataField, BranchRefVar, VariableRef, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
 
 
-export const getEventOfInstrument = (dqContext: DQContext, instrument: string) => {
+export const getEventOfInstrument = (
+  dqContext: DQContext,
+  instrument: string
+) => {
 	let instrumentsVsEvents = dqContext.instrumentsVsEvents;
 
   const found = instrumentsVsEvents.find(item => item.form === instrument);
@@ -16,7 +19,11 @@ export const getEventOfInstrument = (dqContext: DQContext, instrument: string) =
 };
 
 
-export const isVarRepeating = (repeatingInstrumentsAndEvents: REDCapRepeatingsField[], instr: string, event: string | null) => {
+export const isVarRepeating = (
+  repeatingInstrumentsAndEvents: REDCapRepeatingsField[],
+  instr: string,
+  event: string | null
+) => {
   const eventIsRep = repeatingInstrumentsAndEvents.some(item => item.event_name === event);
 
   if (eventIsRep) {
@@ -40,7 +47,12 @@ export const varHasBranchingLogic = (metadataElem: REDCapMetadataField) => {
 };
 
 
-export const runBranchingLogic = (dqContext: DQContext, metadataOfVar: REDCapMetadataField, instance: any) => {
+export const runBranchingLogic = (
+  dqContext: DQContext,
+  metadataOfVar: REDCapMetadataField,
+  instance: any
+) => {
+  // L'instance in input è l'istanza  di riferimento da usare in caso non ci sia dentro alla branching la specifica di quale istanza usare (si usa la stessa).
 	// Branching logic, così come specificata su REDCap.
 	let branchingOrigExpr = metadataOfVar["branching_logic"];
 
@@ -64,7 +76,11 @@ export const runBranchingLogic = (dqContext: DQContext, metadataOfVar: REDCapMet
 };
 
 
-const compileBranchingLogicExpression = (dqContext: DQContext, branchingOrigExpr: string, instance: any = null) => {
+const compileBranchingLogicExpression = (
+  dqContext: DQContext,
+  branchingOrigExpr: string,
+  instance: any = null
+) => {
   const ROW_TYPE_MAPPING = [
 		{ instrument: "", event: "baseline_arm_1", tipoRow: "baseline_and_treatment_at_first_presentation" },
 		{ instrument: "unifocal_followup", event: "unifocal_arm_1", tipoRow: "unifocal_followup" },
@@ -159,7 +175,7 @@ const compileBranchingLogicExpression = (dqContext: DQContext, branchingOrigExpr
       completeVar.targetInstance = targetInstance;
     }
 
-    // Prendere Data row che contiene la variabile (non repeating) corrente.
+    // Prendere Data row che contiene la variabile corrente.
     let rightData4Var = getFirstEventFromDataForVar(dqContext, completeVar, instance );
 
     // Se quella riga esiste...
@@ -180,10 +196,13 @@ const compileBranchingLogicExpression = (dqContext: DQContext, branchingOrigExpr
 };
 
 
-export const evalRedcap = (jsExpr: string, { fallback = false } = {}) => {
+export const evalRedcap = (
+  jsExpr: string,
+  { fallback = false } = {}
+) => {
 	try {
 		// Coerzione e trimming minimi: non trasformo altro.
-		const s = String(jsExpr ?? '').trim();
+		const s = String(jsExpr ?? "").trim();
 
 		// Se vuoto, ritorno il fallback (evita "return ()" -> SyntaxError).
 		if (!s) {
@@ -195,14 +214,17 @@ export const evalRedcap = (jsExpr: string, { fallback = false } = {}) => {
 
 	} catch (err) {
 		// Log chiaro e callback opzionale.
-		console.error('[evalRedcap] Errore durante la valutazione:', err);
-		console.error('[evalRedcap] Espressione non valutabile:', jsExpr);
+		console.error("[evalRedcap] Errore durante la valutazione:", err);
+		console.error("[evalRedcap] Espressione non valutabile:", jsExpr);
 		return fallback;
 	}
 };
 
 
-export const extractRedcapVariables = (dqContext: DQContext, logic: string) => {
+export const extractRedcapVariables = (
+  dqContext: DQContext,
+  logic: string
+) => {
 	// matcha sequenze tipo: [xxx][yyy][zzz] (token completo)
 	const tokenRegex = /(\[[^\]]+\])+/g;
 	// matcha singole [parte]
@@ -302,7 +324,11 @@ export const extractRedcapVariables = (dqContext: DQContext, logic: string) => {
 };
 
 
-export const getFirstEventFromDataForVar = (dqContext: DQContext, variable: VariableRef, contextInstance: string | null) => {
+export const getFirstEventFromDataForVar = (
+  dqContext: DQContext,
+  variable: VariableRef,
+  contextInstance: string | null
+) => {
 	let allData = dqContext.data;
 
 	const isValidInstrument = dqContext.repeatingInstrumentsAndEvents.some(
@@ -322,11 +348,11 @@ export const getFirstEventFromDataForVar = (dqContext: DQContext, variable: Vari
   // =========================
   // CASO 1: NO INSTANCE LOGIC
   // =========================
-  if (!instKeyword || !String(instKeyword).includes('-instance')) {
+  if (!instKeyword || !String(instKeyword).includes("-instance")) {
     // NO repeating instrument (baseline rows)
     const nonRepeating = eventRows.find(
       r =>
-        (!r.redcap_repeat_instrument || r.redcap_repeat_instrument === '')
+        (!r.redcap_repeat_instrument || r.redcap_repeat_instrument === "")
     );
     return nonRepeating;
   }
@@ -350,21 +376,21 @@ export const getFirstEventFromDataForVar = (dqContext: DQContext, variable: Vari
   const current = Number(contextInstance ?? 0);
 
   switch (instKeyword) {
-    case 'first-instance':
+    case "first-instance":
       return sorted[0];
-    case 'last-instance':
+    case "last-instance":
       return sorted[sorted.length - 1];
-    case 'current-instance':
+    case "current-instance":
       return sorted.find(r =>
         Number(r.redcap_repeat_instance) === current
       );
-    case 'previous-instance':
+    case "previous-instance":
       return [...sorted]
         .reverse()
         .find(r =>
           Number(r.redcap_repeat_instance) < current
         );
-    case 'next-instance':
+    case "next-instance":
       return sorted.find(r =>
         Number(r.redcap_repeat_instance) > current
       );
@@ -376,7 +402,11 @@ export const getFirstEventFromDataForVar = (dqContext: DQContext, variable: Vari
 };
 
 
-export const getRowsOfDataForRepeatingVar = (dqContext: DQContext, instr: string, event: string) => {
+export const getRowsOfDataForRepeatingVar = (
+  dqContext: DQContext,
+  instr: string,
+  event: string
+) => {
 	let repeatingInstrumentsAndEvents = dqContext.repeatingInstrumentsAndEvents;
 	let allData = dqContext.data;
 
@@ -397,7 +427,11 @@ export const getRowsOfDataForRepeatingVar = (dqContext: DQContext, instr: string
 };
 
 
-export const replaceVarWithValue = (expression: string, variable: VariableRef, dataRow: REDCapRecord) => {
+export const replaceVarWithValue = (
+  expression: string,
+  variable: VariableRef,
+  dataRow: REDCapRecord
+) => {
 	let value4replacing = dataRow[variable.realField];
 	let newExpression = expression.replaceAll(variable.orig, "'" + value4replacing + "'");
 	return newExpression;
@@ -460,7 +494,11 @@ const nonexistentVars = (dqContext: DQContext, varsArray: string[]) => {
 };
 
 
-function checkVarsConsistency(precParams: any[] | null, params: any[], vars: string[]) {
+function checkVarsConsistency(
+  precParams: any[] | null,
+  params: any[],
+  vars: string[]
+) {
 	var varsSet = new Set(vars);
 	var foundInPrecParams = new Set();
 	var foundInParams = new Set();
@@ -480,7 +518,11 @@ function checkVarsConsistency(precParams: any[] | null, params: any[], vars: str
 };
 
 
-function findVarsInStructure(value: any[], varsSet: Set<string>, foundSet: Set<any>) {
+function findVarsInStructure(
+  value: any[],
+  varsSet: Set<string>,
+  foundSet: Set<any>
+) {
   if (Array.isArray(value)) {
     for (const element of value) {
       findVarsInStructure(element, varsSet, foundSet);
@@ -488,98 +530,6 @@ function findVarsInStructure(value: any[], varsSet: Set<string>, foundSet: Set<a
   } else if (typeof value === "string" && varsSet.has(value)) {
     foundSet.add(value);
   }
-};
-
-
-const missingParams = (dqContext: DQContext, recordData: REDCapRecord[], parameters: any[] | null) => {
-	let result: any[] = [];
-	let missingCount = 0;
-
-	if (parameters === null) {
-		// "result" è ancora undefined: viene ritornato per segnalare il problema (esiste una funzione ma non i corrispondenti params).
-		return result;
-	}
-
-	// Estraggo tutti i nomi variabile da "params" o "precParams" (che non ha type fisso).
-	const vars = extractVarsFromParams(dqContext, parameters);
-		
-	// Se arrivo qui ho un check/precheck da eseguire e params/precParams non nullo, quindi vars (array delle variabili da verificare) non dovrebbe mai essere null.
-	if (vars.length === 0){
-		return result;
-	}
-
-	// Esclusi i casi problematici, result parte a false (passa a true quando una variabile è nulla, ovvero devo skippare il DQ check).
-	result[0] = false;
-	for (const element of vars) {
-		// Per ogni variabile da controllare ne definisco instrument ed event per focalizzare il check solo sui record di dati corretti e non trovare falsi positivi nel check dei nulli.
-		let v: any = element;
-		let metadata = dqContext.metadata;
-		let metadataOfV = metadata.find(item => item.field_name === v);
-
-		if (typeof metadataOfV === "undefined") {
-			//console.log("***" + v + "*** is not a variable in metadata");
-			return
-		}
-
-		let instrumentOfV = metadataOfV["form_name"];
-		// Vista ipotesi Intrument appartiene a 1 solo Event: ok questa funzione (prende il primo evento).
-		let eventOfV = getEventOfInstrument(dqContext, instrumentOfV);
-
-		let myInstr = instrumentOfV;
-		const iter = recordData.length;
-		for (let i = 0; i < iter; i++) {
-			let data = recordData[i];
-			let instr = data["redcap_repeat_instrument"];
-			let event = data["redcap_event_name"];
-			if (event === eventOfV) {
-				if (!(isVarRepeating(dqContext.repeatingInstrumentsAndEvents, instrumentOfV, eventOfV))){
-					instrumentOfV = "";
-				}
-				if (instr === instrumentOfV){
-					let valueOfV = data[v];
-					// Se la seguente condizione è vera esiste un problema per la variabile "v".
-					if (valueOfV === ""){
-						result[0] = true;
-						missingCount = missingCount + 1;
-						result[missingCount] = [event, myInstr, v];
-					}
-				}
-			}
-		}
-	}
-
-	return result;
-};
-
-
-const extractVarsFromParams = (dqContext: DQContext, parameters: any[]) => {
-	// Funzione per riconoscere quali sono le variabili dentro a params e precParams.
-	// NOTA: arrivare qui dopo aver eseguito checkVarsConsistency dovrebbe garantire che non ci siano typo/nomi sbagliati tra quelli inclusi in precParams e params.
-	// La funzione legge precParam ricorsivamente, qualsiasi sia la sua struttura, fino ad arrivare ai singoli token di tipo stringa.
-  // Poi verifica se i singoli token si trovano nei metadata REDCap: queste sono le variabili.
-	const foundVars = new Set();
-
-	const walk = (value: any) => {
-		// Eseguo ricorsivamente finché il type dell'espressione esaminata è un array. 
-		if (Array.isArray(value)) {
-			value.forEach(walk);
-		} 
-		// Se invece è stringa, valuto se esiste nei metadata (quindi se è una variabile).
-		else if (
-			typeof value === "string"
-		) {
-			// Verifico se value è una variabile esistente nei metadata REDCap; se sì la aggiungo alla lista di variabili da verificare.
-			let metadata = dqContext.metadata;
-			let metadataOfValue = metadata.find(item => item.field_name === value);
-			if (typeof metadataOfValue !== "undefined") {
-				//console.log("***" + value + "*** is a variable to be checked");
-				foundVars.add(value);
-			}
-		}
-	};
-
-	walk(parameters);
-	return [...foundVars];
 };
 
 
@@ -651,307 +601,177 @@ export const DoDataQuality = async (
 			//	1 - Instrument REP in Event NON_REP
 			//	2 - Instrument NON_REP in Event REP
 
-			const stopDq1 = ['dq_1_12', 'dq_1_27', 'dq_1_28','dq_3_1','dq_4_1','dq_9_1'];
-			if (stopDq1.includes(check.name)) {
-				//console.log("Stop here!");
-			}
-
-			let isRepeating = isVarRepeating(dqContext.repeatingInstrumentsAndEvents, instrumentOfMainVar, eventOfMainVar);
+			let isRepeating = isVarRepeating(repeatingInstrumentsAndEvents, instrumentOfMainVar, eventOfMainVar);
 
 			let varsArray = check.vars;
 			
-			let bLogicPassed = false;
+			let bLogicPassed = true;
 
-			// Se NON repeating => esecuzione singola
-			if (!isRepeating) {
-				// 1 - Controlla branching
-				// Calcola branching logic di ciascuna: true se tutte true (quindi in AND) 
-				let branchingPassed: any;
-				let noBranchingInCheck = true;
-				// Per ogni variabile interessata dal check corrente...
-				varsArray.forEach(checkVarName => {
-					let metadataElem = metadata.find(item => item.field_name === checkVarName);
-					// Gestisco il caso in cui ci siano delle variabili che non sono in metadata
-					if (typeof metadataElem === "undefined") {
-						//console.log("***" + checkVarName + "*** is not a variable in metadata");
-						return null;
-					}
-					if (varHasBranchingLogic(metadataElem)) {
-						noBranchingInCheck = false;
-						// Inizializzo branchingpassed solo se c'è almeno una branching
-						if (typeof branchingPassed === "undefined" && branchingPassed === undefined) {
-							branchingPassed = true;
-						}
-						// Visto che uso && eseguo branching solo se quelle prima sono passate
-						branchingPassed = branchingPassed && runBranchingLogic(dqContext, metadataElem, null);
-					}
-				})
-				bLogicPassed = branchingPassed || noBranchingInCheck;
+      // Verifico che tutte le vars elencate nel json per quel DQ check esistano nei metadata. Solo se è così proseguo. Mi aspetto nonExistingVars vuoto.
+			let nonExistingVars = nonexistentVars(dqContext, check.vars);
 
-        // 2 - Pre-check
-				// Se tutte le var interessate passano la branching...
-				if (noBranchingInCheck || branchingPassed) {
-					let precheckAvailable;
-					let precheckPassed;
-					if (check.prec != null && typeof check.prec === 'function') {
-						precheckAvailable = true;
-						precheckPassed = check.prec(recordData, ...(check.precParams ?? []));
-					}
-          else {
-						precheckAvailable = false;
-					}
-	
-					// 3 - Check
-					if (!precheckAvailable || precheckPassed) {
-						let checkResult = check.func(recordData, ...check.params);
-						results[check.name] = checkResult;
-					}
-        }
-			} 
-
-      // Se repeating => esecuzione multipla
-			else if (isRepeating) {
-				// Valuto ogni istanza di mainVar separatamente
-				let rowsOfDataForMainVar = getRowsOfDataForRepeatingVar(dqContext, instrumentOfMainVar, eventOfMainVar);
-        if (rowsOfDataForMainVar === false) {
-          return null;
-        }
-
-				rowsOfDataForMainVar.forEach(dataInstance => {
-					let instanceNum = (dataInstance["redcap_repeat_instance"] ? dataInstance["redcap_repeat_instance"] : 0);
-
-					// 1 - Controlla branching
-					// Calcola branching logic di ciascuna: true se tutte true (quindi in AND)
-					let branchingPassed: any;
-					let noBranchingInCheck = true;
-					//per ogni variabile interessata dal check corrente...
-					varsArray.forEach(checkVarName => {
-						let metadataElem = metadata.find(item => item.field_name === checkVarName);
-						if (typeof metadataElem === "undefined") {
-							//console.log("***" + checkVarName + "*** is not a variable in metadata");
-							return null;
-						}
-						if (varHasBranchingLogic(metadataElem)) {
-							noBranchingInCheck = false;
-							// Inizializzo branchingpassed solo se c'è almeno una branching
-							if (typeof branchingPassed === "undefined" && branchingPassed === undefined) {
-								branchingPassed = true;
-							}
-							// Visto che uso && eseguo branching solo se quelle prima sono passate
-							branchingPassed = branchingPassed && runBranchingLogic(dqContext, metadataElem, instanceNum);
-						}
-					})
-					bLogicPassed = branchingPassed || noBranchingInCheck;
+      if (nonExistingVars.length > 0) {
+				console.log("Error in the vars list for check " + check.name + ": ");
+				nonExistingVars.forEach(function (v) {
+					console.log(" - ", v);
 				});
-			}
-			
-			let precheckPass = true;
-
-			// Verifica risultato funzione principale solo per NON repeating
-			if (!isRepeating) {
-				if (!bLogicPassed) {
-					// Se è un NON repeating, ma ho avuto fail nelle branching, fisso results (#fail) a 0.
-					// Lo fisso a zero perché fail nella branching significa che non mi aspetto che il check debba essere fatto.
-					results[check.name + " - " + check.desc] = 0;
-					precheckPass = false;
-				}
-				else if (bLogicPassed) {
-					// Lavoro basandomi su vars perché è l'unico elenco variabili che ha struttura fissa (array di stringhe); precParams e params hanno struttura variabile.
-					// Verifico che tutte le vars elencate nel json di per quel DQ check esistano nei metadata. Solo se è così proseguo. Mi aspetto nonExistingVars vuoto.
-					let nonExistingVars = nonexistentVars(dqContext, check.vars);
-					if(nonExistingVars.length > 0){
-						//console.log("Error in the vars list for check " + check.name + ": ");
-						nonExistingVars.forEach(function (v) {
-							console.log(v);
-						});
-						return null;
-					}
-					// Se non ci sono variabili unknown nell'array vars proseguo
-					else if (nonExistingVars.length === 0) {
-						// Results contiene il numero di errori nelle branching logic (prima del check principale). Per un non repeating, se ho "bLogicPassed = true" significa che results (nr di fail) = 0.
-						results[check.name + " - " + check.desc] = 0;
-						// Verifico che tutte le variabili del vettore vars esistano in precParams e Params (se sì vuol dire che non ho typo).
-            // Se sì proseguo, Se no mi fermo. Cosa faccio coi results? Tecnicamente non è un fail dei dati, ma un problema nella struttura della regola.
-						let varConsistency = checkVarsConsistency(check.precParams, check.params, check.vars);
-						if(!varConsistency){
-							//console.log("There are errors in precParams or params definition.");
-							return null;
-						}
-						else if(varConsistency) {
-							// Ora che ho accertato che non ci sono problemi con i nomi delle variabili.
-							// Per tutte le funzioni (sia precheck, sia check) devo anche verificare che tutti gli instrument coinvolti siano completi, altrimenti passo al check seguente.
-							  // Se ho precheck da valutare:
-							if (check.prec != null && typeof check.prec === "function") {
-								// Prima del precheck effettivo verifico se una o più variabili del precheck è nulla; se sì, non passo nemmeno a eseguire i precheck perché la regola non è rilevante.
-                // precVarNull è true se almeno una delle variabili del precheck è nulla.
-								const precVarIsNull = missingParams(dqContext, recordData, check.precParams);
-								if (precVarIsNull === undefined || precVarIsNull.length === 0) {
-									//console.log("Problem case: precParam are not specified for function prec or REDCap variables are not recognized in precParam.");
-									//return precVarIsNull;
-                  return null;
-								}
-								else if (precVarIsNull[0] === true) {
-									// In questo caso esco dal DQ check corrente senza ulteriori problemi; semplicemente non è applicabile.
-									results[check.name + " - " + check.desc] = 0;
-									  // allResults[0] = results;
-									  // allResults[1] = missings;
-									  // return allResults;
-									return results;
-								}
-                // Solo se tutte le variabili del precheck sono NON nulle (confronto stretto "precVarIsNull === false"), proseguo con la valutazione di precheck e funzioni successive, altrimenti salto alla prossima DQ rule.
-								else if (precVarIsNull[0] === false){
-									// A questo punto results continua ad essere 0 (la non applicabilità del precheck non implica errore).
-									results[check.name + " - " + check.desc] = 0;
-									// Evaluate the precheck
-									const result = check.prec(recordData, ...(check.precParams ?? []));
-                    // Store "PASS" or "FAIL" based on the result
-                    // results[check.name + " - " + check.desc] = result ? "PASS" : "FAIL";
-									if (typeof result === "boolean") {
-										//console.log("The precheck result is a boolean.");
-										if (!result) {
-											// Se il precheck non è verificato, il DQ check attuale non è applicabile (results 0) e salto al prossimo (return).
-											precheckPass = false;
-											results[check.name + " - " + check.desc] = 0;
-											//console.log("The precheck failed. Next DQ check");
-									      // allResults[0] = results;
-											  // allResults[1] = missings;
-											  // return allResults;
-											return results;
-										}
-										//results[check.name + ' - ' + check.desc] = result ? '' : '1';
-									}
-                  else if (typeof result === "object" && result !== null) {
-										//console.log("The precheck result is an object.");
-										const errored = Object.values(result).filter(value => value === false).length;
-										//console.log(" - nr of errors in the precheck = " + errored);
-										if (errored == 0) {
-											//results[check.name + " - " + check.desc] = "";
-											results[check.name + " - " + check.desc] = 0;
-										}
-										else {
-											// Se almeno un precheck non è verificato, il DQ check attuale non è applicabile (results 0) e salto al prossimo (return).
-											precheckPass = false;
-											results[check.name + " - " + check.desc] = 0;
-								        // allResults[0] = results;
-							          // allResults[1] = missings;
-									      // return allResults;
-											return results;
-										}
-									}
-								} // end if (precVarIsNull === false) {
-							} // end if (check.prec != null && typeof check.prec === "function")
-							
-							/////////////////////////////////////////////////////////////////////////////////////////////////////////
-							// VERIFICA CHECK PRINCIPALI (nota: qui entro solo se NON repeating)
-							/////////////////////////////////////////////////////////////////////////////////////////////////////////
-							if(!precheckPass) {
-								// Se ho avuto fail nel precheck fisso results (#fail) a 1
-								results[check.name + " - " + check.desc] = 0;
-								//console.log("Failed precheck. go to next DQ check");
-								  // allResults[0] = results;
-								  // allResults[1] = missings;
-								  // return allResults;
-								return results;
-							}
-							// Se ho passato i precheck:
-							else if (precheckPass) {
-								// "results" contiene il numero di errori nelle branching logic (prima del check principale).
-                // Per un non repeating, se ho "bLogicPassed = true" significa che results (#fail) = 0.
-								results[check.name + " - " + check.desc] = 0;
-								// Prima di valutare i check, verifico se ho variabili nulle (come ho fatto nei precheck).
-                // In questo caso, però, se ho dei null imposto il check a FAIL e passo al prossimo DQ check.
-								// "anyVarNull" è true se almeno una delle variabili del check è nulla.
-								const anyVarIsNull = missingParams(dqContext, recordData, check.params);
-								//console.log("Any params variable is null = " + anyVarIsNull);
-								if (anyVarIsNull === undefined || anyVarIsNull.length === 0){
-									//console.log("Problem case: params are not specified for function main or REDCap variables are not recognized in params.");
-									//return anyVarIsNull;
-                  return null;
-								}
-								else if (anyVarIsNull[0] === true){
-									// In questo caso esco dal DQ check corrente senza ulteriori problemi; semplicemente non è applicabile.
-									results[check.name + " - " + check.desc] = 0;
-									  // for (let i = 1; i < anyVarIsNull.length; i++){
-										//   missings[anyVarIsNull[i][2]] = anyVarIsNull[i];
-									  // }
-									  // allResults[0] = results;
-									  // allResults[1] = missings;
-									  // return allResults;
-									return results;
-								}
-								// Se è andato tutto liscio e non ho var nulle nei params faccio i check.
-								// Evaluate the check
-								const result = check.func(recordData, ...check.params);
-                  // Store "PASS" or "FAIL" based on the result.
-                  // results[check.name + " - " + check.desc] = result ? "PASS" : "FAIL";
-								if (typeof result === "boolean") {
-									//console.log("The result is a boolean.");
-									if (!result) {
-										results[check.name + " - " + check.desc] = 1;
-									}
-								} else if (typeof result === "object" && result !== null) {
-									//console.log("The result is an object.");
-									const errored = Object.values(result).filter(value => value === false).length;
-									//console.log(" - nr of errors = " + errored);
-									if (errored == 0) {
-										results[check.name + " - " + check.desc] = 0;
-									}
-									else {
-										results[check.name + " - " + check.desc] = 1;
-									}
-								}
-							} // end if(precheckPass)
-						} // end if varconsistency
-					} // end else if((nonExistingVars === null) || (nonExistingVars === undefined))
-				} // end if(bLogicPassed) 
-			}
-			else {
-				// Se è un repeating instrument fisso momentaneamente a -1000.
-				results[check.name + " - " + check.desc] = -1000;
+				return;
 			}
 
-			/////////////////////////////////////////////////////////////////////////////////////////////////////////
-			// VERIFICA CHECK PRINCIPALI
-			/////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// Se non ci sono errori nell'array delle vars (esistono tutte), verifico la consistenza tra gli array vars, precparams e params (sono scritti a mano quindi soggetti a errore).
+			else if (nonExistingVars.length === 0) {
+				// Verifico che tutte le variabili del vettore vars esistano in precParams e Params. Se sì (vuol dire che non ho typo) proseguo, altrimenti mi fermo.
+				let varConsistency = checkVarsConsistency(check.precParams, check.params, check.vars);
+				if (!varConsistency) {
+					console.log("Ci sono uno o più errori nella definizione delle variabili in precParams e/o params!");
+					return;
+				}
 
-			// Verifica risultato funzione principale solo per NON repeating
-			if (!isRepeating) {
-				if(bLogicPassed) {
-					// "results" contiene il numero di errori nelle branching logic (prima del check principale). Per un non repeating, se ho bLogicPassed true significa che results (#fail) = 0.
-					results[check.name + " - " + check.desc] = 0;
-					// Evaluate the check
-					const result = check.func(recordData, ...check.params);
-            // Store "PASS" or "FAIL" based on the result
-            // results[check.name + " - " + check.desc] = result ? "PASS" : "FAIL";
-					if (typeof result === "boolean") {
-						//console.log("The result is a boolean.");
-						let resVal = results[check.name + " - " + check.desc];
-						if (!result) {
-							results[check.name + " - " + check.desc] = resVal + 1;
-						}
-					} else if (typeof result === "object" && result !== null) {
-						//console.log("The result is an object.");
-						const errored = Object.values(result).filter(value => value === false).length;
-						//console.log(" - nr of errors = " + errored);
-						if (errored == 0) {
-							results[check.name + " - " + check.desc] = "";
-						}
-						else {
-							let resVal = results[check.name + " - " + check.desc];
-							results[check.name + " - " + check.desc] = resVal + errored;
-						}
-					}
-				}
-				else {
-					// Se è un NON repeating ma ho avuto fail nelle branching fisso results (#fail) a 0.
-					// Lo fisso a 0 perché se le branching hanno fail vuol dire che la var non mi aspetto sia valorizzata.
-					results[check.name + " - " + check.desc] = 0;
-				}
-			}
-			else {
-				// Se è un repeating instrument fisso momentaneamente a -1000.
-				results[check.name + " - " + check.desc] = -1000;
-			}
+				else if (varConsistency) {
+
+          // Se NON repeating => esecuzione singola
+          if (!isRepeating) {
+            // Metto di default il result del controllo a "true" (cioè "non errore", che è già il valore giusto se fallisco le verifiche sula branching e sui precheck).
+            // Eventualmente cambierà a "false" in fase di verifica del check principale, se fallisce.
+						results[check.name + " - " + check.desc] = true;
+
+            // 1 - Controlla branching
+            // Calcola branching logic di ciascuna: true se tutte true (quindi in AND).
+            let branchingPassed: any;
+            let noBranchingInCheck = true;
+            // Ciclo per ogni variabile interessata dal check corrente.
+            varsArray.forEach(checkVarName => {
+              let metadataElem = metadata.find(item => item.field_name === checkVarName);
+              // Gestisco il caso in cui ci siano delle variabili che non sono in metadata.
+              if (typeof metadataElem === "undefined") {
+                //console.log("***" + checkVarName + "*** is not a variable in metadata");
+                return null;
+              }
+              if (varHasBranchingLogic(metadataElem)) {
+                noBranchingInCheck = false;
+                // Inizializzo branchingpassed solo se c'è almeno una branching.
+                if (typeof branchingPassed === "undefined" && branchingPassed === undefined) {
+                  branchingPassed = true;
+                }
+                // Visto che uso && eseguo branching solo se quelle prima sono passate.
+                branchingPassed = branchingPassed && runBranchingLogic(dqContext, metadataElem, null);
+              }
+            })
+            bLogicPassed = bLogicPassed && (branchingPassed || noBranchingInCheck);
+
+            // Se tutte le var interessate passano la branching proseguo alla verifica dei precheck.
+            if (noBranchingInCheck || branchingPassed) {
+              // 2 - Pre-check
+              let precheckAvailable;
+              let precheckPassed;
+              // Se esiste un precheck nel DQ, allora setto precheckAvailable a "true" e proseguo a verificarlo (-> valore di precheckPassed).
+              if (check.prec != null && typeof check.prec === "function") {
+                precheckAvailable = true;
+                precheckPassed = check.prec(recordData, ...(check.precParams ?? []));
+              }
+              // Se non esiste un precheck nel DQ, allora setto precheckAvailable a "false".
+              else {
+                precheckAvailable = false;
+              }
+              
+              // Ultimo passo: verifica dei check (solo se tutti gli step precedenti passano).
+              // 3 - Check
+              if (!precheckAvailable || precheckPassed) {
+                let checkResult = check.func(recordData, ...check.params);
+                results[check.name + " - " + check.desc] = checkResult;
+              }
+            }
+          } 
+
+          // Se repeating => esecuzione multipla
+          else if (isRepeating) {
+            // Valuto ogni istanza di mainVar separatamente.
+            let rowsOfDataForMainVar = getRowsOfDataForRepeatingVar(dqContext, instrumentOfMainVar, eventOfMainVar);
+            if (rowsOfDataForMainVar === false) {
+              return null;
+            }
+
+            // I prossimi step devono avvenire solo se nel Record ho effettivamente delle righe del tipo richiesto.
+            // Altrimenti non ha senso controllare (nemmeno le branching logic). E per ogni riga del tipo giusto, faccio girare le verifiche della branching.
+            // Se non ho righe del tipo giusto posso passare oltre col result a 0.
+            if (rowsOfDataForMainVar.length > 0) {
+              const partial: Record<any,any> = {};
+
+              rowsOfDataForMainVar.forEach(dataInstance => {
+                let instanceNum = (dataInstance["redcap_repeat_instance"] ? dataInstance["redcap_repeat_instance"] : 0);
+
+                partial[instanceNum] = 0;
+
+                // 1 - Controlla branching
+                // Calcola branching logic di ciascuna: true se tutte true (quindi in AND).
+                let branchingPassed: any;
+                let noBranchingInCheck = true;
+                //let metadataVar;
+                // Per ogni variabile interessata dal check corrente...
+                varsArray.forEach(checkVarName => {
+                  let metadataElem = metadata.find(item => item.field_name === checkVarName);
+                  //metadataVar = metadataElem;
+                  if (typeof metadataElem === "undefined") {
+                    //console.log("***" + checkVarName + "*** is not a variable in metadata");
+                    return null;
+                  }
+                  if (varHasBranchingLogic(metadataElem)) {
+                    noBranchingInCheck = false;
+                    // Inizializzo branchingpassed solo se c'è almeno una branching.
+                    if (typeof branchingPassed === "undefined" && branchingPassed === undefined) {
+                      branchingPassed = true;
+                    }
+                    // Visto che uso "&&"" eseguo branching solo se quelle prima sono passate.
+                    branchingPassed = branchingPassed && runBranchingLogic(dqContext, metadataElem, instanceNum);
+                  }
+                  else {
+                    branchingPassed = true;
+                    noBranchingInCheck = true;
+                  }
+
+                  bLogicPassed = branchingPassed && (branchingPassed || noBranchingInCheck);
+                })
+
+                // Se tutte le var interessate passano la branching proseguo alla verifica dei precheck.
+                if (bLogicPassed) {
+                  // 2 - Pre-check
+                  let precheckAvailable;
+                  let precheckPassed;
+                  // Se esiste un precheck nel DQ, allora setto precheckAvailable a "true" e proseguo a verificarlo (-> valore di precheckPassed).
+                  if (check.prec != null && typeof check.prec === "function") {
+                    precheckAvailable = true;
+                    precheckPassed = check.prec(recordData, ...(check.precParams ?? []));
+                  }
+                  // Se non esiste un precheck nel DQ, allora setto precheckAvailable a "false".
+                  else {
+                    precheckAvailable = false;
+                  }
+          
+                  // Ultimo passo: verifica dei check, che avviene solo se tutti gli step precedenti passano.
+                  // 3 - Check
+                  if (!precheckAvailable || precheckPassed) {
+                    let checkResult = check.func(recordData, ...check.params, dataInstance);
+                    partial[instanceNum] = checkResult;
+                  }
+                }
+              });
+
+              // I risultati di tipo "T/F" vengono convertiti in "1/0" per andare nel report.
+              Object.keys(partial).forEach(key => {
+                if (partial[key] === true) partial[key] = 0;
+                else if (partial[key] === false) partial[key] = 1;
+              });
+
+              results[check.name + " - " + check.desc] = Object.values(partial).reduce((sum, value) => sum + value, 0);
+            }
+
+            else {
+              // Se non trovo rows del tipo che mi interessa per la valutazione della variabile, allora posso già interrompere la valutazione del check mettendo "false".
+              results[check.name + " - " + check.desc] = 1;
+            }
+			    }
+        }
+      }
 		}
 	});
     // allResults[0] = results;

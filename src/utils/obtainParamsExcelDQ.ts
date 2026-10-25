@@ -2,7 +2,7 @@ import { fetchRecords } from "@/fetch/dq-fetch";
 import { initializeBaselineCounters,	processBaselineRecord } from '@/fetch/mgmt-complete-patients';
 import { buildDiseaseExtensionTimeline, updateDiseaseExtensionPatients, updateDiseaseExtensionCounters, aggregateDiseaseExtensionCounters } from '@/fetch/mgmt-disease-extension';
 import { initializeFollowupStats, buildStatusTimeline, buildTimelineSummary, analyzeFollowupCompleteness, classifyPatients } from '@/fetch/mgmt-followup';
-import { buildUnknownSummary, processUnknownRecord, extractUnknownCodes, processMissingRecord } from '@/fetch/mgmt-unknown';
+import { buildUnknownMissingSummary, processUnknownRecord, extractUnknownCodes, processMissingRecord } from '@/fetch/mgmt-unknown';
 import type { REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField, REDCapRecord, DQContext } from "@/utils/types";
 
 
@@ -140,7 +140,7 @@ export const obtainParamsExcelDQ = async(
       }
     }
 
-    const unknownSummary = buildUnknownSummary(unknownMatrix);
+    const unknownSummary = buildUnknownMissingSummary(unknownMatrix, missingMatrix, metadata);
     unknownSummaryState = unknownSummary;
 
     const allTimelineSummary = buildTimelineSummary(allTimeline);

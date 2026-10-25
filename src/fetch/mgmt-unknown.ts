@@ -29,20 +29,42 @@ export function buildUnknownSummary(
 }
 
 
-// Function to process the Unknown Records
+// Function to build the Missing Summary
+export function buildMissingSummary(
+  missingMatrix: any
+) {
+  return Object.values(missingMatrix).map((row: any) => {
+    const denominatorMissing = row.denominatorPatients.size;
+    const missing = row.missingPatients.size;
+    return {
+      field: row.field,
+      denominatorMissing,
+      missing,
+      percent:
+        denominatorMissing > 0
+          ? (missing / denominatorMissing) * 100
+          : 0
+    };
+  });
+}
+
+
+// Processes all rows for a patient to calculate unknown values.
+//  - unknownCodes: "unknown" values ​​from the metadata for all variables that have a specification regarding this.
+//  - unknownMatrix: a cumulative structure that tracks eligible patients and those with unknown values.
 export function processUnknownRecord(
   recordId: string,
   recordData: REDCapRecord[],
   unknownCodes: any[],
   unknownMatrix: any
 ) {
-  for (const rowData of recordData) {
+  for (const row of recordData) {
     unknownCodes.forEach((codeObj) => {
       const fieldName = codeObj.field_name;
-      const eligible = (codeObj.event_name === rowData.redcap_event_name && codeObj.form_name === rowData.redcap_repeat_instrument)
+      const eligible = (codeObj.event_name === row.redcap_event_name && codeObj.form_name === row.redcap_repeat_instrument)
         ? 1
         : 0;
-      const match = (eligible && rowData[fieldName] === codeObj.val)
+      const match = (eligible && row[fieldName] === codeObj.val)
         ? 1
         : 0;
 
@@ -67,61 +89,6 @@ export function processUnknownRecord(
       unknownMatrix[fieldName][matchKey] += match;
     });
   }
-}
-
-
-// Function to extract "unknown" values ​​from the metadata for all variables that have a specification regarding this.
-// These specifications are found in the "select_choices_or_calculations" field (for dropdowns) or in the "field_note" field (for text variables).
-// I am not concerned with variables that have notes such as "if DD unknown...".
-export const extractUnknownCodes = (
-  metadata: REDCapMetadataField[],
-  instrumentsVsEvents: REDCapInstrVsEventsField[],
-  repeatings: REDCapRepeatingsField[]
-) => {
-    if (!Array.isArray(metadata)) return [];
-    const results: any[] = [];
-
-    metadata.forEach(block => {
-      let fieldName = block.field_name;
-      let instrumentName = block.form_name;
-
-      const found = instrumentsVsEvents.find(item => item.form === instrumentName);
-      if (found === undefined) return [];
-      let eventName = found.unique_event_name;
-
-      if (!(isVarRepeating(repeatings, instrumentName, eventName))){
-        instrumentName = "";
-      }
-      
-      const note = block.field_note || "";
-      const select = block.select_choices_or_calculations || "";
-
-      // I exclude the case "DD unknown" / "DD Unknown" (that can appear in field_note).
-      const hasDDUnknown =
-      /DD\s+unknown/.test(note);
-
-      if (hasDDUnknown) return [];
-
-      let code = null;
-
-      // Case 1: field_note -> "... If unknown, input ##"
-      const noteMatch = note.match(/If unknown,\s*input\s*(\d+)/i);
-      if (noteMatch) {
-        code = noteMatch[1];
-      }
-
-      // Case 2: select_choices_or_calculations -> "...|##, Unknown|..."
-      const selectMatch = select.match(/(?:^|\|)\s*(\d+)\s*,\s*Unknown/i);
-      if (selectMatch) {
-        code = selectMatch[1];
-      }
-
-      if (code) {
-        results.push({ field_name: fieldName, form_name: instrumentName, event_name: eventName, val: code });
-      }
-    });
-
-  return results;
 }
 
 
@@ -172,6 +139,122 @@ export function processMissingRecord(
       }
     }
   }
+}
+
+
+// ============================================================
+// UNIFIED UNKNOWN + MISSING (SUMMARY)
+// ============================================================
+export function buildUnknownMissingSummary(
+  unknownMatrix: any,
+  missingMatrix: any,
+  metadata: REDCapMetadataField[]
+) {
+  const unknownSummary = buildUnknownSummary(unknownMatrix);
+  const missingSummary = buildMissingSummary(missingMatrix);
+  const summaryMap: Record<
+    string,
+    {
+      field: string;
+      formName: string;
+      denominatorMissing: number;
+      percentMissing: number;
+      denominator: number;
+      percentUnknown: number;
+    }
+  > = {};
+
+  // Mappa il nome del form per ogni variabile
+  const formNameByField = Object.fromEntries(metadata.map(item => [item.field_name, item.form_name]));
+
+  // 1. Inserisco tutti i risultati UNKNOWN.
+  for (const item of unknownSummary) {
+    summaryMap[item.field] = {
+      field: item.field,
+      formName: (formNameByField[item.field] || "").replace(/_/g, " "),
+      denominatorMissing: 0,
+      percentMissing: 0,
+      denominator: item.denominator,
+      percentUnknown: item.percent
+    };
+  }
+
+  // 2. Aggiungo/completo i risultati MISSING.
+  for (const item of missingSummary) {
+    if (!summaryMap[item.field]) {
+      summaryMap[item.field] = {
+        field: item.field,
+        formName: (formNameByField[item.field] || "").replace(/_/g, " "),
+
+        denominatorMissing: item.denominatorMissing,
+        percentMissing: item.percent,
+
+        denominator: 0,
+        percentUnknown: 0
+      };
+    }
+    else {
+      summaryMap[item.field].denominatorMissing = item.denominatorMissing;
+      summaryMap[item.field].percentMissing = item.percent;
+    }
+  }
+  
+  return Object.values(summaryMap);
+}
+
+
+// Function to extract "unknown" values ​​from the metadata for all variables that have a specification regarding this.
+// These specifications are found in the "select_choices_or_calculations" field (for dropdowns) or in the "field_note" field (for text variables).
+// I am not concerned with variables that have notes such as "if DD unknown...".
+export const extractUnknownCodes = (
+  metadata: REDCapMetadataField[],
+  instrumentsVsEvents: REDCapInstrVsEventsField[],
+  repeatings: REDCapRepeatingsField[]
+) => {
+    if (!Array.isArray(metadata)) return [];
+    const results: any[] = [];
+
+    metadata.forEach(block => {
+      let fieldName = block.field_name;
+      let instrumentName = block.form_name;
+
+      const found = instrumentsVsEvents.find(item => item.form === instrumentName);
+      if (found === undefined) return [];
+      let eventName = found.unique_event_name;
+
+      if (!(isVarRepeating(repeatings, instrumentName, eventName))) {
+        instrumentName = "";
+      }
+      
+      const note = block.field_note || "";
+      const select = block.select_choices_or_calculations || "";
+
+      // I exclude the case "DD unknown" / "DD Unknown" (that can appear in field_note).
+      const hasDDUnknown =
+      /DD\s+unknown/.test(note);
+
+      if (hasDDUnknown) return [];
+
+      let code = null;
+
+      // Case 1: field_note -> "... If unknown, input ##"
+      const noteMatch = note.match(/If unknown,\s*input\s*(\d+)/i);
+      if (noteMatch) {
+        code = noteMatch[1];
+      }
+
+      // Case 2: select_choices_or_calculations -> "...|##, Unknown|..."
+      const selectMatch = select.match(/(?:^|\|)\s*(\d+)\s*,\s*Unknown/i);
+      if (selectMatch) {
+        code = selectMatch[1];
+      }
+
+      if (code) {
+        results.push({ field_name: fieldName, form_name: instrumentName, event_name: eventName, val: code });
+      }
+    });
+
+  return results;
 }
 
 

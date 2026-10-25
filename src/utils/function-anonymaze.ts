@@ -1,7 +1,11 @@
 import CryptoJS from "crypto-js";
 
 
-export const removeFieldCheck = (recordData: any, attribute: any, pazienteId: any) => {
+export const removeFieldCheck = (
+  recordData: any,
+  attribute: any,
+  pazienteId: any
+) => {
 	// For each extracted item, I locate the attribute to be removed, I delete it, and I add a numbering for the patients.
 	recordData.forEach((item: any) => {
     delete item[attribute];
@@ -21,7 +25,11 @@ export const removeFieldCheck = (recordData: any, attribute: any, pazienteId: an
 }
 
 
-export const elapsedDays = (recordData: any, dateTarget: any, dateList: any) => {
+export const elapsedDays = (
+  recordData: any,
+  dateTarget: any,
+  dateList: any
+) => {
   let targetDate: Date | null = null;
 
 	// I retrieve the target date to be used for calculating differences, convert it into a Date object (targetDate), and then set the column to 0.
@@ -75,8 +83,12 @@ export const elapsedDays = (recordData: any, dateTarget: any, dateList: any) => 
 };
 
 
-export const hmacHash = (recordData: any, attributeList: any, patientId: any, secret: any) => {
-
+export const hmacHash = (
+  recordData: any,
+  attributeList: any,
+  patientId: any,
+  secret: any
+) => {
   // NOTE: "patientId" is not used in this function, but it is required for the code structure. DO NOT REMOVE!
   if (patientId === -1) {
     console.log("Patient ID: ", patientId);  // To avoid an "unused variable" error.

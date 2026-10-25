@@ -472,7 +472,7 @@ export default function DataQualityApp() {
       {/* LOADING */}
       {/* sr-only = screen-reader accessibility */}
       <div role="status" className="sr-only">
-        {loading ? 'Caricamento in corso...' : ''}
+        {loading ? "Caricamento in corso..." : ""}
       </div>
       {loading && (
         <div className="loading-overlay" aria-hidden="true">

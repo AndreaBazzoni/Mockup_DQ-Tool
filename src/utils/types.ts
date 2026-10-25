@@ -27,9 +27,9 @@ export interface AnonCheck {
 export interface QualCheck {
   name: string;
   desc: string;
-  prec: any | null;
+  prec: ((recordData: any, ...args: any[]) => any) | null;
   precParams: any[] | null;
-  func: (recordData: any, ...throuples: any[]) => any;
+  func: (recordData: any, ...args: any[]) => boolean | boolean[];
   params: any[];
   vars: string[];
 }

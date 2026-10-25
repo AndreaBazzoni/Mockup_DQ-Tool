@@ -6,38 +6,26 @@ import {
 	dateCompareWithDateString,
 	dateCompareWithDelta,
 	dateWithinIntervalWithDeltas,
-	varHasValueRepInstr,
-	varHasValueWithPreviousSelfRepInstr,
-	multiVarHasValueRepInstr,
-	multiVarHasValueFirstVsLastInstRepInstr,  //1:1
-	multiVarHasValueFixedVsLastInstRepInstr,  //1:1
-	multiDateCompareFirstVsLastInstRepInstr,  //1:1
-	multiDateCompareFixedVsLastInstRepInstr,  //1:1
-	uniqueDateCompareToMaxDateRepInstr,  //1:1
-	varWithinIntervalRepInstr,
 	compareAllDatesToFixed,
-	dateCompareWithDeltaRepInstr,
-	dateCompareWithPreviousSelfRepInstr,	
-	dateCompareToFixedDateRepInstr,  //n:1
-	uniqueDateCompareToFixedDateRepInstr,  //1:1  (in realtà n:1, ma si presume che le n siano tutte uguali)
-} from '@/utils/function-dqchecks';
+	varHasValueRepInstrREV,
+	varHasValueWithPreviousSelfRepInstrREV,
+	multiVarHasValueRepInstrREV,
+	multiVarHasValueFirstVsLastInstRepInstrREV,
+	multiVarHasValueFixedVsLastInstRepInstrREV,
+	multiDateCompareFirstVsLastInstRepInstrREV,  // 1:1
+	multiDateCompareFixedVsLastInstRepInstr,  // 1:1 (ok, non serve versione REV)
+	uniqueDateCompareToMaxDateRepInstr,  //1:1 (ok, non serve versione REV)
+	varWithinIntervalRepInstrREV,
+	dateCompareWithDeltaRepInstrREV,
+	dateCompareWithPreviousSelfRepInstrREV,
+	dateCompareToFixedDateRepInstrREV,  // n:1
+	uniqueDateCompareToFixedDateRepInstrREV
+} from "@/utils/function-dqchecks";
 import type { QualCheck } from './types';
-
 
 // Define a mapping of check names to function references and parameters
 export const dqChecks: QualCheck[] = [
-/*	
-	{
-		name:'dq_1_0',
-		desc:'Test of BL for ("bl_status_loco") with preCheck',
-		prec:varHasValue,
-		precParams:["bl_123_sys_ther_set", 1],
-		func:varWithinInterval,
-		params:["bl_status_loco", 0, 10],
-		vars:["bl_123_sys_ther_set","bl_status_loco"]
-	}
-,
-*/
+	
 	{
 		name:'dq_1_1',
 		desc:'Year of birth ("bl_dob") must be between 1900 and 2025',
@@ -94,8 +82,8 @@ export const dqChecks: QualCheck[] = [
 		prec:null,
 		precParams:null,
 		func:varWithinInterval,
-		params:["bl_123_age_diag_man", 18, 100],
-		vars:["bl_123_age_diag_man"]
+		params:["bl_weight", 20, 250],
+		vars:["bl_weight"]
 	}
 ,
 	{
@@ -104,8 +92,8 @@ export const dqChecks: QualCheck[] = [
 		prec:null,
 		precParams:null,
 		func:varWithinInterval,
-		params:["bl_weight", 60, 250],
-		vars:["bl_weight"]
+		params:["bl_height", 60, 250],
+		vars:["bl_height"]
 	}
 ,
 	{
@@ -240,52 +228,42 @@ export const dqChecks: QualCheck[] = [
 ,
 	{
 		name:'dq_1_20',
-		desc:'Soft tissues (Superficial trunk) - Multiple lesions: number of lesions ("bl_23_dis_ext_base_soft_les_trunk") must be between 1 and 100',
+		desc:'Soft tissues (Superficial trunk) - Multiple lesions: number of lesions ("bl_23_dis_ext_base_soft_les_trunk_spec") must be between 1 and 100',
 		prec:null,
 		precParams:null,
 		func:varWithinInterval,
-		params:["bl_23_dis_ext_base_soft_les_trunk", 1, 100],
-		vars:["bl_23_dis_ext_base_soft_les_trunk"]
+		params:["bl_23_dis_ext_base_soft_les_trunk_spec", 1, 100],
+		vars:["bl_23_dis_ext_base_soft_les_trunk_spec"]
 	}
 ,
 	{
 		name:'dq_1_21',
-		desc:'Soft tissues (Intra-abdominal) - Multiple lesions: number of lesions ("bl_23_dis_ext_base_soft_les_abdo") must be between 1 and 100',
+		desc:'Soft tissues (Intra-abdominal) - Multiple lesions: number of lesions ("bl_23_dis_ext_base_soft_les_abdo_spec") must be between 1 and 100',
 		prec:null,
 		precParams:null,
 		func:varWithinInterval,
-		params:["bl_23_dis_ext_base_soft_les_abdo", 1, 100],
-		vars:["bl_23_dis_ext_base_soft_les_abdo"]
+		params:["bl_23_dis_ext_base_soft_les_abdo_spec", 1, 100],
+		vars:["bl_23_dis_ext_base_soft_les_abdo_spec"]
 	}
 ,
 	{
 		name:'dq_1_22',
-		desc:'Soft tissues (Intrathoracic) - Multiple lesions: number of lesions ("bl_23_dis_ext_base_soft_les_thor") must be between 1 and 100',
+		desc:'Soft tissues (Intrathoracic) - Multiple lesions: number of lesions ("bl_23_dis_ext_base_soft_les_thor_spec") must be between 1 and 100',
 		prec:null,
 		precParams:null,
 		func:varWithinInterval,
-		params:["bl_23_dis_ext_base_soft_les_abdo", 1, 100],
-		vars:["bl_23_dis_ext_base_soft_les_abdo"]
+		params:["bl_23_dis_ext_base_soft_les_thor_spec", 1, 100],
+		vars:["bl_23_dis_ext_base_soft_les_thor_spec"]
 	}
 ,
 	{
 		name:'dq_1_23',
-		desc:'Soft tissues (Head & neck) - Multiple lesions: number of lesions ("bl_23_dis_ext_base_soft_les_hn") must be between 1 and 100',
+		desc:'Soft tissues (Head & neck) - Multiple lesions: number of lesions ("bl_23_dis_ext_base_soft_les_hn_spec") must be between 1 and 100',
 		prec:null,
 		precParams:null,
 		func:varWithinInterval,
-		params:["bl_23_dis_ext_base_soft_les_abdo", 1, 100],
-		vars:["bl_23_dis_ext_base_soft_les_abdo"]
-	}
-,
-	{
-		name:'dq_1_24',
-		desc:'Other - Multiple lesions: number of lesions ("bl_23_dis_ext_base_oth") must be between 1 and 100',
-		prec:null,
-		precParams:null,
-		func:varWithinInterval,
-		params:["bl_23_dis_ext_base_soft_les_abdo", 1, 100],
-		vars:["bl_23_dis_ext_base_soft_les_abdo"]
+		params:["bl_23_dis_ext_base_soft_les_hn_spec", 1, 100],
+		vars:["bl_23_dis_ext_base_soft_les_hn_spec"]
 	}
 ,
 	{
@@ -680,7 +658,7 @@ export const dqChecks: QualCheck[] = [
 ,
 	{
 		name:'dq_1_64',
-		desc:'Bone - Radiotherapy Setting Preoperative ("bl_23_bone_radio_set")=1 - Bone - Date of surgery ("bl_23_surg_dsurg_bone") must be subsequent to Bone - Radiotherapy - Ending date ("bl_23_radio_liv_dend")',
+		desc:'Bone - Radiotherapy Setting Preoperative ("bl_23_bone_radio_set")=1 - Bone - Date of surgery ("bl_23_surg_dsurg_bone") must be subsequent to Bone - Radiotherapy - Ending date ("bl_23_radio_bone_dend")',
 		prec:varHasValue,
 		precParams:["bl_23_bone_radio_set", 1],
 		func:dateCompareWithDelta,
@@ -690,7 +668,7 @@ export const dqChecks: QualCheck[] = [
 ,
 	{
 		name:'dq_1_65',
-		desc:'Bone - Radiotherapy Setting Postoperative ("bl_23_bone_radio_set")=2 - Bone - Radiotherapy - Starting date ("bl_23_radio_liv_dstart") must be subsequent to Bone - Date of surgery ("bl_23_surg_dsurg_bone")',
+		desc:'Bone - Radiotherapy Setting Postoperative ("bl_23_bone_radio_set")=2 - Bone - Radiotherapy - Starting date ("bl_23_radio_bone_dstart") must be subsequent to Bone - Date of surgery ("bl_23_surg_dsurg_bone")',
 		prec:varHasValue,
 		precParams:["bl_23_bone_radio_set", 2],
 		func:dateCompareWithDelta,
@@ -720,7 +698,7 @@ export const dqChecks: QualCheck[] = [
 ,
 	{
 		name:'dq_1_68',
-		desc:'Soft tissues - Radiotherapy - Starting date ("bl_23_radio_liv_dstart") must be subsequent to Date of diagnosis ("bl_1st_pathol_ddiag")',
+		desc:'Soft tissues - Radiotherapy - Starting date ("bl_23_radio_soft_dstart") must be subsequent to Date of diagnosis ("bl_1st_pathol_ddiag")',
 		prec:null,
 		precParams:null,
 		func:dateCompareWithDelta,
@@ -730,7 +708,7 @@ export const dqChecks: QualCheck[] = [
 ,
 	{
 		name:'dq_1_69',
-		desc:'Soft tissues - Radiotherapy - Ending date ("bl_23_radio_liv_dend") must be subsequent to Soft tissues - Radiotherapy - Starting date ("bl_23_radio_liv_dstart")',
+		desc:'Soft tissues - Radiotherapy - Ending date ("bl_23_radio_soft_dend") must be subsequent to Soft tissues - Radiotherapy - Starting date ("bl_23_radio_soft_dstart")',
 		prec:null,
 		precParams:null,
 		func:dateCompareWithDelta,
@@ -740,7 +718,7 @@ export const dqChecks: QualCheck[] = [
 ,
 	{
 		name:'dq_1_70',
-		desc:'Soft tissues - Radiotherapy Setting Preoperative ("bl_23_soft_radio_set")=1 - Soft tissues - Date of surgery ("bl_23_surg_dsurg_soft") must be subsequent to Soft tissues - Radiotherapy - Ending date ("bl_23_radio_liv_dend")',
+		desc:'Soft tissues - Radiotherapy Setting Preoperative ("bl_23_soft_radio_set")=1 - Soft tissues - Date of surgery ("bl_23_surg_dsurg_soft") must be subsequent to Soft tissues - Radiotherapy - Ending date ("bl_23_radio_soft_dend")',
 		prec:varHasValue,
 		precParams:["bl_23_soft_radio_set", 1],
 		func:dateCompareWithDelta,
@@ -750,7 +728,7 @@ export const dqChecks: QualCheck[] = [
 ,
 	{
 		name:'dq_1_71',
-		desc:'Soft tissues - Radiotherapy Setting Postoperative ("bl_23_soft_radio_set")=2 - Soft tissues - Radiotherapy - Starting date ("bl_23_radio_liv_dstart") must be subsequent to Soft tissues - Date of surgery ("bl_23_surg_dsurg_soft")',
+		desc:'Soft tissues - Radiotherapy Setting Postoperative ("bl_23_soft_radio_set")=2 - Soft tissues - Radiotherapy - Starting date ("bl_23_radio_soft_dstart") must be subsequent to Soft tissues - Date of surgery ("bl_23_surg_dsurg_soft")',
 		prec:varHasValue,
 		precParams:["bl_23_soft_radio_set", 2],
 		func:dateCompareWithDelta,
@@ -844,8 +822,8 @@ export const dqChecks: QualCheck[] = [
 		prec:null,
 		precParams:null,
 		func:dateCompareWithDelta,
-		params:["bl_23_radio_lymph_dstart", "bl_1st_pathol_ddiag", 0, ">="],
-		vars:["bl_23_radio_lymph_dstart", "bl_1st_pathol_ddiag"]
+		params:["bl_23_radio_sero_dstart", "bl_1st_pathol_ddiag", 0, ">="],
+		vars:["bl_23_radio_sero_dstart", "bl_1st_pathol_ddiag"]
 	}
 ,
 	{
@@ -854,8 +832,8 @@ export const dqChecks: QualCheck[] = [
 		prec:null,
 		precParams:null,
 		func:dateCompareWithDelta,
-		params:["bl_23_radio_lymph_dend", "bl_23_radio_lymph_dstart", 0, ">="],
-		vars:["bl_23_radio_lymph_dend", "bl_23_radio_lymph_dstart"]
+		params:["bl_23_radio_sero_dend", "bl_23_radio_sero_dstart", 0, ">="],
+		vars:["bl_23_radio_sero_dend", "bl_23_radio_sero_dstart"]
 	}
 ,
 	{
@@ -864,8 +842,8 @@ export const dqChecks: QualCheck[] = [
 		prec:varHasValue,
 		precParams:["bl_23_sero_radio_set", 1],
 		func:dateCompareWithDelta,
-		params:["bl_23_surg_dsurg_lymph", "bl_23_radio_lymph_dend", 0, ">="],
-		vars:["bl_23_sero_radio_set", "bl_23_surg_dsurg_lymph", "bl_23_radio_lymph_dend"]
+		params:["bl_23_surg_dsurg_sero", "bl_23_radio_sero_dend", 0, ">="],
+		vars:["bl_23_sero_radio_set", "bl_23_surg_dsurg_sero", "bl_23_radio_sero_dend"]
 	}
 ,
 	{
@@ -874,8 +852,8 @@ export const dqChecks: QualCheck[] = [
 		prec:varHasValue,
 		precParams:["bl_23_sero_radio_set", 2],
 		func:dateCompareWithDelta,
-		params:["bl_23_radio_lymph_dstart", "bl_23_surg_dsurg_lymph", 0, ">="],
-		vars:["bl_23_sero_radio_set", "bl_23_radio_lymph_dstart", "bl_23_surg_dsurg_lymph"]
+		params:["bl_23_radio_sero_dstart", "bl_23_surg_dsurg_sero", 0, ">="],
+		vars:["bl_23_sero_radio_set", "bl_23_radio_sero_dstart", "bl_23_surg_dsurg_sero"]
 	}
 ,
 	{
@@ -884,8 +862,8 @@ export const dqChecks: QualCheck[] = [
 		prec:varHasValue,
 		precParams:["bl_23_sero_radio_set", 4],
 		func:dateCompareWithDelta,
-		params:["bl_23_radio_lymph_dstart", "bl_1st_pathol_ddiag", 0, ">="],
-		vars:["bl_23_sero_radio_set", "bl_23_radio_lymph_dstart", "bl_1st_pathol_ddiag"]
+		params:["bl_23_radio_sero_dstart", "bl_1st_pathol_ddiag", 0, ">="],
+		vars:["bl_23_sero_radio_set", "bl_23_radio_sero_dstart", "bl_1st_pathol_ddiag"]
 	}
 ,
 	{
@@ -894,8 +872,8 @@ export const dqChecks: QualCheck[] = [
 		prec:varHasValue,
 		precParams:["bl_23_sero_radio_set", 3],
 		func:dateCompareWithDelta,
-		params:["bl_23_radio_lymph_dstart", "bl_1st_pathol_ddiag", 0, ">="],
-		vars:["bl_23_sero_radio_set", "bl_23_radio_lymph_dstart", "bl_1st_pathol_ddiag"]
+		params:["bl_23_radio_sero_dstart", "bl_1st_pathol_ddiag", 0, ">="],
+		vars:["bl_23_sero_radio_set", "bl_23_radio_sero_dstart", "bl_1st_pathol_ddiag"]
 	}
 ,
 	{
@@ -1418,49 +1396,6 @@ export const dqChecks: QualCheck[] = [
 		vars:["bl_1st_pathol_ddiag"]
 	}
 ,
-/*
-REPLACED BY multiOR on the 4 variables (see below)
-	{
-		name:'dq_1_138',
-		desc:'Molecular testing for WWTR1 ("bl_molec_test_wwtr1") must be 1 (positive) or 2 (negative)',
-		prec:null,
-		precParams:null,
-		func:multiVarHasValueOR,
-		params:[["bl_molec_test_wwtr1", 1], ["bl_molec_test_wwtr1", 2]],
-		vars:["bl_molec_test_wwtr1"]
-	}
-,
-	{
-		name:'dq_1_139',
-		desc:'Molecular testing for CAMTA1 ("bl_molec_test_camta1") must be 1 (positive) or 2 (negative)',
-		prec:null,
-		precParams:null,
-		func:multiVarHasValueOR,
-		params:[["bl_molec_test_camta1", 1], ["bl_molec_test_camta1", 2]],
-		vars:["bl_molec_test_camta1"]
-	}
-,
-	{
-		name:'dq_1_140',
-		desc:'Molecular testing for YAP ("bl_molec_test_yap") must be 1 (positive) or 2 (negative)',
-		prec:null,
-		precParams:null,
-		func:multiVarHasValueOR,
-		params:[["bl_molec_test_yap", 1], ["bl_molec_test_yap", 2]],
-		vars:["bl_molec_test_yap"]
-	}
-,
-	{
-		name:'dq_1_141',
-		desc:'Molecular testing for TFE3 ("bl_molec_test_tfe3") must be 1 (positive) or 2 (negative)',
-		prec:null,
-		precParams:null,
-		func:multiVarHasValueOR,
-		params:[["bl_molec_test_tfe3", 1], ["bl_molec_test_tfe3", 2]],
-		vars:["bl_molec_test_tfe3"],
-	}
-,
-*/
 	{
 		name:'dq_1_138',
 		desc:'At least one of the molecular testings ("bl_molec_test_wwtr1", "bl_molec_test_camta1", "bl_molec_test_yap", "bl_molec_test_tfe3") must be 1 (positive) or 2 (negative)',
@@ -1469,14 +1404,14 @@ REPLACED BY multiOR on the 4 variables (see below)
 		func:multiVarHasValueOR,
 		params:[["bl_molec_test_wwtr1", 1], ["bl_molec_test_wwtr1", 2], ["bl_molec_test_camta1", 1], ["bl_molec_test_camta1", 2], ["bl_molec_test_yap", 1], ["bl_molec_test_yap", 2], ["bl_molec_test_tfe3", 1], ["bl_molec_test_tfe3", 2]],
 		vars:["bl_molec_test_wwtr1", "bl_molec_test_camta1", "bl_molec_test_yap", "bl_molec_test_tfe3"]
-	}
+	}	
 ,
 	{
 		name:'dq_2_1',
 		desc:'Date of follow-up ("ufu_date") must be subsequent to Date of diagnosis ("bl_1st_pathol_ddiag")',
 		prec:null,
 		precParams:null,
-		func:dateCompareToFixedDateRepInstr,
+		func:dateCompareToFixedDateRepInstrREV,
 		params:["ufu_date", "bl_1st_pathol_ddiag", 0, ">", 1],
 		vars:["ufu_date", "bl_1st_pathol_ddiag"]
 	}
@@ -1486,7 +1421,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of follow-up ("ufu_date") must be subsequent to Previous Date of follow-up ("ufu_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithPreviousSelfRepInstr,
+		func:dateCompareWithPreviousSelfRepInstrREV,
 		params:["ufu_date", 0, ">"],
 		vars:["ufu_date"]
 	}
@@ -1496,7 +1431,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Weight at last visit ("ufu_weight") must be between 20 and 250',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["ufu_weight", 20, 250],
 		vars:["ufu_weight"]
 	}
@@ -1506,7 +1441,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Tumour-related weight loss % at the time of follow-up ("ufu_symptoms_tum_rel_weight_loss") must be between 1 and 100',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["ufu_symptoms_tum_rel_weight_loss", 1, 100],
 		vars:["ufu_symptoms_tum_rel_weight_loss"]
 	}
@@ -1516,7 +1451,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Hemoglobin value ("ufu_hemo") must be between 1 and 25',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["ufu_hemo", 1, 25],
 		vars:["ufu_hemo"]
 	}
@@ -1526,7 +1461,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Fibrinogen value ("ufu_fibrin") must be between 1 and 2000',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["ufu_fibrin", 1, 2000],
 		vars:["ufu_fibrin"]
 	}
@@ -1536,7 +1471,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'GDF-15 value ("ufu_gdf15") must be between 100 and 25000',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["ufu_gdf15", 100, 25000],
 		vars:["ufu_gdf15"]
 	}
@@ -1546,7 +1481,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Gender female - Menopausal date ("ufu_menopausal_date") must be subsequent to date of birth ("bl_dob")',
 		prec:varHasValue,
 		precParams:["bl_gender", 2],
-		func:uniqueDateCompareToFixedDateRepInstr,
+		func:uniqueDateCompareToFixedDateRepInstrREV,
 		params:["ufu_menopausal_date", "bl_dob", 0, ">=", 1],
 		vars:["bl_gender", "ufu_menopausal_date", "bl_dob"]
 	}
@@ -1556,7 +1491,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Surveillance ongoing ("ufu_surveil_yn")=1 in current instance - Surveillance ongoing ("ufu_surveil_yn")=1 in previous instance',
 		prec:null,
 		precParams:null,
-		func:varHasValueWithPreviousSelfRepInstr,
+		func:varHasValueWithPreviousSelfRepInstrREV,
 		params:["ufu_surveil_yn", 1],
 		vars:["ufu_surveil_yn"]
 	}
@@ -1566,7 +1501,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systemic therapy ongoing ("ufu_syst_ther_yn")=1  in current instance - Systemic therapy ongoing ("ufu_syst_ther_yn")=1 in previous instance',
 		prec:null,
 		precParams:null,
-		func:varHasValueWithPreviousSelfRepInstr,
+		func:varHasValueWithPreviousSelfRepInstrREV,
 		params:["ufu_syst_ther_yn", 1],
 		vars:["ufu_syst_ther_yn"]
 	}
@@ -1576,7 +1511,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of death ("ufu_dod") must be subsequent to Date of diagnosis ("bl_1st_pathol_ddiag")',
 		prec:null,
 		precParams:null,
-		func:uniqueDateCompareToFixedDateRepInstr,
+		func:uniqueDateCompareToFixedDateRepInstrREV,
 		params:["ufu_dod", "bl_1st_pathol_ddiag", 0, ">=", 1],
 		vars:["ufu_dod", "bl_1st_pathol_ddiag"]
 	}
@@ -1596,7 +1531,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of local recurrence ("ulr_date") must be subsequent to Previous Date of follow-up ("ufu_date")',
 		prec:null,
 		precParams:null,
-		func:multiDateCompareFirstVsLastInstRepInstr,
+		func:multiDateCompareFirstVsLastInstRepInstrREV,
 		params:["ulr_date", "ufu_date"],
 		vars:["ulr_date", "ufu_date"]
 	}
@@ -1606,7 +1541,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of local recurrence ("ulr_date") must be subsequent to Previous Date of local recurrence ("ulr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithPreviousSelfRepInstr,
+		func:dateCompareWithPreviousSelfRepInstrREV,
 		params:["ulr_date", 0, ">"],
 		vars:["ulr_date"]
 	}
@@ -1616,7 +1551,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Local recurrence size ("ulr_size") must be between 1 and 300',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["ulr_size", 1, 300],
 		vars:["ulr_size"]
 	}
@@ -1626,7 +1561,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Weight at local recurrence ("ulr_weight") must be between 20 and 250',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["ulr_weight", 20, 250],
 		vars:["ulr_weight"]
 	}
@@ -1636,7 +1571,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Tumour-related weight loss % at the time of local recurrence ("ulr_symptoms_tum_rel_weight_loss") must be between 1 and 100',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["ulr_symptoms_tum_rel_weight_loss", 1, 100],
 		vars:["ulr_symptoms_tum_rel_weight_loss"]
 	}
@@ -1646,7 +1581,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Hemoglobin value ("ulr_hemo") must be between 1 and 25',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["ulr_hemo", 1, 25],
 		vars:["ulr_hemo"]
 	}
@@ -1656,7 +1591,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Fibrinogen value ("ulr_fibrin") must be between 1 and 2000',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["ulr_fibrin", 1, 2000],
 		vars:["ulr_fibrin"]
 	}
@@ -1666,7 +1601,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'GDF-15 value ("ulr_gdf15") must be between 100 and 25000',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["ulr_gdf15", 100, 25000],
 		vars:["ulr_gdf15"]
 	}
@@ -1676,7 +1611,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Gender female - Menopausal date ("ulr_menopausal_date") must be subsequent to date of birth ("bl_dob")',
 		prec:varHasValue,
 		precParams:["bl_gender", 2],
-		func:uniqueDateCompareToFixedDateRepInstr,
+		func:uniqueDateCompareToFixedDateRepInstrREV,
 		params:["ulr_menopausal_date", "bl_dob", 0, ">", 1],
 		vars:["bl_gender", "ulr_menopausal_date", "bl_dob"]
 	}
@@ -1686,7 +1621,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Surveillance at last follow-up ("ulr_surveil_yn")=1 - Surveillance ongoing ("ufu_surveil_yn" previous instance)=1',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueFirstVsLastInstRepInstr,
+		func:multiVarHasValueFirstVsLastInstRepInstrREV,
 		params:[["ulr_surveil_yn", 1], ["ufu_surveil_yn", 1]],
 		vars:["ulr_surveil_yn", "ufu_surveil_yn"]
 	}
@@ -1696,7 +1631,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Surveillance at last follow-up ("ulr_surveil_yn")=0 - Surveillance ongoing ("ufu_surveil_yn" previous instance)=0',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueFirstVsLastInstRepInstr,
+		func:multiVarHasValueFirstVsLastInstRepInstrREV,
 		params:[["ulr_surveil_yn", 0], ["ufu_surveil_yn", 0]],
 		vars:["ulr_surveil_yn", "ufu_surveil_yn"]
 	}
@@ -1706,7 +1641,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Surveillance continue ("ulr_surveil_continue_yn")=1 - New medical therapy ("ulr_sys_ther_new_yn")=0 - Systemic therapy ("ulr_sys_ther_start_yn")=0 - Radiotherapy ("ulr_radio_yn")=0 - Surgery ("ulr_surg_yn")=0 - Isolated limb perfusion ("ulr_limbperf_yn")=0 - Local ablative techniques ("ulr_abla_yn")=0',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["ulr_surveil_continue_yn", 1], ["ulr_sys_ther_new_yn", 0], ["ulr_sys_ther_start_yn", 0], ["ulr_radio_yn", 0], ["ulr_surg_yn", 0], ["ulr_limbperf_yn", 0], ["ulr_abla_yn", 0]],
 		vars:["ulr_surveil_continue_yn", "ulr_sys_ther_new_yn", "ulr_sys_ther_start_yn", "ulr_radio_yn", "ulr_surg_yn", "ulr_limbperf_yn", "ulr_abla_yn"]
 	}
@@ -1716,7 +1651,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systhemic therapy at last follow-up ("ulr_sys_ther_yn")=1 - Systemic therapy ongoing ("ufu_syst_ther_yn")=1',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueFirstVsLastInstRepInstr,
+		func:multiVarHasValueFirstVsLastInstRepInstrREV,
 		params:[["ulr_sys_ther_yn", 1], ["ufu_syst_ther_yn", 1]],
 		vars:["ulr_sys_ther_yn", "ufu_syst_ther_yn"]
 	}
@@ -1726,7 +1661,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systhemic therapy at last follow-up ("ulr_sys_ther_yn")=0 - Systemic therapy ongoing ("ufu_syst_ther_yn")=0',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueFirstVsLastInstRepInstr,
+		func:multiVarHasValueFirstVsLastInstRepInstrREV,
 		params:[["ulr_sys_ther_yn", 0], ["ufu_syst_ther_yn", 0]],
 		vars:["ulr_sys_ther_yn", "ufu_syst_ther_yn"]
 	}
@@ -1736,7 +1671,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systhemic therapy continue ("ulr_sys_ther_continue_yn")=1 - Surveillance continue ("ulr_surveil_continue_yn")=0',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["ulr_sys_ther_continue_yn", 1], ["ulr_surveil_continue_yn", 0]],
 		vars:["ulr_sys_ther_continue_yn", "ulr_surveil_continue_yn"]
 	}
@@ -1746,7 +1681,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Starting date ("ulr_sys_ther_new_pre_start") must be subsequent to Date of local recurrence ("ulr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_sys_ther_new_pre_start", "ulr_date", 0, ">="],
 		vars:["ulr_sys_ther_new_pre_start", "ulr_date"]
 	}
@@ -1756,7 +1691,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Starting date ("ulr_sys_ther_new_post_start") must be subsequent to Date of local recurrence ("ulr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_sys_ther_new_post_start", "ulr_date", 0, ">="],
 		vars:["ulr_sys_ther_new_post_start", "ulr_date"]
 	}
@@ -1766,7 +1701,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Starting date ("ulr_sys_ther_new_pal_start") must be subsequent to Date of local recurrence ("ulr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_sys_ther_new_pal_start", "ulr_date", 0, ">="],
 		vars:["ulr_sys_ther_new_pal_start", "ulr_date"]
 	}
@@ -1776,7 +1711,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Ending date ("ulr_sys_ther_new_pre_end") must be subsequent to New medical therapy - Starting date ("ulr_sys_ther_new_pre_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_sys_ther_new_pre_end", "ulr_sys_ther_new_pre_start", 0, ">="],
 		vars:["ulr_sys_ther_new_pre_end", "ulr_sys_ther_new_pre_start"]
 	}
@@ -1786,7 +1721,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Ending date ("ulr_sys_ther_new_post_end") must be subsequent to New medical therapy - Starting date ("ulr_sys_ther_new_post_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_sys_ther_new_post_end", "ulr_sys_ther_new_post_start", 0, ">="],
 		vars:["ulr_sys_ther_new_post_end", "ulr_sys_ther_new_post_start"]
 	}
@@ -1796,7 +1731,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Ending date ("ulr_sys_ther_new_pal_end") must be subsequent to New medical therapy - Starting date ("ulr_sys_ther_new_pal_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_sys_ther_new_pal_end", "ulr_sys_ther_new_pal_start", 0, ">="],
 		vars:["ulr_sys_ther_new_pal_end", "ulr_sys_ther_new_pal_start"]
 	}
@@ -1804,9 +1739,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_18',
 		desc:'New medical therapy Setting Preoperative ("ulr_sys_ther_new_set")=1 - Date of surgery ("ulr_surg_date") must be subsequent to New medical therapy - Ending date ("ulr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_surg_date", "ulr_sys_ther_new_pre_end", 0, ">="],
 		vars:["ulr_sys_ther_new_set", "ulr_surg_date", "ulr_sys_ther_new_pre_end"]
 	}
@@ -1814,9 +1749,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_19',
 		desc:'New medical therapy Setting Postoperative ("ulr_sys_ther_new_set")=2 - New medical therapy - Starting date ("ulr_sys_ther_new_post_start") must be subsequent to Date of surgery ("ulr_surg_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_sys_ther_new_post_start", "ulr_surg_date", 0, ">="],
 		vars:["ulr_sys_ther_new_set", "ulr_sys_ther_new_post_start", "ulr_surg_date"]
 	}
@@ -1824,9 +1759,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_20',
 		desc:'New medical therapy Setting Pre and Postoperative ("ulr_sys_ther_new_set")=3 - Date of surgery ("ulr_surg_date") must be subsequent to New medical therapy - Preoperative - Starting date ("ulr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_surg_date", "ulr_sys_ther_new_pre_start", 0, ">="],
 		vars:["ulr_sys_ther_new_set", "ulr_surg_date", "ulr_sys_ther_new_pre_start"]
 	}
@@ -1834,9 +1769,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_21',
 		desc:'New medical therapy Setting Pre and Postoperative ("ulr_sys_ther_new_set")=3 - New medical therapy - Ending date ("ulr_sys_ther_new_post_end") must be subsequent to Date of surgery ("ulr_surg_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_sys_ther_new_post_end", "ulr_surg_date", 0, ">="],
 		vars:["ulr_sys_ther_new_set", "ulr_sys_ther_new_post_end", "ulr_surg_date"]
 	}
@@ -1844,9 +1779,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_22',
 		desc:'New medical therapy Setting Palliative ("ulr_sys_ther_new_set")=4 - New medical therapy - Starting date ("ulr_sys_ther_new_pal_start") must be subsequent to Date of local recurrence ("ulr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_sys_ther_new_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_sys_ther_new_pal_start", "ulr_date", 0, ">="],
 		vars:["ulr_sys_ther_new_set", "ulr_sys_ther_new_pal_start", "ulr_date"]
 	}
@@ -1854,9 +1789,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_23',
 		desc:'New medical therapy Setting Palliative ("ulr_sys_ther_new_set")=4 - New medical therapy - Ending date ("ulr_sys_ther_new_pal_end") must be subsequent to New medical therapy - Starting date ("ulr_sys_ther_new_pal_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_sys_ther_new_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_sys_ther_new_pal_end", "ulr_sys_ther_new_pal_start", 0, ">="],
 		vars:["ulr_sys_ther_new_set", "ulr_sys_ther_new_pal_end", "ulr_sys_ther_new_pal_start"]
 	}
@@ -1867,7 +1802,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Radiotherapy - Starting date ("ulr_radio_start") must be subsequent to Date of local recurrence ("ulr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_radio_start", "ulr_date", 0, ">="],
 		vars:["ulr_radio_start", "ulr_date"]
 	}
@@ -1877,7 +1812,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Radiotherapy - Ending date ("ulr_radio_end") must be subsequent to Radiotherapy - Starting date ("ulr_radio_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_radio_end", "ulr_radio_start", 0, ">="],
 		vars:["ulr_radio_end", "ulr_radio_start"]
 	}
@@ -1885,9 +1820,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_34',
 		desc:'Radiotherapy Setting Preoperative ("ulr_radio_set")=1 - Date of surgery ("ulr_surg_date") must be subsequent to Radiotherapy - Ending date ("ulr_radio_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_radio_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_surg_date", "ulr_radio_end", 0, ">="],
 		vars:["ulr_radio_set", "ulr_surg_date", "ulr_radio_end"]
 	}
@@ -1895,9 +1830,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_35',
 		desc:'Radiotherapy Setting Postoperative ("ulr_radio_set")=2 - Radiotherapy - Starting date ("ulr_radio_start") must be subsequent to Date of surgery ("ulr_surg_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_radio_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_radio_start", "ulr_surg_date", 0, ">="],
 		vars:["ulr_radio_set", "ulr_radio_start", "ulr_surg_date"]
 	}
@@ -1905,9 +1840,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_36',
 		desc:'Radiotherapy Setting Palliative ("ulr_radio_set")=3 - Radiotherapy - Starting date ("ulr_radio_start") must be subsequent to Date of local recurrence ("ulr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_radio_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_radio_start", "ulr_date", 0, ">="],
 		vars:["ulr_radio_set", "ulr_radio_start", "ulr_date"]
 	}
@@ -1915,9 +1850,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_37',
 		desc:'Radiotherapy Setting Palliative ("ulr_radio_set")=3 - Radiotherapy - Ending date ("ulr_radio_end") must be subsequent to Radiotherapy - Starting date ("ulr_radio_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_radio_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_radio_end", "ulr_radio_start", 0, ">="],
 		vars:["ulr_radio_set", "ulr_radio_end", "ulr_radio_start"]
 	}
@@ -1925,9 +1860,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_38',
 		desc:'Radiotherapy Setting Definitive ("ulr_radio_set")=4 - Radiotherapy - Starting date ("ulr_radio_start") must be subsequent to Date of local recurrence ("ulr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_radio_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_radio_start", "ulr_date", 0, ">="],
 		vars:["ulr_radio_set", "ulr_radio_start", "ulr_date"]
 	}
@@ -1935,9 +1870,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_39',
 		desc:'Radiotherapy Setting Definitive ("ulr_radio_set")=4 - Radiotherapy - Ending date ("ulr_radio_end") must be subsequent to Radiotherapy - Starting date ("ulr_radio_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_radio_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_radio_end", "ulr_radio_start", 0, ">="],
 		vars:["ulr_radio_set", "ulr_radio_end", "ulr_radio_start"]
 	}
@@ -1945,9 +1880,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_40',
 		desc:'Radiotherapy Setting Definitive ("ulr_radio_set")=4 -  Radiotherapy ("ulr_radio_yn")=1 - Surgery ("ulr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_radio_set", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["ulr_radio_yn", 1], ["ulr_surg_yn", 0]],
 		vars:["ulr_radio_set", "ulr_radio_yn", "ulr_surg_yn"]
 	}
@@ -1955,9 +1890,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_41',
 		desc:'Radiotherapy Setting Postoperative ("ulr_radio_set")=2 - Radiotherapy - Starting date ("ulr_radio_start") must be subsequent to to max 60 days post Surgery ("ulr_surg_yn")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_radio_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_radio_start", "ulr_surg_yn", 0, ">="],
 		vars:["ulr_radio_set", "ulr_radio_start", "ulr_surg_yn"]
 	}
@@ -1967,7 +1902,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Isolated limb perfusion - Procedure date ("ulr_limbperf_date") must be subsequent to Date of local recurrence ("ulr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_limbperf_date", "ulr_date", 0, ">="],
 		vars:["ulr_limbperf_date", "ulr_date"]
 	}
@@ -1975,9 +1910,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_43',
 		desc:'Isolated limb perfusion Setting Preoperative ("ulr_limbperf_set")=1 - Date of surgery ("ulr_surg_date") must be subsequent to Isolated limb perfusion - Procedure date ("ulr_limbperf_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_limbperf_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_surg_date", "ulr_limbperf_date", 0, ">="],
 		vars:["ulr_limbperf_set", "ulr_surg_date", "ulr_limbperf_date"]
 	}
@@ -1985,9 +1920,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_44',
 		desc:'Isolated limb perfusion Setting Definitive ("ulr_limbperf_set")=4 - Procedure date ("ulr_limbperf_date") must be subsequent to Date of local recurrence ("ulr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_limbperf_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_limbperf_date", "ulr_date", 0, ">="],
 		vars:["ulr_limbperf_set", "ulr_limbperf_date", "ulr_date"]
 	}
@@ -1997,7 +1932,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Local ablative techniques - Procedure date ("ulr_abla_date") must be subsequent to Date of local recurrence ("ulr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_abla_date", "ulr_date", 0, ">="],
 		vars:["ulr_abla_date", "ulr_date"]
 	}
@@ -2005,9 +1940,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_46',
 		desc:'Local ablative techniques Setting Preoperative ("ulr_abla_set")=1 - Date of surgery ("ulr_surg_date") must be subsequent to Local ablative techniques - Procedure date ("ulr_abla_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_abla_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_surg_date", "ulr_abla_date", 0, ">="],
 		vars:["ulr_abla_set", "ulr_surg_date", "ulr_abla_date"]
 	}
@@ -2015,9 +1950,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_47',
 		desc:'Local ablative techniques Setting Definitive ("ulr_abla_set")=4 - Local ablative techniques - Procedure date ("ulr_abla_date") must be subsequent to Date of local recurrence ("ulr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_abla_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_abla_date", "ulr_date", 0, ">="],
 		vars:["ulr_abla_set", "ulr_abla_date", "ulr_date"]
 	}
@@ -2025,9 +1960,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_3_48',
 		desc:'Local ablative techniques Setting Definitive ("ulr_abla_set")=4 - Local ablative techniques ("ulr_abla_yn")=1 - Surgery ("ulr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["ulr_abla_set", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["ulr_abla_yn", 1], ["ulr_surg_yn", 0]],
 		vars:["ulr_abla_set", "ulr_abla_yn", "ulr_surg_yn"]
 	}
@@ -2037,7 +1972,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of surgery ("ulr_surg_date") must be subsequent to Date of local recurrence ("ulr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_surg_date", "ulr_date", 0, ">="],
 		vars:["ulr_surg_date", "ulr_date"]
 	}
@@ -2047,7 +1982,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Size of pathological specimen ("ulr_surg_specsize") must be between 1 and 300',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["ulr_surg_specsize", 1, 300],
 		vars:["ulr_surg_specsize"]
 	}
@@ -2057,7 +1992,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of local recurrence pathological diagnosis ("ulr_pathol_date") must be subsequent to Date of local recurrence ("ulr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["ulr_pathol_date", "ulr_date", 0, ">="],
 		vars:["ulr_pathol_date", "ulr_date"]
 	}
@@ -2067,7 +2002,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Mitotic index value ("ulr_pathol_prog_mito") must be between 1 and 99',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["ulr_pathol_prog_mito", 1, 99],
 		vars:["ulr_pathol_prog_mito"]
 	}
@@ -2077,11 +2012,11 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of death ("ulr_dod") must be subsequent to Date of registration ("bl_dor")',
 		prec:null,
 		precParams:null,
-		func:uniqueDateCompareToFixedDateRepInstr,
+		func:uniqueDateCompareToFixedDateRepInstrREV,
 		params:["ulr_dod", "bl_dor", 0, ">=", 1],
 		vars:["ulr_dod", "bl_dor"]
 	}
-,
+	,
 	{
 		name:'dq_4_1',
 		desc:'Date of distant metastases ("udm_date") must be subsequent to Previous Date of Local Recurrence ("ulr_date")',
@@ -2237,7 +2172,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Surveillance at last follow-up ("udm_surveil_yn")=1 - Surveillance ongoing ("ufu_surveil_yn" previous instance)=1',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueFixedVsLastInstRepInstr,
+		func:multiVarHasValueFixedVsLastInstRepInstrREV,
 		params:[["udm_surveil_yn", 1], ["ufu_surveil_yn", 1]],
 		vars:["udm_surveil_yn", "ufu_surveil_yn"]
 	}
@@ -2247,7 +2182,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Surveillance at last follow-up ("udm_surveil_yn")=0 - Surveillance ongoing ("ufu_surveil_yn" previous instance)=0',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueFixedVsLastInstRepInstr,
+		func:multiVarHasValueFixedVsLastInstRepInstrREV,
 		params:[["udm_surveil_yn", 0], ["ufu_surveil_yn", 0]],
 		vars:["udm_surveil_yn", "ufu_surveil_yn"]
 	}
@@ -2267,7 +2202,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systhemic therapy at last follow-up ("udm_sys_ther_yn")=1 - Systemic therapy ongoing ("ufu_syst_ther_yn")=1',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueFixedVsLastInstRepInstr,
+		func:multiVarHasValueFixedVsLastInstRepInstrREV,
 		params:[["udm_sys_ther_yn", 1], ["ufu_syst_ther_yn", 1]],
 		vars:["udm_sys_ther_yn", "ufu_syst_ther_yn"]
 	}
@@ -2277,7 +2212,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systhemic therapy at last follow-up ("udm_sys_ther_yn")=0 - Systemic therapy ongoing ("ufu_syst_ther_yn")=0',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueFixedVsLastInstRepInstr,
+		func:multiVarHasValueFixedVsLastInstRepInstrREV,
 		params:[["udm_sys_ther_yn", 0], ["ufu_syst_ther_yn", 0]],
 		vars:["udm_sys_ther_yn", "ufu_syst_ther_yn"]
 	}
@@ -2594,11 +2529,11 @@ REPLACED BY multiOR on the 4 variables (see below)
 ,
 	{
 		name:'dq_5_1',
-		desc:'Date of follow-up ("lfu_date") must be subsequent to Date of diagnosis ("bl_1st_pathol_ddiag") or Surveillance Ending Date ("bl_123_surv_dend") or Systemic therapy - Preoperative - Ending date ("bl_123_sys_ther_pre_dend") or Systemic therapy - Postoperative - Ending date ("bl_123_sys_ther_post_dend") or Systemic therapy - Palliative - Ending date ("bl_123_sys_ther_pal_dend") or Radiotherapy - Ending date ("bl_1_radio_set_dend") or Isolated limb perfusion - Procedure date ("bl_123_limb_dproc") or Local ablative techniques - Procedure date ("bl_1_abla_dproc") or Date of surgery ("bl_1_surg_dsurg")',
+		desc:'Date of follow-up ("lfu_date") must be subsequent to Date of diagnosis ("bl_1st_pathol_ddiag")',
 		prec:null,
 		precParams:null,
-		func:dateCompareToFixedDateRepInstr,
-		params:["lfu_date", "bl_1st_pathol_ddiag", 0, ">"],
+		func:dateCompareToFixedDateRepInstrREV,
+		params:["lfu_date", "bl_1st_pathol_ddiag", 0, ">", 0],
 		vars:["lfu_date", "bl_1st_pathol_ddiag"]
 	}
 ,
@@ -2607,7 +2542,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of follow-up ("lfu_date") must be subsequent to Previous Date of follow-up ("lfu_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithPreviousSelfRepInstr,
+		func:dateCompareWithPreviousSelfRepInstrREV,
 		params:["lfu_date", 0, ">"],
 		vars:["lfu_date"]
 	}
@@ -2617,7 +2552,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Weight at last visit ("lfu_weight") must be between 20 and 250',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lfu_weight", 20, 250],
 		vars:["lfu_weight"]
 	}
@@ -2627,7 +2562,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Tumour-related weight loss % at the time of follow-up ("lfu_symptoms_tum_rel_weight_loss") must be between 1 and 100',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lfu_symptoms_tum_rel_weight_loss", 1, 100],
 		vars:["lfu_symptoms_tum_rel_weight_loss"]
 	}
@@ -2637,7 +2572,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Hemoglobin value ("lfu_hemo") must be between 1 and 25',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lfu_hemo", 1, 25],
 		vars:["lfu_hemo"]
 	}
@@ -2647,7 +2582,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Fibrinogen value ("lfu_fibrin") must be between 1 and 2000',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lfu_fibrin", 1, 2000],
 		vars:["lfu_fibrin"]
 	}
@@ -2657,7 +2592,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'GDF-15 value ("lfu_gdf15") must be between 100 and 25000',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lfu_gdf15", 100, 25000],
 		vars:["lfu_gdf15"]
 	}
@@ -2667,7 +2602,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Gender female - Menopausal date ("lfu_menopausal_date") must be subsequent to date of birth ("bl_dob")',
 		prec:varHasValue,
 		precParams:["bl_gender", 2],
-		func:uniqueDateCompareToFixedDateRepInstr,
+		func:uniqueDateCompareToFixedDateRepInstrREV,
 		params:["lfu_menopausal_date", "bl_dob", 0, ">", 1],
 		vars:["lfu_menopausal_date", "bl_dob"]
 	}
@@ -2678,7 +2613,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Surveillance ongoing ("lfu_surveil_yn")=1 in current instance - Surveillance ongoing ("lfu_surveil_yn")=1 in previous instance',
 		prec:null,
 		precParams:null,
-		func:varHasValueWithPreviousSelfRepInstr,
+		func:varHasValueWithPreviousSelfRepInstrREV,
 		params:["lfu_surveil_yn", 0, ">"],
 		vars:["lfu_surveil_yn"]
 	}
@@ -2688,7 +2623,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systemic therapy ongoing ("lfu_syst_ther_yn")=1  in current instance - Systemic therapy ongoing ("lfu_syst_ther_yn")=1  in previous instance',
 		prec:null,
 		precParams:null,
-		func:varHasValueWithPreviousSelfRepInstr,
+		func:varHasValueWithPreviousSelfRepInstrREV,
 		params:["lfu_syst_ther_yn", 0, ">"],
 		vars:["lfu_syst_ther_yn"]
 	}
@@ -2698,17 +2633,18 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of death ("lfu_dod") must be subsequent to Date of registration ("bl_dor")',
 		prec:null,
 		precParams:null,
-		func:uniqueDateCompareToFixedDateRepInstr,
+		func:uniqueDateCompareToFixedDateRepInstrREV,
 		params:["lfu_dod", "bl_dor", 0, ">", 1],
 		vars:["lfu_dod", "bl_dor"]
 	}
+		
 ,
 	{
 		name:'dq_6_1',
 		desc:'Date of progression ("lpr_date") must be subsequent to Previous Date of follow-up ("lfu_date")',
 		prec:null,
 		precParams:null,
-		func:multiDateCompareFirstVsLastInstRepInstr,
+		func:multiDateCompareFirstVsLastInstRepInstrREV,
 		params:["lpr_date", "lfu_date"],
 		vars:["lpr_date", "lfu_date"]
 	}
@@ -2718,7 +2654,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of progression ("lpr_date") must be subsequent to Previous Date of Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithPreviousSelfRepInstr,
+		func:dateCompareWithPreviousSelfRepInstrREV,
 		params:["lpr_date", 0, ">"],
 		vars:["lpr_date"]
 	}
@@ -2728,7 +2664,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Weight at progression ("lpr_weight") must be between 20 and 250',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_weight", 20, 250],
 		vars:["lpr_weight"]
 	}
@@ -2738,7 +2674,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Tumour-related weight loss % at the time of progression ("lpr_symptoms_tum_rel_weight_loss") must be between 1 and 100',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_symptoms_tum_rel_weight_loss", 1, 100],
 		vars:["lpr_symptoms_tum_rel_weight_loss"]
 	}
@@ -2748,7 +2684,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Hemoglobin value ("lpr_hemo") must be between 1 and 25',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_hemo", 1, 25],
 		vars:["lpr_hemo"]
 	}
@@ -2758,7 +2694,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Fibrinogen value ("lpr_fibrin") must be between 1 and 2000',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_fibrin", 1, 2000],
 		vars:["lpr_fibrin"]
 	}
@@ -2768,7 +2704,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'GDF-15 value ("lpr_gdf15") must be between 100 and 25000',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_gdf15", 100, 25000],
 		vars:["lpr_gdf15"]
 	}
@@ -2778,7 +2714,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Gender female - Menopausal date ("lpr_menopausal_date") must be subsequent to date of birth ("bl_dob")',
 		prec:varHasValue,
 		precParams:["bl_gender", 2],
-		func:uniqueDateCompareToFixedDateRepInstr,
+		func:uniqueDateCompareToFixedDateRepInstrREV,
 		params:["lpr_menopausal_date", "bl_dob", 0, ">=", 1],
 		vars:["bl_gender", "lpr_menopausal_date", "bl_dob"]
 	}
@@ -2788,7 +2724,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lung - Multiple lesions: number of lesions ("lpr_dis_ext_lung_les_spec") must be between 1 and 100',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_dis_ext_lung_les_spec", 1, 100],
 		vars:["lpr_dis_ext_lung_les_spec"]
 	}
@@ -2798,7 +2734,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Liver - Multiple lesions: number of lesions ("lpr_dis_ext_liv_les_spec") must be between 1 and 100',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_dis_ext_liv_les_spec", 1, 100],
 		vars:["lpr_dis_ext_liv_les_spec"]
 	}
@@ -2808,7 +2744,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Bone - Multiple lesions: number of lesions ("lpr_dis_ext_bone_les_spec") must be between 1 and 100',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_dis_ext_bone_les_spec", 1, 100],
 		vars:["lpr_dis_ext_bone_les_spec"]
 	}
@@ -2818,7 +2754,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues (Limb) - Multiple lesions: number of lesions ("lpr_dis_ext_soft_les_limb_spec") must be between 1 and 100',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_dis_ext_soft_les_limb_spec", 1, 100],
 		vars:["lpr_dis_ext_soft_les_limb_spec"]
 	}
@@ -2828,7 +2764,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues (Superficial trunk) - Multiple lesions: number of lesions ("lpr_dis_ext_soft_les_trunk_spec") must be between 1 and 100',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_dis_ext_soft_les_trunk_spec", 1, 100],
 		vars:["lpr_dis_ext_soft_les_trunk_spec"]
 	}
@@ -2838,7 +2774,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues (Intra-abdominal) - Multiple lesions: number of lesions ("lpr_dis_ext_soft_les_abdo_spec") must be between 1 and 100',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_dis_ext_soft_les_abdo_spec", 1, 100],
 		vars:["lpr_dis_ext_soft_les_abdo_spec"]
 	}
@@ -2848,7 +2784,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues (Intrathoracic) - Multiple lesions: number of lesions ("lpr_dis_ext_soft_les_thor_spec") must be between 1 and 100',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_dis_ext_soft_les_thor_spec", 1, 100],
 		vars:["lpr_dis_ext_soft_les_thor_spec"]
 	}
@@ -2858,7 +2794,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues (Head & neck) - Multiple lesions: number of lesions ("lpr_dis_ext_soft_les_hn_spec") must be between 1 and 100',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_dis_ext_soft_les_hn_spec", 1, 100],
 		vars:["lpr_dis_ext_soft_les_hn_spec"]
 	}
@@ -2868,7 +2804,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Surveillance at last follow-up ("lpr_surveil_yn")=1 - Surveillance ongoing ("lfu_surveil_yn")=1',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueFirstVsLastInstRepInstr,
+		func:multiVarHasValueFirstVsLastInstRepInstrREV,
 		params:[["lpr_surveil_yn", 1], ["lfu_surveil_yn", 1]],
 		vars:["lpr_surveil_yn", "lfu_surveil_yn"]
 	}
@@ -2878,7 +2814,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Surveillance at last follow-up ("lpr_surveil_yn")=0 - Surveillance ongoing ("lfu_surveil_yn")=0',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueFirstVsLastInstRepInstr,
+		func:multiVarHasValueFirstVsLastInstRepInstrREV,
 		params:[["lpr_surveil_yn", 0], ["lfu_surveil_yn", 0]],
 		vars:["lpr_surveil_yn", "lfu_surveil_yn"]
 	}
@@ -2888,7 +2824,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Surveillance continue ("lpr_surveil_continue_yn")=1 - New medical therapy ("lpr_sys_ther_new_yn")=0 - Systemic therapy ("lpr_sys_ther_start_yn")=0 - Radiotherapy ("lpr_radio_yn")=0 - Surgery ("lpr_surg_yn")=0 - Isolated limb perfusion ("lpr_limbperf_yn")=0 - Local ablative techniques ("lpr_abla_yn")=0',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["lpr_surveil_continue_yn", 1], ["lpr_sys_ther_new_yn", 0], ["lpr_sys_ther_start_yn", 0], ["lpr_radio_yn", 0], ["lpr_surg_yn", 0], ["lpr_limbperf_yn", 0], ["lpr_abla_yn", 0]],
 		vars:["lpr_surveil_continue_yn", "lpr_sys_ther_new_yn", "lpr_sys_ther_start_yn", "lpr_radio_yn", "lpr_surg_yn", "lpr_limbperf_yn", "lpr_abla_yn"]
 	}
@@ -2898,7 +2834,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systhemic therapy at last follow-up ("lpr_sys_ther_yn")=1 - Systemic therapy ongoing ("lfu_syst_ther_yn")=1',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueFirstVsLastInstRepInstr,
+		func:multiVarHasValueFirstVsLastInstRepInstrREV,
 		params:[["lpr_sys_ther_yn", 1], ["lfu_syst_ther_yn", 1]],
 		vars:["lpr_sys_ther_yn", "lfu_syst_ther_yn"]
 	}
@@ -2908,7 +2844,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systhemic therapy at last follow-up ("lpr_sys_ther_yn")=0 - Systemic therapy ongoing ("lfu_syst_ther_yn")=0',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueFirstVsLastInstRepInstr,
+		func:multiVarHasValueFirstVsLastInstRepInstrREV,
 		params:[["lpr_sys_ther_yn", 0], ["lfu_syst_ther_yn", 0]],
 		vars:["lpr_sys_ther_yn", "lfu_syst_ther_yn"]
 	}
@@ -2918,7 +2854,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systhemic therapy continue ("lpr_sys_ther_continue_yn")=1 - Surveillance continue ("lpr_surveil_continue_yn")=0',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["lpr_sys_ther_continue_yn", 1], ["lpr_surveil_continue_yn", 0]],
 		vars:["lpr_sys_ther_continue_yn", "lpr_surveil_continue_yn"]
 	}
@@ -2928,7 +2864,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Starting date ("lpr_sys_ther_new_pre_start") must be subsequent to Date of local recurrence ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_pre_start", "lpr_date", 0, ">="],
 		vars:["lpr_sys_ther_new_pre_start", "lpr_date"]
 	}
@@ -2938,7 +2874,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Starting date ("lpr_sys_ther_new_post_start") must be subsequent to Date of local recurrence ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_start", "lpr_date", 0, ">="],
 		vars:["lpr_sys_ther_new_post_start", "lpr_date"]
 	}
@@ -2948,7 +2884,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Starting date ("lpr_sys_ther_new_pal_start") must be subsequent to Date of local recurrence ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_pal_start", "lpr_date", 0, ">="],
 		vars:["lpr_sys_ther_new_pal_start", "lpr_date"]
 	}
@@ -2958,7 +2894,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Ending date ("lpr_sys_ther_new_pre_end") must be subsequent to New medical therapy - Starting date ("lpr_sys_ther_new_pre_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_pre_end", "lpr_sys_ther_new_pre_start", 0, ">="],
 		vars:["lpr_sys_ther_new_pre_end", "lpr_sys_ther_new_pre_start"]
 	}
@@ -2968,7 +2904,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Ending date ("lpr_sys_ther_new_post_end") must be subsequent to New medical therapy - Starting date ("lpr_sys_ther_new_post_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_end", "lpr_sys_ther_new_post_start", 0, ">="],
 		vars:["lpr_sys_ther_new_post_end", "lpr_sys_ther_new_post_start"]
 	}
@@ -2978,7 +2914,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Ending date ("lpr_sys_ther_new_pal_end") must be subsequent to New medical therapy - Starting date ("lpr_sys_ther_new_pal_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_pal_end", "lpr_sys_ther_new_pal_start", 0, ">="],
 		vars:["lpr_sys_ther_new_pal_end", "lpr_sys_ther_new_pal_start"]
 	}
@@ -2986,9 +2922,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_26',
 		desc:'New medical therapy Setting Preoperative ("lpr_sys_ther_new_set")=1 - Date of surgery ("lpr_surg_date_lung") must be subsequent to New medical therapy - Ending date ("lpr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_lung", "lpr_sys_ther_new_pre_end", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_lung", "lpr_sys_ther_new_pre_end"]
 	}
@@ -2996,9 +2932,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_26b',
 		desc:'New medical therapy Setting Preoperative ("lpr_sys_ther_new_set")=1 - Date of surgery ("lpr_surg_date_liver") must be subsequent to New medical therapy - Ending date ("lpr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_liver", "lpr_sys_ther_new_pre_end", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_liver", "lpr_sys_ther_new_pre_end"]
 	}
@@ -3006,9 +2942,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_26c',
 		desc:'New medical therapy Setting Preoperative ("lpr_sys_ther_new_set")=1 - Date of surgery ("lpr_surg_date_bone") must be subsequent to New medical therapy - Ending date ("lpr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_bone", "lpr_sys_ther_new_pre_end", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_bone", "lpr_sys_ther_new_pre_end"]
 	}
@@ -3016,9 +2952,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_26d',
 		desc:'New medical therapy Setting Preoperative ("lpr_sys_ther_new_set")=1 - Date of surgery ("lpr_surg_date_soft") must be subsequent to New medical therapy - Ending date ("lpr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_soft", "lpr_sys_ther_new_pre_end", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_soft", "lpr_sys_ther_new_pre_end"]
 	}
@@ -3026,9 +2962,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_26e',
 		desc:'New medical therapy Setting Preoperative ("lpr_sys_ther_new_set")=1 - Date of surgery ("lpr_surg_date_lymph") must be subsequent to New medical therapy - Ending date ("lpr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_lymph", "lpr_sys_ther_new_pre_end", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_lymph", "lpr_sys_ther_new_pre_end"]
 	}
@@ -3036,9 +2972,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_26f',
 		desc:'New medical therapy Setting Preoperative ("lpr_sys_ther_new_set")=1 - Date of surgery ("lpr_surg_date_serosal") must be subsequent to New medical therapy - Ending date ("lpr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_serosal", "lpr_sys_ther_new_pre_end", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_serosal", "lpr_sys_ther_new_pre_end"]
 	}
@@ -3046,9 +2982,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_26g',
 		desc:'New medical therapy Setting Preoperative ("lpr_sys_ther_new_set")=1 - Date of surgery ("lpr_surg_date_oth") must be subsequent to New medical therapy - Ending date ("lpr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_oth", "lpr_sys_ther_new_pre_end", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_oth", "lpr_sys_ther_new_pre_end"]
 	}
@@ -3056,9 +2992,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_27',
 		desc:'New medical therapy Setting Postoperative ("lpr_sys_ther_new_set")=2 - New medical therapy - Starting date ("lpr_sys_ther_new_post_start") must be subsequent to Date of surgery ("lpr_surg_date_lung")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_start", "lpr_surg_date_lung", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_start", "lpr_surg_date_lung"]
 	}
@@ -3066,9 +3002,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_27b',
 		desc:'New medical therapy Setting Postoperative ("lpr_sys_ther_new_set")=2 - New medical therapy - Starting date ("lpr_sys_ther_new_post_start") must be subsequent to Date of surgery ("lpr_surg_date_liver")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_start", "lpr_surg_date_liver", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_start", "lpr_surg_date_liver"]
 	}
@@ -3076,9 +3012,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_27c',
 		desc:'New medical therapy Setting Postoperative ("lpr_sys_ther_new_set")=2 - New medical therapy - Starting date ("lpr_sys_ther_new_post_start") must be subsequent to Date of surgery ("lpr_surg_date_bone")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_start", "lpr_surg_date_bone", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_start", "lpr_surg_date_bone"]
 	}
@@ -3086,9 +3022,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_27d',
 		desc:'New medical therapy Setting Postoperative ("lpr_sys_ther_new_set")=2 - New medical therapy - Starting date ("lpr_sys_ther_new_post_start") must be subsequent to Date of surgery ("lpr_surg_date_soft")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_start", "lpr_surg_date_soft", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_start", "lpr_surg_date_soft"]
 	}
@@ -3096,9 +3032,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_27e',
 		desc:'New medical therapy Setting Postoperative ("lpr_sys_ther_new_set")=2 - New medical therapy - Starting date ("lpr_sys_ther_new_post_start") must be subsequent to Date of surgery ("lpr_surg_date_lymph")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_start", "lpr_surg_date_lymph", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_start", "lpr_surg_date_lymph"]
 	}
@@ -3106,9 +3042,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_27f',
 		desc:'New medical therapy Setting Postoperative ("lpr_sys_ther_new_set")=2 - New medical therapy - Starting date ("lpr_sys_ther_new_post_start") must be subsequent to Date of surgery ("lpr_surg_date_serosal")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_start", "lpr_surg_date_serosal", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_start", "lpr_surg_date_serosal"]
 	}
@@ -3116,9 +3052,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_27g',
 		desc:'New medical therapy Setting Postoperative ("lpr_sys_ther_new_set")=2 - New medical therapy - Starting date ("lpr_sys_ther_new_post_start") must be subsequent to Date of surgery ("lpr_surg_date_oth")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_start", "lpr_surg_date_oth", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_start", "lpr_surg_date_oth"]
 	}
@@ -3126,9 +3062,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_28',
 		desc:'New medical therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - Date of surgery ("lpr_surg_date_lung") must be subsequent to New medical therapy - Preoperative - Starting date ("lpr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_lung", "lpr_sys_ther_new_pre_start", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_lung", "lpr_sys_ther_new_pre_start"]
 	}
@@ -3136,9 +3072,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_28b',
 		desc:'New medical therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - Date of surgery ("lpr_surg_date_liver") must be subsequent to New medical therapy - Preoperative - Starting date ("lpr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_liver", "lpr_sys_ther_new_pre_start", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_liver", "lpr_sys_ther_new_pre_start"]
 	}
@@ -3146,9 +3082,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_28c',
 		desc:'New medical therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - Date of surgery ("lpr_surg_date_bone") must be subsequent to New medical therapy - Preoperative - Starting date ("lpr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_bone", "lpr_sys_ther_new_pre_start", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_bone", "lpr_sys_ther_new_pre_start"]
 	}
@@ -3156,9 +3092,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_28d',
 		desc:'New medical therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - Date of surgery ("lpr_surg_date_soft") must be subsequent to New medical therapy - Preoperative - Starting date ("lpr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_soft", "lpr_sys_ther_new_pre_start", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_soft", "lpr_sys_ther_new_pre_start"]
 	}
@@ -3166,9 +3102,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_28e',
 		desc:'New medical therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - Date of surgery ("lpr_surg_date_lymph") must be subsequent to New medical therapy - Preoperative - Starting date ("lpr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_lymph", "lpr_sys_ther_new_pre_start", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_lymph", "lpr_sys_ther_new_pre_start"]
 	}
@@ -3176,9 +3112,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_28f',
 		desc:'New medical therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - Date of surgery ("lpr_surg_date_serosal") must be subsequent to New medical therapy - Preoperative - Starting date ("lpr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_serosal", "lpr_sys_ther_new_pre_start", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_serosal", "lpr_sys_ther_new_pre_start"]
 	}
@@ -3186,9 +3122,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_28g',
 		desc:'New medical therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - Date of surgery ("lpr_surg_date_oth") must be subsequent to New medical therapy - Preoperative - Starting date ("lpr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_oth", "lpr_sys_ther_new_pre_start", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_oth", "lpr_sys_ther_new_pre_start"]
 	}
@@ -3196,9 +3132,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_29',
 		desc:'New medical therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - New medical therapy - Ending date ("lpr_sys_ther_new_post_end") must be subsequent to Date of surgery ("lpr_surg_date_lung")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_end", "lpr_surg_date_lung", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_end", "lpr_surg_date_lung"]
 	}
@@ -3206,9 +3142,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_29b',
 		desc:'New medical therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - New medical therapy - Ending date ("lpr_sys_ther_new_post_end") must be subsequent to Date of surgery ("lpr_surg_date_liver")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_end", "lpr_surg_date_liver", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_end", "lpr_surg_date_liver"]
 	}
@@ -3216,9 +3152,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_29c',
 		desc:'New medical therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - New medical therapy - Ending date ("lpr_sys_ther_new_post_end") must be subsequent to Date of surgery ("lpr_surg_date_bone")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_end", "lpr_surg_date_bone", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_end", "lpr_surg_date_bone"]
 	}
@@ -3226,9 +3162,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_29d',
 		desc:'New medical therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - New medical therapy - Ending date ("lpr_sys_ther_new_post_end") must be subsequent to Date of surgery ("lpr_surg_date_soft")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_end", "lpr_surg_date_soft", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_end", "lpr_surg_date_soft"]
 	}
@@ -3236,9 +3172,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_29e',
 		desc:'New medical therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - New medical therapy - Ending date ("lpr_sys_ther_new_post_end") must be subsequent to Date of surgery ("lpr_surg_date_lymph")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_end", "lpr_surg_date_lymph", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_end", "lpr_surg_date_lymph"]
 	}
@@ -3246,9 +3182,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_29f',
 		desc:'New medical therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - New medical therapy - Ending date ("lpr_sys_ther_new_post_end") must be subsequent to Date of surgery ("lpr_surg_date_serosal")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_end", "lpr_surg_date_serosal", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_end", "lpr_surg_date_serosal"]
 	}
@@ -3256,9 +3192,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_29g',
 		desc:'New medical therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - New medical therapy - Ending date ("lpr_sys_ther_new_post_end") must be subsequent to Date of surgery ("lpr_surg_date_oth")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_end", "lpr_surg_date_oth", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_end", "lpr_surg_date_oth"]
 	}
@@ -3266,9 +3202,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_30',
 		desc:'New medical therapy Setting Palliative ("lpr_sys_ther_new_set")=4 - New medical therapy - Starting date ("lpr_sys_ther_new_pal_start") must be subsequent to Date of progression ("lpr_date") ',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_pal_start", "lpr_date", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_pal_start", "lpr_date"]
 	}
@@ -3276,9 +3212,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_31',
 		desc:'New medical therapy Setting Palliative ("lpr_sys_ther_new_set")=4 - New medical therapy - Ending date ("lpr_sys_ther_new_pal_end") must be subsequent to New medical therapy - Starting date ("lpr_sys_ther_new_pal_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_pal_end", "lpr_sys_ther_new_pal_start", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_pal_end", "lpr_sys_ther_new_pal_start"]
 	}
@@ -3288,7 +3224,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systemic therapy - Starting date ("lpr_sys_ther_new_pre_start") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_pre_start", "lpr_date", 0, ">"],
 		vars:["lpr_sys_ther_new_pre_start", "lpr_date"]
 	}
@@ -3298,7 +3234,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systemic therapy - Starting date ("lpr_sys_ther_new_post_start") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_start", "lpr_date", 0, ">"],
 		vars:["lpr_sys_ther_new_post_start", "lpr_date"]
 	}
@@ -3308,7 +3244,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systemic therapy - Starting date ("lpr_sys_ther_new_pal_start") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_pal_start", "lpr_date", 0, ">"],
 		vars:["lpr_sys_ther_new_pal_start", "lpr_date"]
 	}
@@ -3318,7 +3254,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systemic therapy - Ending date ("lpr_sys_ther_new_pre_end") must be subsequent to Systemic therapy - Starting date ("lpr_sys_ther_new_pre_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_pre_end", "lpr_sys_ther_new_pre_start", 0, ">"],
 		vars:["lpr_sys_ther_new_pre_end", "lpr_sys_ther_new_pre_start"]
 	}
@@ -3328,7 +3264,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systemic therapy - Ending date ("lpr_sys_ther_new_post_end") must be subsequent to Systemic therapy - Starting date ("lpr_sys_ther_new_post_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_end", "lpr_sys_ther_new_post_start", 0, ">"],
 		vars:["lpr_sys_ther_new_post_end", "lpr_sys_ther_new_post_start"]
 	}
@@ -3338,7 +3274,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systemic therapy - Ending date ("lpr_sys_ther_new_pal_end") must be subsequent to Systemic therapy - Starting date ("lpr_sys_ther_new_pal_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_pal_end", "lpr_sys_ther_new_pal_start", 0, ">"],
 		vars:["lpr_sys_ther_new_pal_end", "lpr_sys_ther_new_pal_start"]
 	}
@@ -3346,9 +3282,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_34',
 		desc:'Systemic therapy Setting Preoperative ("lpr_sys_ther_new_set")=1 - Date of surgery ("lpr_surg_date_lung") must be subsequent to Systemic therapy -  Ending date ("lpr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_lung", "lpr_sys_ther_new_pre_end", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_lung", "lpr_sys_ther_new_pre_end"]
 	}
@@ -3356,9 +3292,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_34b',
 		desc:'Systemic therapy Setting Preoperative ("lpr_sys_ther_new_set")=1 - Date of surgery ("lpr_surg_date_liver") must be subsequent to Systemic therapy -  Ending date ("lpr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_liver", "lpr_sys_ther_new_pre_end", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_liver", "lpr_sys_ther_new_pre_end"]
 	}
@@ -3366,9 +3302,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_34c',
 		desc:'Systemic therapy Setting Preoperative ("lpr_sys_ther_new_set")=1 - Date of surgery ("lpr_surg_date_bone") must be subsequent to Systemic therapy -  Ending date ("lpr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_bone", "lpr_sys_ther_new_pre_end", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_bone", "lpr_sys_ther_new_pre_end"]
 	}
@@ -3376,9 +3312,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_34d',
 		desc:'Systemic therapy Setting Preoperative ("lpr_sys_ther_new_set")=1 - Date of surgery ("lpr_surg_date_soft") must be subsequent to Systemic therapy -  Ending date ("lpr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_soft", "lpr_sys_ther_new_pre_end", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_soft", "lpr_sys_ther_new_pre_end"]
 	}
@@ -3386,9 +3322,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_34e',
 		desc:'Systemic therapy Setting Preoperative ("lpr_sys_ther_new_set")=1 - Date of surgery ("lpr_surg_date_lymph") must be subsequent to Systemic therapy -  Ending date ("lpr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_lymph", "lpr_sys_ther_new_pre_end", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_lymph", "lpr_sys_ther_new_pre_end"]
 	}
@@ -3396,9 +3332,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_34f',
 		desc:'Systemic therapy Setting Preoperative ("lpr_sys_ther_new_set")=1 - Date of surgery ("lpr_surg_date_serosal") must be subsequent to Systemic therapy -  Ending date ("lpr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_serosal", "lpr_sys_ther_new_pre_end", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_serosal", "lpr_sys_ther_new_pre_end"]
 	}
@@ -3406,9 +3342,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_34g',
 		desc:'Systemic therapy Setting Preoperative ("lpr_sys_ther_new_set")=1 - Date of surgery ("lpr_surg_date_oth") must be subsequent to Systemic therapy -  Ending date ("lpr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_oth", "lpr_sys_ther_new_pre_end", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_oth", "lpr_sys_ther_new_pre_end"]
 	}
@@ -3416,9 +3352,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_35',
 		desc:'Systemic therapy Setting Postoperative ("lpr_sys_ther_new_set")=2 - Systemic therapy - Starting date ("lpr_sys_ther_new_post_start") must be subsequent to Date of surgery ("lpr_surg_date_lung")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_start", "lpr_surg_date_lung", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_start", "lpr_surg_date_lung"]
 	}
@@ -3426,9 +3362,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_35b',
 		desc:'Systemic therapy Setting Postoperative ("lpr_sys_ther_new_set")=2 - Systemic therapy - Starting date ("lpr_sys_ther_new_post_start") must be subsequent to Date of surgery ("lpr_surg_date_liver")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_start", "lpr_surg_date_liver", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_start", "lpr_surg_date_liver"]
 	}
@@ -3436,9 +3372,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_35c',
 		desc:'Systemic therapy Setting Postoperative ("lpr_sys_ther_new_set")=2 - Systemic therapy - Starting date ("lpr_sys_ther_new_post_start") must be subsequent to Date of surgery ("lpr_surg_date_bone")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_start", "lpr_surg_date_bone", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_start", "lpr_surg_date_bone"]
 	}
@@ -3446,9 +3382,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_35d',
 		desc:'Systemic therapy Setting Postoperative ("lpr_sys_ther_new_set")=2 - Systemic therapy - Starting date ("lpr_sys_ther_new_post_start") must be subsequent to Date of surgery ("lpr_surg_date_soft")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_start", "lpr_surg_date_soft", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_start", "lpr_surg_date_soft"]
 	}
@@ -3456,9 +3392,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_35e',
 		desc:'Systemic therapy Setting Postoperative ("lpr_sys_ther_new_set")=2 - Systemic therapy - Starting date ("lpr_sys_ther_new_post_start") must be subsequent to Date of surgery ("lpr_surg_date_lymph")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_start", "lpr_surg_date_lymph", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_start", "lpr_surg_date_lymph"]
 	}
@@ -3466,9 +3402,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_35f',
 		desc:'Systemic therapy Setting Postoperative ("lpr_sys_ther_new_set")=2 - Systemic therapy - Starting date ("lpr_sys_ther_new_post_start") must be subsequent to Date of surgery ("lpr_surg_date_serosal")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_start", "lpr_surg_date_serosal", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_start", "lpr_surg_date_serosal"]
 	}
@@ -3476,9 +3412,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_35g',
 		desc:'Systemic therapy Setting Postoperative ("lpr_sys_ther_new_set")=2 - Systemic therapy - Starting date ("lpr_sys_ther_new_post_start") must be subsequent to Date of surgery ("lpr_surg_date_oth")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_start", "lpr_surg_date_oth", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_start", "lpr_surg_date_oth"]
 	}
@@ -3486,9 +3422,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_36',
 		desc:'Systemic therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - Date of surgery ("lpr_surg_date_lung") must be subsequent to Systemic therapy - Starting date ("lpr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_lung", "lpr_sys_ther_new_pre_start", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_lung", "lpr_sys_ther_new_pre_start"]
 	}
@@ -3496,9 +3432,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_36b',
 		desc:'Systemic therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - Date of surgery ("lpr_surg_date_liver") must be subsequent to Systemic therapy - Starting date ("lpr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_liver", "lpr_sys_ther_new_pre_start", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_liver", "lpr_sys_ther_new_pre_start"]
 	}
@@ -3506,9 +3442,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_36c',
 		desc:'Systemic therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - Date of surgery ("lpr_surg_date_bone") must be subsequent to Systemic therapy - Starting date ("lpr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_bone", "lpr_sys_ther_new_pre_start", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_bone", "lpr_sys_ther_new_pre_start"]
 	}
@@ -3516,9 +3452,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_36d',
 		desc:'Systemic therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - Date of surgery ("lpr_surg_date_soft") must be subsequent to Systemic therapy - Starting date ("lpr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_soft", "lpr_sys_ther_new_pre_start", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_soft", "lpr_sys_ther_new_pre_start"]
 	}
@@ -3526,9 +3462,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_36e',
 		desc:'Systemic therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - Date of surgery ("lpr_surg_date_lymph") must be subsequent to Systemic therapy - Starting date ("lpr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_lymph", "lpr_sys_ther_new_pre_start", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_lymph", "lpr_sys_ther_new_pre_start"]
 	}
@@ -3536,9 +3472,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_36f',
 		desc:'Systemic therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - Date of surgery ("lpr_surg_date_serosal") must be subsequent to Systemic therapy - Starting date ("lpr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_serosal", "lpr_sys_ther_new_pre_start", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_serosal", "lpr_sys_ther_new_pre_start"]
 	}
@@ -3546,9 +3482,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_36g',
 		desc:'Systemic therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 - Date of surgery ("lpr_surg_date_oth") must be subsequent to Systemic therapy - Starting date ("lpr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_oth", "lpr_sys_ther_new_pre_start", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_surg_date_oth", "lpr_sys_ther_new_pre_start"]
 	}
@@ -3556,9 +3492,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_37',
 		desc:'Systemic therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 -  Systemic therapy -  Ending date ("lpr_sys_ther_new_post_end") must be subsequent to Date of surgery ("lpr_surg_date_lung")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_end", "lpr_surg_date_lung", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_end", "lpr_surg_date_lung"]
 	}
@@ -3566,9 +3502,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_37b',
 		desc:'Systemic therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 -  Systemic therapy -  Ending date ("lpr_sys_ther_new_post_end") must be subsequent to Date of surgery ("lpr_surg_date_liver")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_end", "lpr_surg_date_liver", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_end", "lpr_surg_date_liver"]
 	}
@@ -3576,9 +3512,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_37c',
 		desc:'Systemic therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 -  Systemic therapy -  Ending date ("lpr_sys_ther_new_post_end") must be subsequent to Date of surgery ("lpr_surg_date_bone")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_end", "lpr_surg_date_bone", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_end", "lpr_surg_date_bone"]
 	}
@@ -3586,9 +3522,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_37d',
 		desc:'Systemic therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 -  Systemic therapy -  Ending date ("lpr_sys_ther_new_post_end") must be subsequent to Date of surgery ("lpr_surg_date_soft")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_end", "lpr_surg_date_soft", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_end", "lpr_surg_date_soft"]
 	}
@@ -3596,9 +3532,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_37e',
 		desc:'Systemic therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 -  Systemic therapy -  Ending date ("lpr_sys_ther_new_post_end") must be subsequent to Date of surgery ("lpr_surg_date_lymph")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_end", "lpr_surg_date_lymph", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_end", "lpr_surg_date_lymph"]
 	}
@@ -3606,9 +3542,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_37f',
 		desc:'Systemic therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 -  Systemic therapy -  Ending date ("lpr_sys_ther_new_post_end") must be subsequent to Date of surgery ("lpr_surg_date_serosal")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_end", "lpr_surg_date_serosal", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_end", "lpr_surg_date_serosal"]
 	}
@@ -3616,9 +3552,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_37g',
 		desc:'Systemic therapy Setting Pre and Postoperative ("lpr_sys_ther_new_set")=3 -  Systemic therapy -  Ending date ("lpr_sys_ther_new_post_end") must be subsequent to Date of surgery ("lpr_surg_date_oth")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_post_end", "lpr_surg_date_oth", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_post_end", "lpr_surg_date_oth"]
 	}
@@ -3626,9 +3562,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_38',
 		desc:'Systemic therapy Setting Palliative ("lpr_sys_ther_new_set")=4 - Systemic therapy - Starting date ("lpr_sys_ther_new_pal_start") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_pal_start", "lpr_date", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_pal_start", "lpr_date"]
 	}
@@ -3636,9 +3572,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_39',
 		desc:'Systemic therapy Setting Palliative ("lpr_sys_ther_new_set")=4 - Systemic therapy -  Ending date ("lpr_sys_ther_new_pal_end") must be subsequent to Systemic therapy - Starting date ("lpr_sys_ther_new_pal_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_sys_ther_new_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_sys_ther_new_pal_end", "lpr_sys_ther_new_pal_start", 0, ">"],
 		vars:["lpr_sys_ther_new_set", "lpr_sys_ther_new_pal_end", "lpr_sys_ther_new_pal_start"]
 	}
@@ -3648,7 +3584,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lung - Radiotherapy - Starting date ("lpr_radio_lung_start") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_lung_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_lung_start", "lpr_date"]
 	}
@@ -3658,7 +3594,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lung - Radiotherapy - Ending date ("lpr_radio_lung_end") must be subsequent to Lung - Radiotherapy - Starting date ("lpr_radio_lung_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_lung_end", "lpr_radio_lung_start", 0, ">"],
 		vars:["lpr_radio_lung_end", "lpr_radio_lung_start"]
 	}
@@ -3666,9 +3602,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_51',
 		desc:'Lung - Radiotherapy Setting Preoperative ("lpr_lung_radio_set")=1 - Lung - Date of surgery ("lpr_surg_date_lung") must be subsequent to Lung - Radiotherapy - Ending date ("lpr_radio_lung_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_lung_radio_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_lung", "lpr_radio_lung_end", 0, ">"],
 		vars:["lpr_lung_radio_set", "lpr_surg_date_lung", "lpr_radio_lung_end"]
 	}
@@ -3676,9 +3612,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_52',
 		desc:'Lung - Radiotherapy Setting Postoperative ("lpr_lung_radio_set")=2 - Lung - Radiotherapy - Starting date ("lpr_radio_lung_start") must be subsequent to Lung - Date of surgery ("lpr_surg_date_lung")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_lung_radio_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_lung_start", "lpr_surg_date_lung", 0, ">"],
 		vars:["lpr_lung_radio_set", "lpr_radio_lung_start", "lpr_surg_date_lung"]
 	}
@@ -3686,9 +3622,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_53',
 		desc:'Lung - Radiotherapy Setting Palliative ("lpr_lung_radio_set")=3 - Lung - Radiotherapy - Starting date ("lpr_radio_lung_start") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_lung_radio_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_lung_start", "lpr_date", 0, ">"],
 		vars:["lpr_lung_radio_set", "lpr_radio_lung_start", "lpr_date"]
 	}
@@ -3696,9 +3632,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_54',
 		desc:'Lung - Radiotherapy Setting Definitive ("lpr_lung_radio_set")=4 - Lung - Radiotherapy - Starting date ("lpr_radio_lung_start") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_lung_radio_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_lung_start", "lpr_date", 0, ">"],
 		vars:["lpr_lung_radio_set", "lpr_radio_lung_start", "lpr_date"]
 	}
@@ -3706,9 +3642,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_55',
 		desc:'Lung - Radiotherapy Setting Definitive ("lpr_lung_radio_set")=4  - Radiotherapy ("lpr_radio_yn")=1 - Surgery ("lpr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_lung_radio_set", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["lpr_radio_yn", 1], ["lpr_surg_yn", 0]],
 		vars:["lpr_lung_radio_set", "lpr_radio_yn", "lpr_surg_yn"]
 	}
@@ -3718,7 +3654,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Liver - Radiotherapy - Starting date ("lpr_radio_liver_start") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_liver_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_liver_start", "lpr_date"]
 	}
@@ -3728,7 +3664,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Liver - Radiotherapy - Ending date ("lpr_radio_liver_end") must be subsequent to Liver - Radiotherapy - Starting date ("lpr_radio_liver_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_liver_end", "lpr_radio_liver_start", 0, ">"],
 		vars:["lpr_radio_liver_end", "lpr_radio_liver_start"]
 	}
@@ -3736,9 +3672,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_58',
 		desc:'Liver - Radiotherapy Setting Preoperative ("lpr_radio_liver_set")=1 - Liver - Date of surgery ("lpr_surg_date_liver") must be subsequent to Liver - Radiotherapy - Ending date ("lpr_radio_liver_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_liver_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_liver", "lpr_radio_liver_end", 0, ">"],
 		vars:["lpr_radio_liver_set", "lpr_surg_date_liver", "lpr_radio_liver_end"]
 	}
@@ -3746,9 +3682,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_59',
 		desc:'Liver - Radiotherapy Setting Postoperative ("lpr_radio_liver_set")=2 - Liver - Radiotherapy - Starting date ("lpr_radio_liver_start") must be subsequent to Liver - Date of surgery ("lpr_surg_date_liver")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_liver_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_liver_start", "lpr_surg_date_liver", 0, ">"],
 		vars:["lpr_radio_liver_set", "lpr_radio_liver_start", "lpr_surg_date_liver"]
 	}
@@ -3756,9 +3692,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_60',
 		desc:'Liver - Radiotherapy Setting Palliative ("lpr_radio_liver_set")=3 - Liver - Radiotherapy - Starting date ("lpr_radio_liver_start") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_liver_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_liver_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_liver_set", "lpr_radio_liver_start", "lpr_date"]
 	}
@@ -3766,9 +3702,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_61',
 		desc:'Liver - Radiotherapy Setting Definitive ("lpr_radio_liver_set")=4 - Liver - Radiotherapy - Starting date ("lpr_radio_liver_start") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_liver_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_liver_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_liver_set", "lpr_radio_liver_start", "lpr_date"]
 	}
@@ -3776,11 +3712,11 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_62',
 		desc:'Liver - Radiotherapy Setting Definitive ("lpr_radio_liver_set")=4 - Radiotherapy ("lpr_radio_yn")=1 - Surgery ("lpr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_liver_set", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["lpr_radio_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_radio_liver_set"]
+		vars:["lpr_radio_liver_set","lpr_radio_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -3788,7 +3724,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Bone - Radiotherapy - Starting date ("lpr_radio_bone_start") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_bone_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_bone_start", "lpr_date"]
 	}
@@ -3798,7 +3734,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Bone - Radiotherapy - Ending date ("lpr_radio_bone_end") must be subsequent to Bone - Radiotherapy - Starting date ("lpr_radio_bone_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_bone_end", "lpr_radio_bone_start", 0, ">"],
 		vars:["lpr_radio_bone_end", "lpr_radio_bone_start"]
 	}
@@ -3806,9 +3742,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_65',
 		desc:'Bone - Radiotherapy Setting Preoperative ("lpr_radio_bone_set")=1 - Bone - Date of surgery ("lpr_surg_date_bone") must be subsequent to Bone - Radiotherapy - Ending date ("lpr_radio_bone_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_bone_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_bone", "lpr_radio_bone_end", 0, ">"],
 		vars:["lpr_radio_bone_set", "lpr_surg_date_bone", "lpr_radio_bone_end"]
 	}
@@ -3816,9 +3752,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_66',
 		desc:'Bone - Radiotherapy Setting Postoperative ("lpr_radio_bone_set")=2 - Bone - Radiotherapy - Starting date ("lpr_radio_bone_start") must be subsequent to Bone - Date of surgery ("lpr_surg_date_bone")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_bone_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_bone_start", "lpr_surg_date_bone", 0, ">"],
 		vars:["lpr_radio_bone_set", "lpr_radio_bone_start", "lpr_surg_date_bone"]
 	}
@@ -3826,9 +3762,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_67',
 		desc:'Bone - Radiotherapy Setting Palliative ("lpr_radio_bone_set")=3 - Bone - Radiotherapy - Starting date ("lpr_radio_bone_start") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_bone_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_bone_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_bone_set", "lpr_radio_bone_start", "lpr_date"]
 	}
@@ -3836,9 +3772,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_68',
 		desc:'Bone - Radiotherapy Setting Definitive ("lpr_radio_bone_set")=4 - Bone - Radiotherapy - Starting date ("lpr_radio_bone_start") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_bone_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_bone_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_bone_set", "lpr_radio_bone_start", "lpr_date"]
 	}
@@ -3846,11 +3782,11 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_69',
 		desc:'Bone - Radiotherapy Setting Definitive ("lpr_radio_bone_set")=4 - Radiotherapy ("lpr_radio_yn")=1 - Surgery ("lpr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_bone_set", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["lpr_radio_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_radio_bone_set"]
+		vars:["lpr_radio_bone_set", "lpr_radio_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -3858,7 +3794,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues - Radiotherapy - Starting date ("lpr_radio_soft_start") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_soft_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_soft_start", "lpr_date"]
 	}
@@ -3868,7 +3804,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues - Radiotherapy - Ending date ("lpr_radio_soft_end") must be subsequent to Soft tissues - Radiotherapy - Starting date ("lpr_radio_soft_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_soft_end", "lpr_radio_soft_start", 0, ">"],
 		vars:["lpr_radio_soft_end", "lpr_radio_soft_start"]
 	}
@@ -3876,9 +3812,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_72',
 		desc:'Soft tissues - Radiotherapy Setting Preoperative ("lpr_radio_soft_set")=1 - Soft tissues - Date of surgery ("lpr_surg_date_soft") must be subsequent to Soft tissues - Radiotherapy - Ending date ("lpr_radio_soft_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_soft_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_soft", "lpr_radio_soft_end", 0, ">"],
 		vars:["lpr_radio_soft_set", "lpr_surg_date_soft", "lpr_radio_soft_end"]
 	}
@@ -3886,9 +3822,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_73',
 		desc:'Soft tissues - Radiotherapy Setting Postoperative ("lpr_radio_soft_set")=2 - Soft tissues - Radiotherapy - Starting date ("lpr_radio_soft_start") must be subsequent to Soft tissues - Date of surgery ("lpr_surg_date_soft")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_soft_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_soft_start", "lpr_surg_date_soft", 0, ">"],
 		vars:["lpr_radio_soft_set", "lpr_radio_soft_start", "lpr_surg_date_soft"]
 	}
@@ -3896,9 +3832,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_74',
 		desc:'Soft tissues - Radiotherapy Setting Palliative ("lpr_radio_soft_set")=3 - Soft tissues - Radiotherapy - Starting date ("lpr_radio_soft_start") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_soft_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_soft_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_soft_set", "lpr_radio_soft_start", "lpr_date"]
 	}
@@ -3906,9 +3842,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_75',
 		desc:'Soft tissues - Radiotherapy Setting Definitive ("lpr_radio_soft_set")=4 - Soft tissues - Radiotherapy - Starting date ("lpr_radio_soft_start") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_soft_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_soft_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_soft_set", "lpr_radio_soft_start", "lpr_date"]
 	}
@@ -3916,11 +3852,11 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_76',
 		desc:'Soft tissues - Radiotherapy Setting Definitive ("lpr_radio_soft_set")=4 - Radiotherapy ("lpr_radio_yn")=1 - Surgery ("lpr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_soft_set", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["lpr_radio_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_radio_soft_set"]
+		vars:["lpr_radio_soft_set", "lpr_radio_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -3928,7 +3864,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lymph nodes - Radiotherapy - Starting date ("lpr_radio_lymph_start") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_lymph_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_lymph_start", "lpr_date"]
 	}
@@ -3938,7 +3874,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lymph nodes - Radiotherapy - Ending date ("lpr_radio_lymph_end") must be subsequent to Lymph nodes - Radiotherapy - Starting date ("lpr_radio_lymph_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_lymph_end", "lpr_radio_lymph_start", 0, ">"],
 		vars:["lpr_radio_lymph_end", "lpr_radio_lymph_start"]
 	}
@@ -3946,9 +3882,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_79',
 		desc:'Lymph nodes - Radiotherapy Setting Preoperative ("lpr_radio_lymph_set")=1 - Lymph nodes - Date of surgery ("lpr_surg_date_lymph") must be subsequent to Lymph nodes - Radiotherapy - Ending date ("lpr_radio_lymph_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_lymph_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_lymph", "lpr_radio_lymph_end", 0, ">"],
 		vars:["lpr_radio_lymph_set", "lpr_surg_date_lymph", "lpr_radio_lymph_end"]
 	}
@@ -3956,9 +3892,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_80',
 		desc:'Lymph nodes - Radiotherapy Setting Postoperative ("lpr_radio_lymph_set")=2 - Lymph nodes - Radiotherapy - Starting date ("lpr_radio_lymph_start") must be subsequent to Lymph nodes - Date of surgery ("lpr_surg_date_lymph")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_lymph_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_lymph_start", "lpr_surg_date_lymph", 0, ">"],
 		vars:["lpr_radio_lymph_set", "lpr_radio_lymph_start", "lpr_surg_date_lymph"]
 	}
@@ -3966,9 +3902,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_81',
 		desc:'Lymph nodes - Radiotherapy Setting Palliative ("lpr_radio_lymph_set")=3 - Lymph nodes - Radiotherapy - Starting date ("lpr_radio_lymph_start") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_lymph_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_lymph_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_lymph_set", "lpr_radio_lymph_start", "lpr_date"]
 	}
@@ -3976,9 +3912,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_82',
 		desc:'Lymph nodes - Radiotherapy Setting Definitive ("lpr_radio_lymph_set")=4 - Lymph nodes - Radiotherapy - Starting date ("lpr_radio_lymph_start") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_lymph_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_lymph_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_lymph_set", "lpr_radio_lymph_start", "lpr_date"]
 	}
@@ -3986,11 +3922,11 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_83',
 		desc:'Lymph nodes - Radiotherapy Setting Definitive ("lpr_radio_lymph_set")=4 - Radiotherapy ("lpr_radio_yn")=1 - Surgery ("lpr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_lymph_set", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["lpr_radio_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_radio_lymph_set"]
+		vars:["lpr_radio_lymph_set", "lpr_radio_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -3998,7 +3934,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Serosal - Radiotherapy - Starting date ("lpr_radio_sero_start") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_sero_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_sero_start", "lpr_date"]
 	}
@@ -4008,7 +3944,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Serosal - Radiotherapy - Ending date ("lpr_radio_sero_end") must be subsequent to Serosal - Radiotherapy - Starting date ("lpr_radio_sero_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_sero_end", "lpr_radio_sero_start", 0, ">"],
 		vars:["lpr_radio_sero_end", "lpr_radio_sero_start"]
 	}
@@ -4016,9 +3952,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_86',
 		desc:'Serosal - Radiotherapy Setting Preoperative ("lpr_radio_sero_set")=1 - Serosal - Date of surgery ("lpr_surg_date_sero") must be subsequent to Serosal - Radiotherapy - Ending date ("lpr_radio_sero_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_sero_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_serosal", "lpr_radio_sero_end", 0, ">"],
 		vars:["lpr_radio_sero_set", "lpr_surg_date_serosal", "lpr_radio_sero_end"]
 	}
@@ -4026,9 +3962,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_87',
 		desc:'Serosal - Radiotherapy Setting Postoperative ("lpr_radio_sero_set")=2 - Serosal - Radiotherapy - Starting date ("lpr_radio_sero_start") must be subsequent to Serosal - Date of surgery ("lpr_surg_date_sero")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_sero_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_sero_start", "lpr_surg_date_sero", 0, ">"],
 		vars:["lpr_radio_sero_set", "lpr_radio_sero_start", "lpr_surg_date_sero"]
 	}
@@ -4036,9 +3972,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_88',
 		desc:'Serosal - Radiotherapy Setting Palliative ("lpr_radio_sero_set")=3 - Serosal - Radiotherapy - Starting date ("lpr_radio_sero_start") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_sero_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_sero_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_sero_set", "lpr_radio_sero_start", "lpr_date"]
 	}
@@ -4046,9 +3982,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_89',
 		desc:'Serosal - Radiotherapy Setting Definitive ("lpr_radio_sero_set")=4 - Serosal - Radiotherapy - Starting date ("lpr_radio_sero_start") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_sero_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_sero_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_sero_set", "lpr_radio_sero_start", "lpr_date"]
 	}
@@ -4056,11 +3992,11 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_90',
 		desc:'Serosal - Radiotherapy Setting Definitive ("lpr_radio_sero_set")=4 - Radiotherapy ("lpr_radio_yn")=1 - Surgery ("lpr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_sero_set", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["lpr_radio_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_radio_sero_set"]
+		vars:["lpr_radio_sero_set", "lpr_radio_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -4068,7 +4004,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Other - Radiotherapy - Starting date ("lpr_radio_oth_start") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_oth_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_oth_start", "lpr_date"]
 	}
@@ -4078,7 +4014,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Other - Radiotherapy - Ending date ("lpr_radio_oth_end") must be subsequent to Other - Radiotherapy - Starting date ("lpr_radio_oth_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_oth_end", "lpr_radio_oth_start", 0, ">"],
 		vars:["lpr_radio_oth_end", "lpr_radio_oth_start"]
 	}
@@ -4086,9 +4022,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_93',
 		desc:'Other - Radiotherapy Setting Preoperative ("lpr_radio_oth_set")=1 - Other - Date of surgery ("lpr_surg_date_oth") must be subsequent to Other - Radiotherapy - Ending date ("lpr_radio_oth_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_oth_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_oth", "lpr_radio_oth_end", 0, ">"],
 		vars:["lpr_radio_oth_set", "lpr_surg_date_oth", "lpr_radio_oth_end"]
 	}
@@ -4096,9 +4032,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_94',
 		desc:'Other - Radiotherapy Setting Postoperative ("lpr_radio_oth_set")=2 - Other - Radiotherapy - Starting date ("lpr_radio_oth_start") must be subsequent to Other - Date of surgery ("lpr_surg_date_oth")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_oth_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_oth_start", "lpr_surg_date_oth", 0, ">"],
 		vars:["lpr_radio_oth_set", "lpr_radio_oth_start", "lpr_surg_date_oth"]
 	}
@@ -4106,9 +4042,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_95',
 		desc:'Other - Radiotherapy Setting Palliative ("lpr_radio_oth_set")=3 - Other - Radiotherapy - Starting date ("lpr_radio_oth_start") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_oth_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_oth_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_oth_set", "lpr_radio_oth_start", "lpr_date"]
 	}
@@ -4116,9 +4052,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_96',
 		desc:'Other - Radiotherapy Setting Definitive ("lpr_radio_oth_set")=4 - Other - Radiotherapy - Starting date ("lpr_radio_oth_start") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_oth_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_radio_oth_start", "lpr_date", 0, ">"],
 		vars:["lpr_radio_oth_set", "lpr_radio_oth_start", "lpr_date"]
 	}
@@ -4126,11 +4062,11 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_97',
 		desc:'Other - Radiotherapy Setting Definitive ("lpr_radio_oth_set")=4 - Radiotherapy ("lpr_radio_yn")=1 - Surgery ("lpr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_radio_oth_set", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["lpr_radio_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_radio_oth_set"]
+		vars:["lpr_radio_oth_set", "lpr_radio_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -4138,7 +4074,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Isolated limb perfusion - Procedure date ("lpr_limbperf_date") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_limbperf_date", "lpr_date", 0, ">"],
 		vars:["lpr_limbperf_date", "lpr_date"]
 	}
@@ -4146,9 +4082,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{	
 		name: 'dq_6_99',
 		desc: 'Isolated limb perfusion Setting Preoperative ("lpr_limbperf_set")=1 - Date of surgery ("lpr_surg_date_lung") must be subsequent to Isolated limb perfusion - Procedure date ("lpr_limbperf_date")',
-		prec: multiVarHasValueRepInstr,
+		prec: multiVarHasValueRepInstrREV,
 		precParams: [[["lpr_limbperf_set", 1]]],
-		func: dateCompareWithDeltaRepInstr,
+		func: dateCompareWithDeltaRepInstrREV,
 		params: ["lpr_surg_date_lung", "lpr_limbperf_date", 0, ">"],
 		vars: ["lpr_limbperf_set", "lpr_surg_date_lung", "lpr_limbperf_date"]
 	}	
@@ -4156,9 +4092,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{	
 		name: 'dq_6_99b',
 		desc: 'Isolated limb perfusion Setting Preoperative ("lpr_limbperf_set")=1 - Date of surgery ("lpr_surg_date_liver") must be subsequent to Isolated limb perfusion - Procedure date ("lpr_limbperf_date")',
-		prec: multiVarHasValueRepInstr,
+		prec: multiVarHasValueRepInstrREV,
 		precParams: [[["lpr_limbperf_set", 1]]],
-		func: dateCompareWithDeltaRepInstr,
+		func: dateCompareWithDeltaRepInstrREV,
 		params: ["lpr_surg_date_liver", "lpr_limbperf_date", 0, ">"],
 		vars: ["lpr_limbperf_set", "lpr_surg_date_liver", "lpr_limbperf_date"]
 	}	
@@ -4166,9 +4102,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{	
 		name: 'dq_6_99c',
 		desc: 'Isolated limb perfusion Setting Preoperative ("lpr_limbperf_set")=1 - Date of surgery ("lpr_surg_date_bone") must be subsequent to Isolated limb perfusion - Procedure date ("lpr_limbperf_date")',
-		prec: multiVarHasValueRepInstr,
+		prec: multiVarHasValueRepInstrREV,
 		precParams: [[["lpr_limbperf_set", 1]]],
-		func: dateCompareWithDeltaRepInstr,
+		func: dateCompareWithDeltaRepInstrREV,
 		params: ["lpr_surg_date_bone", "lpr_limbperf_date", 0, ">"],
 		vars: ["lpr_limbperf_set", "lpr_surg_date_bone", "lpr_limbperf_date"]
 	}	
@@ -4176,9 +4112,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{	
 		name: 'dq_6_99d',
 		desc: 'Isolated limb perfusion Setting Preoperative ("lpr_limbperf_set")=1 - Date of surgery ("lpr_surg_date_soft") must be subsequent to Isolated limb perfusion - Procedure date ("lpr_limbperf_date")',
-		prec: multiVarHasValueRepInstr,
+		prec: multiVarHasValueRepInstrREV,
 		precParams: [[["lpr_limbperf_set", 1]]],
-		func: dateCompareWithDeltaRepInstr,
+		func: dateCompareWithDeltaRepInstrREV,
 		params: ["lpr_surg_date_soft", "lpr_limbperf_date", 0, ">"],
 		vars: ["lpr_limbperf_set", "lpr_surg_date_soft", "lpr_limbperf_date"]
 	}	
@@ -4186,9 +4122,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{	
 		name: 'dq_6_99e',
 		desc: 'Isolated limb perfusion Setting Preoperative ("lpr_limbperf_set")=1 - Date of surgery ("lpr_surg_date_lymph") must be subsequent to Isolated limb perfusion - Procedure date ("lpr_limbperf_date")',
-		prec: multiVarHasValueRepInstr,
+		prec: multiVarHasValueRepInstrREV,
 		precParams: [[["lpr_limbperf_set", 1]]],
-		func: dateCompareWithDeltaRepInstr,
+		func: dateCompareWithDeltaRepInstrREV,
 		params: ["lpr_surg_date_lymph", "lpr_limbperf_date", 0, ">"],
 		vars: ["lpr_limbperf_set", "lpr_surg_date_lymph", "lpr_limbperf_date"]
 	}	
@@ -4196,9 +4132,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{	
 		name: 'dq_6_99f',
 		desc: 'Isolated limb perfusion Setting Preoperative ("lpr_limbperf_set")=1 - Date of surgery ("lpr_surg_date_serosal") must be subsequent to Isolated limb perfusion - Procedure date ("lpr_limbperf_date")',
-		prec: multiVarHasValueRepInstr,
+		prec: multiVarHasValueRepInstrREV,
 		precParams: [[["lpr_limbperf_set", 1]]],
-		func: dateCompareWithDeltaRepInstr,
+		func: dateCompareWithDeltaRepInstrREV,
 		params: ["lpr_surg_date_serosal", "lpr_limbperf_date", 0, ">"],
 		vars: ["lpr_limbperf_set", "lpr_surg_date_serosal", "lpr_limbperf_date"]
 	}	
@@ -4206,9 +4142,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{	
 		name: 'dq_6_99g',
 		desc: 'Isolated limb perfusion Setting Preoperative ("lpr_limbperf_set")=1 - Date of surgery ("lpr_surg_date_oth") must be subsequent to Isolated limb perfusion - Procedure date ("lpr_limbperf_date")',
-		prec: multiVarHasValueRepInstr,
+		prec: multiVarHasValueRepInstrREV,
 		precParams: [[["lpr_limbperf_set", 1]]],
-		func: dateCompareWithDeltaRepInstr,
+		func: dateCompareWithDeltaRepInstrREV,
 		params: ["lpr_surg_date_oth", "lpr_limbperf_date", 0, ">"],
 		vars: ["lpr_limbperf_set", "lpr_surg_date_oth", "lpr_limbperf_date"]
 	}	
@@ -4216,9 +4152,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_100',
 		desc:'Isolated limb perfusion Setting Definitive ("lpr_limbperf_set")=4 - Procedure date ("lpr_limbperf_date") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_limbperf_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_limbperf_date", "lpr_date", 0, ">"],
 		vars:["lpr_limbperf_set", "lpr_limbperf_date", "lpr_date"]
 	}
@@ -4226,9 +4162,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_101',
 		desc:'Local ablative techniques Setting Preoperative ("lpr_abla_set_lung") - Date of surgery ("lpr_surg_date_lung") must be subsequent to Local ablative techniques - Procedure date ("lpr_abla_date_lung")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_lung", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_lung", "lpr_abla_date_lung", 0, ">"],
 		vars:["lpr_abla_set_lung", "lpr_surg_date_lung", "lpr_abla_date_lung"]
 	}
@@ -4236,9 +4172,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_101b',
 		desc:'Local ablative techniques Setting Preoperative ("lpr_abla_set_liver") - Date of surgery ("lpr_surg_date_liver") must be subsequent to Local ablative techniques - Procedure date ("lpr_abla_date_liver")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_liver", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_liver", "lpr_abla_date_liver", 0, ">"],
 		vars:["lpr_abla_set_liver", "lpr_surg_date_liver", "lpr_abla_date_liver"]
 	}
@@ -4246,9 +4182,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_101c',
 		desc:'Local ablative techniques Setting Preoperative ("lpr_abla_set_bone") - Date of surgery ("lpr_surg_date_bone") must be subsequent to Local ablative techniques - Procedure date ("lpr_abla_date_bone")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_bone", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_bone", "lpr_abla_date_bone", 0, ">"],
 		vars:["lpr_abla_set_bone", "lpr_surg_date_bone", "lpr_abla_date_bone"]
 	}
@@ -4256,9 +4192,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_101d',
 		desc:'Local ablative techniques Setting Preoperative ("lpr_abla_set_soft") - Date of surgery ("lpr_surg_date_soft") must be subsequent to Local ablative techniques - Procedure date ("lpr_abla_date_soft")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_soft", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_soft", "lpr_abla_date_soft", 0, ">"],
 		vars:["lpr_abla_set_soft", "lpr_surg_date_soft", "lpr_abla_date_soft"]
 	}
@@ -4266,9 +4202,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_101e',
 		desc:'Local ablative techniques Setting Preoperative ("lpr_abla_set_serosal") - Date of surgery ("lpr_surg_date_serosal") must be subsequent to Local ablative techniques - Procedure date ("lpr_abla_date_serosal")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_serosal", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_serosal", "lpr_abla_date_serosal", 0, ">"],
 		vars:["lpr_abla_set_serosal", "lpr_surg_date_serosal", "lpr_abla_date_serosal"]
 	}
@@ -4276,9 +4212,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_101f',
 		desc:'Local ablative techniques Setting Preoperative ("lpr_abla_set_lymph") - Date of surgery ("lpr_surg_date_lymph") must be subsequent to Local ablative techniques - Procedure date ("lpr_abla_date_lymph")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_lymph", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_lymph", "lpr_abla_date_lymph", 0, ">"],
 		vars:["lpr_abla_set_lymph", "lpr_surg_date_lymph", "lpr_abla_date_lymph"]
 	}
@@ -4286,9 +4222,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_101g',
 		desc:'Local ablative techniques Setting Preoperative ("lpr_abla_set_oth") - Date of surgery ("lpr_surg_date_oth") must be subsequent to Local ablative techniques - Procedure date ("lpr_abla_date_oth")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_oth", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_oth", "lpr_abla_date_oth", 0, ">"],
 		vars:["lpr_abla_set_oth", "lpr_surg_date_oth", "lpr_abla_date_oth"]
 	}
@@ -4296,9 +4232,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_102',
 		desc:'Local ablative techniques Setting Definitive ("lpr_abla_set_lung") - Local ablative techniques - Procedure date ("lpr_abla_date_lung") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_lung", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_lung", "lpr_date", 0, ">"],
 		vars:["lpr_abla_set_lung", "lpr_abla_date_lung", "lpr_date"]
 	}
@@ -4306,9 +4242,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_102b',
 		desc:'Local ablative techniques Setting Definitive ("lpr_abla_set_liver") - Local ablative techniques - Procedure date ("lpr_abla_date_liver") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_liver", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_liver", "lpr_date", 0, ">"],
 		vars:["lpr_abla_set_liver", "lpr_abla_date_liver", "lpr_date"]
 	}
@@ -4316,9 +4252,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_102c',
 		desc:'Local ablative techniques Setting Definitive ("lpr_abla_set_bone") - Local ablative techniques - Procedure date ("lpr_abla_date_bone") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_bone", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_bone", "lpr_date", 0, ">"],
 		vars:["lpr_abla_set_bone", "lpr_abla_date_bone", "lpr_date"]
 	}
@@ -4326,9 +4262,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_102d',
 		desc:'Local ablative techniques Setting Definitive ("lpr_abla_set_soft") - Local ablative techniques - Procedure date ("lpr_abla_date_soft") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_soft", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_soft", "lpr_date", 0, ">"],
 		vars:["lpr_abla_set_soft", "lpr_abla_date_soft", "lpr_date"]
 	}
@@ -4336,9 +4272,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_102e',
 		desc:'Local ablative techniques Setting Definitive ("lpr_abla_set_serosal") - Local ablative techniques - Procedure date ("lpr_abla_date_serosal") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_serosal", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_serosal", "lpr_date", 0, ">"],
 		vars:["lpr_abla_set_serosal", "lpr_abla_date_serosal", "lpr_date"]
 	}
@@ -4346,9 +4282,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_102f',
 		desc:'Local ablative techniques Setting Definitive ("lpr_abla_set_lymph") - Local ablative techniques - Procedure date ("lpr_abla_date_lymph") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_lymph", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_lymph", "lpr_date", 0, ">"],
 		vars:["lpr_abla_set_lymph", "lpr_abla_date_lymph", "lpr_date"]
 	}
@@ -4356,9 +4292,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_102g',
 		desc:'Local ablative techniques Setting Definitive ("lpr_abla_set_oth") - Local ablative techniques - Procedure date ("lpr_abla_date_oth") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_oth", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_oth", "lpr_date", 0, ">"],
 		vars:["lpr_abla_set_oth", "lpr_abla_date_oth", "lpr_date"]
 	}
@@ -4366,71 +4302,71 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_103',
 		desc:'Local ablative techniques Setting Definitive ("lpr_abla_set_lung") - Local ablative techniques ("lpr_abla_yn")=1 - Surgery ("lpr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_lung", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["lpr_abla_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_abla_set_lung"]
+		vars:["lpr_abla_set_lung", "lpr_abla_yn", "lpr_surg_yn"]
 	}
 ,
 	{
 		name:'dq_6_103b',
 		desc:'Local ablative techniques Setting Definitive ("lpr_abla_set_liver") - Local ablative techniques ("lpr_abla_yn")=1 - Surgery ("lpr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_liver", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["lpr_abla_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_abla_set_liver"]
+		vars:["lpr_abla_set_liver", "lpr_abla_yn", "lpr_surg_yn"]
 	}
 ,
 	{
 		name:'dq_6_103c',
 		desc:'Local ablative techniques Setting Definitive ("lpr_abla_set_bone") - Local ablative techniques ("lpr_abla_yn")=1 - Surgery ("lpr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_bone", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["lpr_abla_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_abla_set_bone"]
+		vars:["lpr_abla_set_bone", "lpr_abla_yn", "lpr_surg_yn"]
 	}
 ,
 	{
 		name:'dq_6_103d',
 		desc:'Local ablative techniques Setting Definitive ("lpr_abla_set_soft") - Local ablative techniques ("lpr_abla_yn")=1 - Surgery ("lpr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_soft", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["lpr_abla_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_abla_set_soft"]
+		vars:["lpr_abla_set_soft", "lpr_abla_yn", "lpr_surg_yn"]
 	}
 ,
 	{
 		name:'dq_6_103e',
 		desc:'Local ablative techniques Setting Definitive ("lpr_abla_set_serosal") - Local ablative techniques ("lpr_abla_yn")=1 - Surgery ("lpr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_serosal", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["lpr_abla_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_abla_set_serosal"]
+		vars:["lpr_abla_set_serosal", "lpr_abla_yn", "lpr_surg_yn"]
 	}
 ,
 	{
 		name:'dq_6_103f',
 		desc:'Local ablative techniques Setting Definitive ("lpr_abla_set_lymph") - Local ablative techniques ("lpr_abla_yn")=1 - Surgery ("lpr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_lymph", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["lpr_abla_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_abla_set_lymph"]
+		vars:["lpr_abla_set_lymph", "lpr_abla_yn", "lpr_surg_yn"]
 	}
 ,
 	{
 		name:'dq_6_103g',
 		desc:'Local ablative techniques Setting Definitive ("lpr_abla_set_oth") - Local ablative techniques ("lpr_abla_yn")=1 - Surgery ("lpr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_oth", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["lpr_abla_yn", 1], ["lpr_surg_yn", 0]],
-		vars:["lpr_abla_set_oth"]
+		vars:["lpr_abla_set_oth", "lpr_abla_yn", "lpr_surg_yn"]
 	}
 ,
 	{
@@ -4438,7 +4374,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lung - Local ablative techniques - Procedure date ("lpr_abla_date_lung") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_lung", "lpr_date", 0, ">"],
 		vars:["lpr_abla_date_lung", "lpr_date"]
 	}
@@ -4446,9 +4382,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_105',
 		desc:'Lung - Local ablative techniques Setting Preoperative ("lpr_abla_set_lung")=1 - Lung - Date of surgery ("lpr_surg_date_lung") must be subsequent to Lung - Local ablative techniques - Procedure date ("lpr_abla_date_lung")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_lung", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_lung", "lpr_abla_date_lung", 0, ">"],
 		vars:["lpr_abla_set_lung", "lpr_surg_date_lung", "lpr_abla_date_lung"]
 	}
@@ -4456,9 +4392,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_106',
 		desc:'Lung - Local ablative techniques - Setting Definitive ("lpr_abla_set_lung")=4 - Lung - Local ablative techniques - Procedure date ("lpr_abla_date_lung") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_lung", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_lung", "lpr_date", 0, ">"],
 		vars:["lpr_abla_set_lung", "lpr_abla_date_lung", "lpr_date"]
 	}
@@ -4468,7 +4404,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Liver - Local ablative techniques - Procedure date ("lpr_abla_date_liver") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_liver", "lpr_date", 0, ">"],
 		vars:["lpr_abla_date_liver", "lpr_date"]
 	}
@@ -4476,9 +4412,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_108',
 		desc:'Liver - Local ablative techniques Setting Preoperative ("lpr_abla_set_liver")=1 - Liver - Date of surgery ("lpr_surg_date_liver") must be subsequent to Liver - Local ablative techniques - Procedure date ("lpr_abla_date_liver")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_liver", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_liver", "lpr_abla_date_liver", 0, ">"],
 		vars:["lpr_abla_set_liver", "lpr_surg_date_liver", "lpr_abla_date_liver"]
 	}
@@ -4486,9 +4422,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_109',
 		desc:'Liver - Local ablative techniques - Setting Definitive ("lpr_abla_set_liver")=4 - Liver - Local ablative techniques - Procedure date ("lpr_abla_date_liver") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_liver", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_liver", "lpr_date", 0, ">"],
 		vars:["lpr_abla_set_liver", "lpr_abla_date_liver", "lpr_date"]
 	}
@@ -4498,7 +4434,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Bone - Local ablative techniques - Procedure date ("lpr_abla_date_bone") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_bone", "lpr_date", 0, ">"],
 		vars:["lpr_abla_date_bone", "lpr_date"]
 	}
@@ -4506,9 +4442,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_111',
 		desc:'Bone - Local ablative techniques Setting Preoperative ("lpr_abla_set_bone")=1 - Bone - Date of surgery ("lpr_surg_date_bone") must be subsequent to Bone - Local ablative techniques - Procedure date ("lpr_abla_date_bone")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_bone", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_bone", "lpr_abla_date_bone", 0, ">"],
 		vars:["lpr_abla_set_bone", "lpr_surg_date_bone", "lpr_abla_date_bone"]
 	}
@@ -4516,9 +4452,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_112',
 		desc:'Bone - Local ablative techniques - Setting Definitive ("lpr_abla_set_bone")=4 - Bone - Local ablative techniques - Procedure date ("lpr_abla_date_bone") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_bone", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_bone", "lpr_date", 0, ">"],
 		vars:["lpr_abla_set_bone", "lpr_abla_date_bone", "lpr_date"]
 	}
@@ -4528,7 +4464,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft - Local ablative techniques - Procedure date ("lpr_abla_date_soft") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_soft", "lpr_date", 0, ">"],
 		vars:["lpr_abla_date_soft", "lpr_date"]
 	}
@@ -4536,9 +4472,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_114',
 		desc:'Soft - Local ablative techniques Setting Preoperative ("lpr_abla_set_soft")=1 - Soft - Date of surgery ("lpr_surg_date_soft") must be subsequent to Soft - Local ablative techniques - Procedure date ("lpr_abla_date_soft")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_soft", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_soft", "lpr_abla_date_soft", 0, ">"],
 		vars:["lpr_abla_set_soft", "lpr_surg_date_soft", "lpr_abla_date_soft"]
 	}
@@ -4546,9 +4482,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_115',
 		desc:'Soft - Local ablative techniques - Setting Definitive ("lpr_abla_set_soft")=4 - Soft - Local ablative techniques - Procedure date ("lpr_abla_date_soft") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_soft", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_soft", "lpr_date", 0, ">"],
 		vars:["lpr_abla_set_soft", "lpr_abla_date_soft", "lpr_date"]
 	}
@@ -4558,7 +4494,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lymph - Local ablative techniques - Procedure date ("lpr_abla_date_lymph") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_lymph", "lpr_date", 0, ">"],
 		vars:["lpr_abla_date_lymph", "lpr_date"]
 	}
@@ -4566,9 +4502,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_117',
 		desc:'Lymph - Local ablative techniques Setting Preoperative ("lpr_abla_set_lymph")=1 - Lymph - Date of surgery ("lpr_surg_date_lymph") must be subsequent to Lymph - Local ablative techniques - Procedure date ("lpr_abla_date_lymph")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_lymph", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_lymph", "lpr_abla_date_lymph", 0, ">"],
 		vars:["lpr_abla_set_lymph", "lpr_surg_date_lymph", "lpr_abla_date_lymph"]
 	}
@@ -4576,9 +4512,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_118',
 		desc:'Lymph - Local ablative techniques - Setting Definitive ("lpr_abla_set_lymph")=4 - Lymph - Local ablative techniques - Procedure date ("lpr_abla_date_lymph") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_lymph", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_lymph", "lpr_date", 0, ">"],
 		vars:["lpr_abla_set_lymph", "lpr_abla_date_lymph", "lpr_date"]
 	}
@@ -4588,7 +4524,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Serosal - Local ablative techniques - Procedure date ("lpr_abla_date_serosal") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_serosal", "lpr_date", 0, ">"],
 		vars:["lpr_abla_date_serosal", "lpr_date"]
 	}
@@ -4596,9 +4532,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_120',
 		desc:'Serosal - Local ablative techniques Setting Preoperative ("lpr_abla_set_serosal")=1 - Serosal - Date of surgery ("lpr_surg_date_serosal") must be subsequent to Serosal - Local ablative techniques - Procedure date ("lpr_abla_date_serosal")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_serosal", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_serosal", "lpr_abla_date_serosal", 0, ">"],
 		vars:["lpr_abla_set_serosal", "lpr_surg_date_serosal", "lpr_abla_date_serosal"]
 	}
@@ -4606,9 +4542,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_121',
 		desc:'Serosal - Local ablative techniques - Setting Definitive ("lpr_abla_set_serosal")=4 - Serosal - Local ablative techniques - Procedure date ("lpr_abla_date_serosal") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_serosal", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_serosal", "lpr_date", 0, ">"],
 		vars:["lpr_abla_set_serosal", "lpr_abla_date_serosal", "lpr_date"]
 	}
@@ -4618,7 +4554,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Other - Local ablative techniques - Procedure date ("lpr_abla_date_oth") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_oth", "lpr_date", 0, ">"],
 		vars:["lpr_abla_date_oth", "lpr_date"]
 	}
@@ -4626,9 +4562,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_123',
 		desc:'Other - Local ablative techniques Setting Preoperative ("lpr_abla_set_oth")=1 - Other - Date of surgery ("lpr_surg_date_oth") must be subsequent to Other - Local ablative techniques - Procedure date ("lpr_abla_date_oth")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_oth", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_oth", "lpr_abla_date_oth", 0, ">"],
 		vars:["lpr_abla_set_oth", "lpr_surg_date_oth", "lpr_abla_date_oth"]
 	}
@@ -4636,9 +4572,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_6_124',
 		desc:'Other - Local ablative techniques - Setting Definitive ("lpr_abla_set_oth")=4 - Other - Local ablative techniques - Procedure date ("lpr_abla_date_oth") must be subsequent to Date of progression ("lpr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["lpr_abla_set_oth", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_abla_date_oth", "lpr_date", 0, ">"],
 		vars:["lpr_abla_set_oth", "lpr_abla_date_oth", "lpr_date"]
 	}
@@ -4648,7 +4584,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lung - Date of surgery ("lpr_surg_date_lung") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_lung", "lpr_date", 0, ">"],
 		vars:["lpr_surg_date_lung", "lpr_date"]
 	}
@@ -4658,7 +4594,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Liver - Date of surgery ("lpr_surg_date_liver") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_liver", "lpr_date", 0, ">"],
 		vars:["lpr_surg_date_liver", "lpr_date"]
 	}
@@ -4668,7 +4604,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Bone - Date of surgery ("lpr_surg_date_bone") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_bone", "lpr_date", 0, ">"],
 		vars:["lpr_surg_date_bone", "lpr_date"]
 	}
@@ -4678,7 +4614,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues - Date of surgery ("lpr_surg_date_soft") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_soft", "lpr_date", 0, ">"],
 		vars:["lpr_surg_date_soft", "lpr_date"]
 	}
@@ -4688,7 +4624,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lymph nodes - Date of surgery ("lpr_surg_date_lymph") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_lymph", "lpr_date", 0, ">"],
 		vars:["lpr_surg_date_lymph", "lpr_date"]
 	}
@@ -4698,7 +4634,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Serosal - Date of surgery ("lpr_surg_date_serosal") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_serosal", "lpr_date", 0, ">"],
 		vars:["lpr_surg_date_serosal", "lpr_date"]
 	}
@@ -4708,7 +4644,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Other - Date of surgery ("lpr_surg_date_oth") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_surg_date_oth", "lpr_date", 0, ">"],
 		vars:["lpr_surg_date_oth", "lpr_date"]
 	}
@@ -4718,7 +4654,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lung - Size of pathological specimen ("lpr_surg_specsize_lung") must be between 1 and 300',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_surg_specsize_lung", 1, 300],
 		vars:["lpr_surg_specsize_lung"]
 	}
@@ -4728,7 +4664,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Liver - Size of pathological specimen ("lpr_surg_specsize_liver") must be between 1 and 300',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_surg_specsize_liver", 1, 300],
 		vars:["lpr_surg_specsize_liver"]
 	}
@@ -4738,7 +4674,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Bone - Size of pathological specimen ("lpr_surg_specsize_bone") must be between 1 and 300',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_surg_specsize_bone", 1, 300],
 		vars:["lpr_surg_specsize_bone"]
 	}
@@ -4748,7 +4684,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues - Size of pathological specimen ("lpr_surg_specsize_soft") must be between 1 and 300',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_surg_specsize_soft", 1, 300],
 		vars:["lpr_surg_specsize_soft"]
 	}
@@ -4758,7 +4694,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lymph nodes - Size of pathological specimen ("lpr_surg_specsize_lymph") must be between 1 and 300',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_surg_specsize_lymph", 1, 300],
 		vars:["lpr_surg_specsize_lymph"]
 	}
@@ -4768,7 +4704,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Serosal - Size of pathological specimen ("lpr_surg_specsize_serosal") must be between 1 and 300',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_surg_specsize_serosal", 1, 300],
 		vars:["lpr_surg_specsize_serosal"]
 	}
@@ -4778,7 +4714,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Liver - Size of pathological specimen ("lpr_surg_specsize_oth") must be between 1 and 300',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_surg_specsize_oth", 1, 300],
 		vars:["lpr_surg_specsize_oth"]
 	}
@@ -4788,7 +4724,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of local progressive site pathological diagnosis ("lpr_pathol_date") must be subsequent to Date of progression ("lpr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["lpr_pathol_date", "lpr_date", 0, ">"],
 		vars:["lpr_pathol_date", "lpr_date"]
 	}
@@ -4798,7 +4734,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Mitotic index value ("lpr_pathol_prog_mito") must be between 1 and 99',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["lpr_pathol_prog_mito", 1, 99],
 		vars:["lpr_pathol_prog_mito"]
 	}
@@ -4808,7 +4744,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of death ("lpr_dod") must be subsequent to Date of registration ("bl_dor")',
 		prec:null,
 		precParams:null,
-		func:uniqueDateCompareToFixedDateRepInstr,
+		func:uniqueDateCompareToFixedDateRepInstrREV,
 		params:["lpr_dod", "bl_dor", 0, ">=", 1],
 		vars:["lpr_dod", "bl_dor"]
 	}
@@ -4818,7 +4754,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of follow-up ("sfu_date") must be subsequent to Date of diagnosis ("bl_1st_pathol_ddiag")',
 		prec:null,
 		precParams:null,
-		func:dateCompareToFixedDateRepInstr,
+		func:dateCompareToFixedDateRepInstrREV,
 		params:["sfu_date", "bl_1st_pathol_ddiag", 0, ">", 1],
 		vars:["sfu_date", "bl_1st_pathol_ddiag"]
 	}
@@ -4828,7 +4764,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of follow-up ("sfu_date") must be subsequent to Previous Date of follow-up ("sfu_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithPreviousSelfRepInstr,
+		func:dateCompareWithPreviousSelfRepInstrREV,
 		params:["sfu_date", 0, ">"],
 		vars:["sfu_date"]
 	}
@@ -4838,7 +4774,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Weight at last visit ("sfu_weight") must be between 20 and 250',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["sfu_weight", 20, 250],
 		vars:["sfu_weight"]
 	}
@@ -4848,7 +4784,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Tumour-related weight loss % at the time of follow-up ("sfu_symptoms_tum_rel_weight_loss") must be between 1 and 100',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["sfu_symptoms_tum_rel_weight_loss", 1, 100],
 		vars:["sfu_symptoms_tum_rel_weight_loss"]
 	}
@@ -4858,7 +4794,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Hemoglobin value ("sfu_hemo") must be between 1 and 25',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["sfu_hemo", 1, 25],
 		vars:["sfu_hemo"]
 	}
@@ -4868,7 +4804,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Fibrinogen value ("sfu_fibrin") must be between 1 and 2000',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["sfu_fibrin", 1, 2000],
 		vars:["sfu_fibrin"]
 	}
@@ -4878,7 +4814,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'GDF-15 value ("sfu_gdf15") must be between 100 and 25000',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["sfu_gdf15", 100, 25000],
 		vars:["sfu_gdf15"]
 	}
@@ -4888,7 +4824,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Gender female - Menopausal date ("sfu_menopausal_date") must be subsequent to date of birth ("bl_dob")',
 		prec:varHasValue,
 		precParams:["bl_gender", 2],
-		func:uniqueDateCompareToFixedDateRepInstr,
+		func:uniqueDateCompareToFixedDateRepInstrREV,
 		params:["sfu_menopausal_date", "bl_dob", 0, ">=", 1],
 		vars:["bl_gender", "sfu_menopausal_date", "bl_dob"]
 	}
@@ -4899,7 +4835,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Surveillance ongoing ("sfu_surveil_yn")=1 in current instance - Surveillance ongoing ("sfu_surveil_yn")=1 in previous instance',
 		prec:null,
 		precParams:null,
-		func:varHasValueWithPreviousSelfRepInstr,
+		func:varHasValueWithPreviousSelfRepInstrREV,
 		params:["sfu_surveil_yn", 1],
 		vars:["sfu_surveil_yn"]
 	}
@@ -4909,7 +4845,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systemic therapy ongoing ("sfu_syst_ther_yn")=1  in current instance - Systemic therapy ongoing ("sfu_syst_ther_yn")=1 in previous instance',
 		prec:null,
 		precParams:null,
-		func:varHasValueWithPreviousSelfRepInstr,
+		func:varHasValueWithPreviousSelfRepInstrREV,
 		params:["sfu_syst_ther_yn", 1],
 		vars:["sfu_syst_ther_yn"]
 	}
@@ -4919,7 +4855,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of death ("sfu_dod") must be subsequent to Date of registration ("bl_dor")',
 		prec:null,
 		precParams:null,
-		func:uniqueDateCompareToFixedDateRepInstr,
+		func:uniqueDateCompareToFixedDateRepInstrREV,
 		params:["sfu_dod", "bl_dor", 0, ">=", 1],
 		vars:["sfu_dod", "bl_dor"]
 	}
@@ -4929,7 +4865,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of progression ("spr_date") must be subsequent to Previous Date of follow-up ("sfu_date")',
 		prec:null,
 		precParams:null,
-		func:multiDateCompareFirstVsLastInstRepInstr,
+		func:multiDateCompareFirstVsLastInstRepInstrREV,
 		params:["spr_date", "sfu_date"],
 		vars:["spr_date", "sfu_date"]
 	}
@@ -4939,7 +4875,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of progression ("spr_date") must be subsequent to Previous Date of Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithPreviousSelfRepInstr,
+		func:dateCompareWithPreviousSelfRepInstrREV,
 		params:["spr_date", 0, ">"],
 		vars:["spr_date"]
 	}
@@ -4949,7 +4885,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Weight at progression ("spr_weight") must be between 20 and 250',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_weight", 20, 250],
 		vars:["spr_weight"]
 	}
@@ -4959,7 +4895,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Tumour-related weight loss % at the time of progression ("spr_symptoms_tum_rel_weight_loss") must be between 1 and 100',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_symptoms_tum_rel_weight_loss", 1, 100],
 		vars:["spr_symptoms_tum_rel_weight_loss"]
 	}
@@ -4969,7 +4905,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Hemoglobin value ("spr_hemo") must be between 1 and 25',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_hemo", 1, 25],
 		vars:["spr_hemo"]
 	}
@@ -4979,7 +4915,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Fibrinogen value ("spr_fibrin") must be between 1 and 2000',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_fibrin", 1, 2000],
 		vars:["spr_fibrin"]
 	}
@@ -4989,7 +4925,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'GDF-15 value ("spr_gdf15") must be between 100 and 25000',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_gdf15", 100, 25000],
 		vars:["spr_gdf15"]
 	}
@@ -4999,7 +4935,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Gender female - Menopausal date ("spr_menopausal_date") must be subsequent to date of birth ("bl_dob")',
 		prec:varHasValue,
 		precParams:["bl_gender", 2],
-		func:uniqueDateCompareToFixedDateRepInstr,
+		func:uniqueDateCompareToFixedDateRepInstrREV,
 		params:["spr_menopausal_date", "bl_dob", 0, ">=", 1],
 		vars:["bl_gender", "spr_menopausal_date", "bl_dob"]
 	}
@@ -5009,7 +4945,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lung - Multiple lesions: number of lesions ("spr_dis_ext_lung_les_spec") must be between 1 and 100',
 		prec:varHasValue,
 		precParams:["spr_dis_ext_lung_les", 2],
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_dis_ext_lung_les_spec", 1, 100],
 		vars:["spr_dis_ext_lung_les", "spr_dis_ext_lung_les_spec"]
 	}
@@ -5019,7 +4955,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Liver - Multiple lesions: number of lesions ("spr_dis_ext_liv_les_spec") must be between 1 and 100',
 		prec:varHasValue,
 		precParams:["spr_dis_ext_liv_les", 2],
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_dis_ext_liv_les_spec", 1, 100],
 		vars:["spr_dis_ext_liv_les", "spr_dis_ext_liv_les_spec"]
 	}
@@ -5029,7 +4965,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Bone - Multiple lesions: number of lesions ("spr_dis_ext_bone_les_spec") must be between 1 and 100',
 		prec:varHasValue,
 		precParams:["spr_dis_ext_bone_les", 2],
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_dis_ext_bone_les_spec", 1, 100],
 		vars:["spr_dis_ext_bone_les", "spr_dis_ext_bone_les_spec"]
 	}
@@ -5039,7 +4975,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues (Limb) - Multiple lesions: number of lesions ("spr_dis_ext_soft_les_limb_spec") must be between 1 and 100',
 		prec:varHasValue,
 		precParams:["spr_dis_ext_soft_les_limb", 2],
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_dis_ext_soft_les_limb_spec", 1, 100],
 		vars:["spr_dis_ext_soft_les_limb", "spr_dis_ext_soft_les_limb_spec"]
 	}
@@ -5049,7 +4985,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues (Superficial trunk) - Multiple lesions: number of lesions ("spr_dis_ext_soft_les_trunk_spec") must be between 1 and 100',
 		prec:varHasValue,
 		precParams:["spr_dis_ext_soft_les_trunk", 2],
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_dis_ext_soft_les_trunk_spec", 1, 100],
 		vars:["spr_dis_ext_soft_les_trunk", "spr_dis_ext_soft_les_trunk_spec"]
 	}
@@ -5059,7 +4995,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues (Intra-abdominal) - Multiple lesions: number of lesions ("spr_dis_ext_soft_les_abdo_spec") must be between 1 and 100',
 		prec:varHasValue,
 		precParams:["spr_dis_ext_soft_les_abdo", 2],
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_dis_ext_soft_les_abdo_spec", 1, 100],
 		vars:["spr_dis_ext_soft_les_abdo", "spr_dis_ext_soft_les_abdo_spec"]
 	}
@@ -5069,7 +5005,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues (Intrathoracic) - Multiple lesions: number of lesions ("spr_dis_ext_soft_les_thor_spec") must be between 1 and 100',
 		prec:varHasValue,
 		precParams:["spr_dis_ext_soft_les_thor", 2],
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_dis_ext_soft_les_thor_spec", 1, 100],
 		vars:["spr_dis_ext_soft_les_thor", "spr_dis_ext_soft_les_thor_spec"]
 	}
@@ -5079,7 +5015,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues (Head & neck) - Multiple lesions: number of lesions ("spr_dis_ext_soft_les_hn_spec") must be between 1 and 100',
 		prec:varHasValue,
 		precParams:["spr_dis_ext_soft_les_hn", 2],
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_dis_ext_soft_les_hn_spec", 1, 100],
 		vars:["spr_dis_ext_soft_les_hn", "spr_dis_ext_soft_les_hn_spec"]
 	}
@@ -5090,7 +5026,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Surveillance at last follow-up ("spr_surveil_yn")=1 - Surveillance ongoing ("sfu_surveil_yn")=1',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueFirstVsLastInstRepInstr,
+		func:multiVarHasValueFirstVsLastInstRepInstrREV,
 		params:[["spr_surveil_yn", 1], ["sfu_surveil_yn", 1]],
 		vars:["spr_surveil_yn", "sfu_surveil_yn"]
 	}
@@ -5100,7 +5036,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Surveillance at last follow-up ("spr_surveil_yn")=0 - Surveillance ongoing ("sfu_surveil_yn")=0',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueFirstVsLastInstRepInstr,
+		func:multiVarHasValueFirstVsLastInstRepInstrREV,
 		params:[["spr_surveil_yn", 0], ["sfu_surveil_yn", 0]],
 		vars:["spr_surveil_yn", "sfu_surveil_yn"]
 	}
@@ -5110,7 +5046,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Surveillance continue ("spr_surveil_continue_yn")=1 - New medical therapy ("spr_sys_ther_new_yn")=0 - Systemic therapy ("spr_sys_ther_start_yn")=0 - Radiotherapy ("spr_radio_yn")=0 - Surgery ("spr_surg_yn")=0 - Isolated limb perfusion ("spr_limbperf_yn")=0 - Local ablative techniques ("spr_abla_yn")=0',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["spr_surveil_continue_yn", 1], ["spr_sys_ther_new_yn", 0], ["spr_sys_ther_start_yn", 0], ["spr_radio_yn", 0], ["spr_surg_yn", 0], ["spr_limbperf_yn", 0], ["spr_abla_yn", 0]],
 		vars:["spr_surveil_continue_yn", "spr_sys_ther_new_yn", "spr_sys_ther_start_yn", "spr_radio_yn", "spr_surg_yn", "spr_limbperf_yn", "spr_abla_yn"]
 	}
@@ -5120,7 +5056,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systhemic therapy at last follow-up ("spr_sys_ther_yn")=1 - Systemic therapy ongoing ("sfu_syst_ther_yn")=1',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueFirstVsLastInstRepInstr,
+		func:multiVarHasValueFirstVsLastInstRepInstrREV,
 		params:[["spr_sys_ther_yn", 1], ["sfu_syst_ther_yn", 1]],
 		vars:["spr_sys_ther_yn", "sfu_syst_ther_yn"]
 	}
@@ -5130,7 +5066,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systhemic therapy at last follow-up ("spr_sys_ther_yn")=0 - Systemic therapy ongoing ("sfu_syst_ther_yn")=0',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueFirstVsLastInstRepInstr,
+		func:multiVarHasValueFirstVsLastInstRepInstrREV,
 		params:[["spr_sys_ther_yn", 0], ["sfu_syst_ther_yn", 0]],
 		vars:["spr_sys_ther_yn", "sfu_syst_ther_yn"]
 	}
@@ -5140,7 +5076,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systhemic therapy continue ("spr_sys_ther_continue_yn")=1 - Surveillance continue ("spr_surveil_continue_yn")=0',
 		prec:null,
 		precParams:null,
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["spr_sys_ther_continue_yn", 1], ["spr_surveil_continue_yn", 0]],
 		vars:["spr_sys_ther_continue_yn", "spr_surveil_continue_yn"]
 	}
@@ -5150,7 +5086,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Starting date ("spr_sys_ther_new_pre_start") must be subsequent to Date of local recurrence ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_pre_start", "spr_date", 0, ">="],
 		vars:["spr_sys_ther_new_pre_start", "spr_date"]
 	}
@@ -5160,7 +5096,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Starting date ("spr_sys_ther_new_post_start") must be subsequent to Date of local recurrence ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_start", "spr_date", 0, ">="],
 		vars:["spr_sys_ther_new_post_start", "spr_date"]
 	}
@@ -5170,7 +5106,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Starting date ("spr_sys_ther_new_pal_start") must be subsequent to Date of local recurrence ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_pal_start", "spr_date", 0, ">="],
 		vars:["spr_sys_ther_new_pal_start", "spr_date"]
 	}
@@ -5180,7 +5116,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Ending date ("spr_sys_ther_new_pre_end") must be subsequent to New medical therapy - Starting date ("spr_sys_ther_new_pre_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_pre_end", "spr_sys_ther_new_pre_start", 0, ">="],
 		vars:["spr_sys_ther_new_pre_end", "spr_sys_ther_new_pre_start"]
 	}
@@ -5190,7 +5126,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Ending date ("spr_sys_ther_new_post_end") must be subsequent to New medical therapy - Starting date ("spr_sys_ther_new_post_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_end", "spr_sys_ther_new_post_start", 0, ">="],
 		vars:["spr_sys_ther_new_post_end", "spr_sys_ther_new_post_start"]
 	}
@@ -5200,7 +5136,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'New medical therapy - Ending date ("spr_sys_ther_new_pal_end") must be subsequent to New medical therapy - Starting date ("spr_sys_ther_new_pal_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_pal_end", "spr_sys_ther_new_pal_start", 0, ">="],
 		vars:["spr_sys_ther_new_pal_end", "spr_sys_ther_new_pal_start"]
 	}
@@ -5208,9 +5144,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_26',
 		desc:'New medical therapy Setting Preoperative ("spr_sys_ther_new_set")=1 - Date of surgery ("spr_surg_date_lung") must be subsequent to New medical therapy - Ending date ("spr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_lung", "spr_sys_ther_new_pre_end", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_lung", "spr_sys_ther_new_pre_end"]
 	}
@@ -5218,9 +5154,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_26b',
 		desc:'New medical therapy Setting Preoperative ("spr_sys_ther_new_set")=1 - Date of surgery ("spr_surg_date_liver") must be subsequent to New medical therapy - Ending date ("spr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_liver", "spr_sys_ther_new_pre_end", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_liver", "spr_sys_ther_new_pre_end"]
 	}
@@ -5228,9 +5164,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_26c',
 		desc:'New medical therapy Setting Preoperative ("spr_sys_ther_new_set")=1 - Date of surgery ("spr_surg_date_bone") must be subsequent to New medical therapy - Ending date ("spr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_bone", "spr_sys_ther_new_pre_end", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_bone", "spr_sys_ther_new_pre_end"]
 	}
@@ -5238,9 +5174,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_26d',
 		desc:'New medical therapy Setting Preoperative ("spr_sys_ther_new_set")=1 - Date of surgery ("spr_surg_date_soft") must be subsequent to New medical therapy - Ending date ("spr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_soft", "spr_sys_ther_new_pre_end", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_soft", "spr_sys_ther_new_pre_end"]
 	}
@@ -5248,9 +5184,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_26e',
 		desc:'New medical therapy Setting Preoperative ("spr_sys_ther_new_set")=1 - Date of surgery ("spr_surg_date_lymph") must be subsequent to New medical therapy - Ending date ("spr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_lymph", "spr_sys_ther_new_pre_end", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_lymph", "spr_sys_ther_new_pre_end"]
 	}
@@ -5258,9 +5194,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_26f',
 		desc:'New medical therapy Setting Preoperative ("spr_sys_ther_new_set")=1 - Date of surgery ("spr_surg_date_serosal") must be subsequent to New medical therapy - Ending date ("spr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_serosal", "spr_sys_ther_new_pre_end", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_serosal", "spr_sys_ther_new_pre_end"]
 	}
@@ -5268,9 +5204,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_26g',
 		desc:'New medical therapy Setting Preoperative ("spr_sys_ther_new_set")=1 - Date of surgery ("spr_surg_date_oth") must be subsequent to New medical therapy - Ending date ("spr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_oth", "spr_sys_ther_new_pre_end", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_oth", "spr_sys_ther_new_pre_end"]
 	}
@@ -5278,9 +5214,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_27',
 		desc:'New medical therapy Setting Postoperative ("spr_sys_ther_new_set")=2 - New medical therapy - Starting date ("spr_sys_ther_new_post_start") must be subsequent to Date of surgery ("spr_surg_date_lung")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_start", "spr_surg_date_lung", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_start", "spr_surg_date_lung"]
 	}
@@ -5288,9 +5224,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_27b',
 		desc:'New medical therapy Setting Postoperative ("spr_sys_ther_new_set")=2 - New medical therapy - Starting date ("spr_sys_ther_new_post_start") must be subsequent to Date of surgery ("spr_surg_date_liver")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_start", "spr_surg_date_liver", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_start", "spr_surg_date_liver"]
 	}
@@ -5298,9 +5234,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_27c',
 		desc:'New medical therapy Setting Postoperative ("spr_sys_ther_new_set")=2 - New medical therapy - Starting date ("spr_sys_ther_new_post_start") must be subsequent to Date of surgery ("spr_surg_date_bone")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_start", "spr_surg_date_bone", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_start", "spr_surg_date_bone"]
 	}
@@ -5308,9 +5244,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_27d',
 		desc:'New medical therapy Setting Postoperative ("spr_sys_ther_new_set")=2 - New medical therapy - Starting date ("spr_sys_ther_new_post_start") must be subsequent to Date of surgery ("spr_surg_date_soft")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_start", "spr_surg_date_soft", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_start", "spr_surg_date_soft"]
 	}
@@ -5318,9 +5254,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_27e',
 		desc:'New medical therapy Setting Postoperative ("spr_sys_ther_new_set")=2 - New medical therapy - Starting date ("spr_sys_ther_new_post_start") must be subsequent to Date of surgery ("spr_surg_date_lymph")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_start", "spr_surg_date_lymph", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_start", "spr_surg_date_lymph"]
 	}
@@ -5328,9 +5264,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_27f',
 		desc:'New medical therapy Setting Postoperative ("spr_sys_ther_new_set")=2 - New medical therapy - Starting date ("spr_sys_ther_new_post_start") must be subsequent to Date of surgery ("spr_surg_date_serosal")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_start", "spr_surg_date_serosal", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_start", "spr_surg_date_serosal"]
 	}
@@ -5338,9 +5274,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_27g',
 		desc:'New medical therapy Setting Postoperative ("spr_sys_ther_new_set")=2 - New medical therapy - Starting date ("spr_sys_ther_new_post_start") must be subsequent to Date of surgery ("spr_surg_date_oth")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_start", "spr_surg_date_oth", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_start", "spr_surg_date_oth"]
 	}
@@ -5348,9 +5284,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_28',
 		desc:'New medical therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - Date of surgery ("spr_surg_date_lung") must be subsequent to New medical therapy - Preoperative - Starting date ("spr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_lung", "spr_sys_ther_new_pre_start", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_lung", "spr_sys_ther_new_pre_start"]
 	}
@@ -5358,9 +5294,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_28b',
 		desc:'New medical therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - Date of surgery ("spr_surg_date_liver") must be subsequent to New medical therapy - Preoperative - Starting date ("spr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_liver", "spr_sys_ther_new_pre_start", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_liver", "spr_sys_ther_new_pre_start"]
 	}
@@ -5368,9 +5304,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_28c',
 		desc:'New medical therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - Date of surgery ("spr_surg_date_bone") must be subsequent to New medical therapy - Preoperative - Starting date ("spr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_bone", "spr_sys_ther_new_pre_start", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_bone", "spr_sys_ther_new_pre_start"]
 	}
@@ -5378,9 +5314,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_28d',
 		desc:'New medical therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - Date of surgery ("spr_surg_date_soft") must be subsequent to New medical therapy - Preoperative - Starting date ("spr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_soft", "spr_sys_ther_new_pre_start", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_soft", "spr_sys_ther_new_pre_start"]
 	}
@@ -5388,9 +5324,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_28e',
 		desc:'New medical therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - Date of surgery ("spr_surg_date_lymph") must be subsequent to New medical therapy - Preoperative - Starting date ("spr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_lymph", "spr_sys_ther_new_pre_start", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_lymph", "spr_sys_ther_new_pre_start"]
 	}
@@ -5398,9 +5334,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_28f',
 		desc:'New medical therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - Date of surgery ("spr_surg_date_serosal") must be subsequent to New medical therapy - Preoperative - Starting date ("spr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_serosal", "spr_sys_ther_new_pre_start", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_serosal", "spr_sys_ther_new_pre_start"]
 	}
@@ -5408,9 +5344,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_28g',
 		desc:'New medical therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - Date of surgery ("spr_surg_date_oth") must be subsequent to New medical therapy - Preoperative - Starting date ("spr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_oth", "spr_sys_ther_new_pre_start", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_oth", "spr_sys_ther_new_pre_start"]
 	}
@@ -5418,9 +5354,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_29',
 		desc:'New medical therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - New medical therapy - Ending date ("spr_sys_ther_new_post_end") must be subsequent to Date of surgery ("spr_surg_date_lung")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_end", "spr_surg_date_lung", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_end", "spr_surg_date_lung"]
 	}
@@ -5428,9 +5364,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_29b',
 		desc:'New medical therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - New medical therapy - Ending date ("spr_sys_ther_new_post_end") must be subsequent to Date of surgery ("spr_surg_date_liver")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_end", "spr_surg_date_liver", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_end", "spr_surg_date_liver"]
 	}
@@ -5438,9 +5374,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_29c',
 		desc:'New medical therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - New medical therapy - Ending date ("spr_sys_ther_new_post_end") must be subsequent to Date of surgery ("spr_surg_date_bone")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_end", "spr_surg_date_bone", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_end", "spr_surg_date_bone"]
 	}
@@ -5448,9 +5384,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_29d',
 		desc:'New medical therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - New medical therapy - Ending date ("spr_sys_ther_new_post_end") must be subsequent to Date of surgery ("spr_surg_date_soft")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_end", "spr_surg_date_soft", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_end", "spr_surg_date_soft"]
 	}
@@ -5458,9 +5394,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_29e',
 		desc:'New medical therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - New medical therapy - Ending date ("spr_sys_ther_new_post_end") must be subsequent to Date of surgery ("spr_surg_date_lymph")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_end", "spr_surg_date_lymph", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_end", "spr_surg_date_lymph"]
 	}
@@ -5468,9 +5404,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_29f',
 		desc:'New medical therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - New medical therapy - Ending date ("spr_sys_ther_new_post_end") must be subsequent to Date of surgery ("spr_surg_date_serosal")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_end", "spr_surg_date_serosal", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_end", "spr_surg_date_serosal"]
 	}
@@ -5478,9 +5414,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_29g',
 		desc:'New medical therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - New medical therapy - Ending date ("spr_sys_ther_new_post_end") must be subsequent to Date of surgery ("spr_surg_date_oth")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_end", "spr_surg_date_oth", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_end", "spr_surg_date_oth"]
 	}
@@ -5488,9 +5424,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_30',
 		desc:'New medical therapy Setting Palliative ("spr_sys_ther_new_set")=4 - New medical therapy - Starting date ("spr_sys_ther_new_pal_start") must be subsequent to Date of progression ("spr_date") ',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_pal_start", "spr_date", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_pal_start", "spr_date"]
 	}
@@ -5498,9 +5434,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_31',
 		desc:'New medical therapy Setting Palliative ("spr_sys_ther_new_set")=4 - New medical therapy - Ending date ("spr_sys_ther_new_pal_end") must be subsequent to New medical therapy - Starting date ("spr_sys_ther_new_pal_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_pal_end", "spr_sys_ther_new_pal_start", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_pal_end", "spr_sys_ther_new_pal_start"]
 	}
@@ -5510,7 +5446,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systemic therapy - Starting date ("spr_sys_ther_new_pre_start") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_pre_start", "spr_date", 0, ">"],
 		vars:["spr_sys_ther_new_pre_start", "spr_date"]
 	}
@@ -5520,7 +5456,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Systemic therapy - Ending date ("spr_sys_ther_new_pre_end") must be subsequent to Systemic therapy - Starting date ("spr_sys_ther_new_pre_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_pre_end", "spr_sys_ther_new_pre_start", 0, ">"],
 		vars:["spr_sys_ther_new_pre_end", "spr_sys_ther_new_pre_start"]
 	}
@@ -5528,9 +5464,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_34',
 		desc:'Systemic therapy Setting Preoperative ("spr_sys_ther_new_set")=1 - Date of surgery ("spr_surg_date_lung") must be subsequent to Systemic therapy -  Ending date ("spr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_lung", "spr_sys_ther_new_pre_end", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_lung", "spr_sys_ther_new_pre_end"]
 	}
@@ -5538,9 +5474,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_34b',
 		desc:'Systemic therapy Setting Preoperative ("spr_sys_ther_new_set")=1 - Date of surgery ("spr_surg_date_liver") must be subsequent to Systemic therapy -  Ending date ("spr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_liver", "spr_sys_ther_new_pre_end", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_liver", "spr_sys_ther_new_pre_end"]
 	}
@@ -5548,9 +5484,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_34c',
 		desc:'Systemic therapy Setting Preoperative ("spr_sys_ther_new_set")=1 - Date of surgery ("spr_surg_date_bone") must be subsequent to Systemic therapy -  Ending date ("spr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_bone", "spr_sys_ther_new_pre_end", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_bone", "spr_sys_ther_new_pre_end"]
 	}
@@ -5558,9 +5494,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_34d',
 		desc:'Systemic therapy Setting Preoperative ("spr_sys_ther_new_set")=1 - Date of surgery ("spr_surg_date_soft") must be subsequent to Systemic therapy -  Ending date ("spr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_soft", "spr_sys_ther_new_pre_end", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_soft", "spr_sys_ther_new_pre_end"]
 	}
@@ -5568,9 +5504,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_34e',
 		desc:'Systemic therapy Setting Preoperative ("spr_sys_ther_new_set")=1 - Date of surgery ("spr_surg_date_lymph") must be subsequent to Systemic therapy -  Ending date ("spr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_lymph", "spr_sys_ther_new_pre_end", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_lymph", "spr_sys_ther_new_pre_end"]
 	}
@@ -5578,9 +5514,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_34f',
 		desc:'Systemic therapy Setting Preoperative ("spr_sys_ther_new_set")=1 - Date of surgery ("spr_surg_date_serosal") must be subsequent to Systemic therapy -  Ending date ("spr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_serosal", "spr_sys_ther_new_pre_end", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_serosal", "spr_sys_ther_new_pre_end"]
 	}
@@ -5588,9 +5524,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_34g',
 		desc:'Systemic therapy Setting Preoperative ("spr_sys_ther_new_set")=1 - Date of surgery ("spr_surg_date_oth") must be subsequent to Systemic therapy -  Ending date ("spr_sys_ther_new_pre_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_oth", "spr_sys_ther_new_pre_end", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_oth", "spr_sys_ther_new_pre_end"]
 	}
@@ -5598,9 +5534,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_35',
 		desc:'Systemic therapy Setting Postoperative ("spr_sys_ther_new_set")=2 - Systemic therapy - Starting date ("spr_sys_ther_new_post_start") must be subsequent to Date of surgery ("spr_surg_date_lung")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_start", "spr_surg_date_lung", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_start", "spr_surg_date_lung"]
 	}
@@ -5608,9 +5544,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_35b',
 		desc:'Systemic therapy Setting Postoperative ("spr_sys_ther_new_set")=2 - Systemic therapy - Starting date ("spr_sys_ther_new_post_start") must be subsequent to Date of surgery ("spr_surg_date_liver")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_start", "spr_surg_date_liver", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_start", "spr_surg_date_liver"]
 	}
@@ -5618,9 +5554,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_35c',
 		desc:'Systemic therapy Setting Postoperative ("spr_sys_ther_new_set")=2 - Systemic therapy - Starting date ("spr_sys_ther_new_post_start") must be subsequent to Date of surgery ("spr_surg_date_bone")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_start", "spr_surg_date_bone", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_start", "spr_surg_date_bone"]
 	}
@@ -5628,9 +5564,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_35d',
 		desc:'Systemic therapy Setting Postoperative ("spr_sys_ther_new_set")=2 - Systemic therapy - Starting date ("spr_sys_ther_new_post_start") must be subsequent to Date of surgery ("spr_surg_date_soft")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_start", "spr_surg_date_soft", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_start", "spr_surg_date_soft"]
 	}
@@ -5638,9 +5574,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_35e',
 		desc:'Systemic therapy Setting Postoperative ("spr_sys_ther_new_set")=2 - Systemic therapy - Starting date ("spr_sys_ther_new_post_start") must be subsequent to Date of surgery ("spr_surg_date_lymph")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_start", "spr_surg_date_lymph", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_start", "spr_surg_date_lymph"]
 	}
@@ -5648,9 +5584,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_35f',
 		desc:'Systemic therapy Setting Postoperative ("spr_sys_ther_new_set")=2 - Systemic therapy - Starting date ("spr_sys_ther_new_post_start") must be subsequent to Date of surgery ("spr_surg_date_serosal")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_start", "spr_surg_date_serosal", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_start", "spr_surg_date_serosal"]
 	}
@@ -5658,9 +5594,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_35g',
 		desc:'Systemic therapy Setting Postoperative ("spr_sys_ther_new_set")=2 - Systemic therapy - Starting date ("spr_sys_ther_new_post_start") must be subsequent to Date of surgery ("spr_surg_date_oth")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_start", "spr_surg_date_oth", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_start", "spr_surg_date_oth"]
 	}
@@ -5668,9 +5604,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_36',
 		desc:'Systemic therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - Date of surgery ("spr_surg_date_lung") must be subsequent to Systemic therapy - Starting date ("spr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_lung", "spr_sys_ther_new_pre_start", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_lung", "spr_sys_ther_new_pre_start"]
 	}
@@ -5678,9 +5614,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_36b',
 		desc:'Systemic therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - Date of surgery ("spr_surg_date_liver") must be subsequent to Systemic therapy - Starting date ("spr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_liver", "spr_sys_ther_new_pre_start", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_liver", "spr_sys_ther_new_pre_start"]
 	}
@@ -5688,9 +5624,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_36c',
 		desc:'Systemic therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - Date of surgery ("spr_surg_date_bone") must be subsequent to Systemic therapy - Starting date ("spr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_bone", "spr_sys_ther_new_pre_start", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_bone", "spr_sys_ther_new_pre_start"]
 	}
@@ -5698,9 +5634,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_36d',
 		desc:'Systemic therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - Date of surgery ("spr_surg_date_soft") must be subsequent to Systemic therapy - Starting date ("spr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_soft", "spr_sys_ther_new_pre_start", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_soft", "spr_sys_ther_new_pre_start"]
 	}
@@ -5708,9 +5644,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_36e',
 		desc:'Systemic therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - Date of surgery ("spr_surg_date_lymph") must be subsequent to Systemic therapy - Starting date ("spr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_lymph", "spr_sys_ther_new_pre_start", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_lymph", "spr_sys_ther_new_pre_start"]
 	}
@@ -5718,9 +5654,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_36f',
 		desc:'Systemic therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - Date of surgery ("spr_surg_date_serosal") must be subsequent to Systemic therapy - Starting date ("spr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_serosal", "spr_sys_ther_new_pre_start", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_serosal", "spr_sys_ther_new_pre_start"]
 	}
@@ -5728,9 +5664,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_36g',
 		desc:'Systemic therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 - Date of surgery ("spr_surg_date_oth") must be subsequent to Systemic therapy - Starting date ("spr_sys_ther_new_pre_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_oth", "spr_sys_ther_new_pre_start", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_surg_date_oth", "spr_sys_ther_new_pre_start"]
 	}
@@ -5738,9 +5674,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_37',
 		desc:'Systemic therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 -  Systemic therapy -  Ending date ("spr_sys_ther_new_post_end") must be subsequent to Date of surgery ("spr_surg_date_lung")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_end", "spr_surg_date_lung", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_end", "spr_surg_date_lung"]
 	}
@@ -5748,9 +5684,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_37b',
 		desc:'Systemic therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 -  Systemic therapy -  Ending date ("spr_sys_ther_new_post_end") must be subsequent to Date of surgery ("spr_surg_date_liver")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_end", "spr_surg_date_liver", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_end", "spr_surg_date_liver"]
 	}
@@ -5758,9 +5694,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_37c',
 		desc:'Systemic therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 -  Systemic therapy -  Ending date ("spr_sys_ther_new_post_end") must be subsequent to Date of surgery ("spr_surg_date_bone")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_end", "spr_surg_date_bone", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_end", "spr_surg_date_bone"]
 	}
@@ -5768,9 +5704,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_37d',
 		desc:'Systemic therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 -  Systemic therapy -  Ending date ("spr_sys_ther_new_post_end") must be subsequent to Date of surgery ("spr_surg_date_soft")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_end", "spr_surg_date_soft", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_end", "spr_surg_date_soft"]
 	}
@@ -5778,9 +5714,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_37e',
 		desc:'Systemic therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 -  Systemic therapy -  Ending date ("spr_sys_ther_new_post_end") must be subsequent to Date of surgery ("spr_surg_date_lymph")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_end", "spr_surg_date_lymph", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_end", "spr_surg_date_lymph"]
 	}
@@ -5788,9 +5724,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_37f',
 		desc:'Systemic therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 -  Systemic therapy -  Ending date ("spr_sys_ther_new_post_end") must be subsequent to Date of surgery ("spr_surg_date_serosal")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_end", "spr_surg_date_serosal", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_end", "spr_surg_date_serosal"]
 	}
@@ -5798,9 +5734,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_37g',
 		desc:'Systemic therapy Setting Pre and Postoperative ("spr_sys_ther_new_set")=3 -  Systemic therapy -  Ending date ("spr_sys_ther_new_post_end") must be subsequent to Date of surgery ("spr_surg_date_oth")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_post_end", "spr_surg_date_oth", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_post_end", "spr_surg_date_oth"]
 	}
@@ -5808,9 +5744,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_38',
 		desc:'Systemic therapy Setting Palliative ("spr_sys_ther_new_set")=4 - Systemic therapy - Starting date ("spr_sys_ther_new_pal_start") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_pal_start", "spr_date", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_pal_start", "spr_date"]
 	}
@@ -5818,9 +5754,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_39',
 		desc:'Systemic therapy Setting Palliative ("spr_sys_ther_new_set")=4 - Systemic therapy -  Ending date ("spr_sys_ther_new_pal_end") must be subsequent to Systemic therapy - Starting date ("spr_sys_ther_new_pal_start")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_sys_ther_new_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_sys_ther_new_pal_end", "spr_sys_ther_new_pal_start", 0, ">"],
 		vars:["spr_sys_ther_new_set", "spr_sys_ther_new_pal_end", "spr_sys_ther_new_pal_start"]
 	}
@@ -5831,7 +5767,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lung - Radiotherapy - Starting date ("spr_radio_lung_start") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_lung_start", "spr_date", 0, ">"],
 		vars:["spr_radio_lung_start", "spr_date"]
 	}
@@ -5841,7 +5777,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lung - Radiotherapy - Ending date ("spr_radio_lung_end") must be subsequent to Lung - Radiotherapy - Starting date ("spr_radio_lung_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_lung_end", "spr_radio_lung_start", 0, ">"],
 		vars:["spr_radio_lung_end", "spr_radio_lung_start"]
 	}
@@ -5849,9 +5785,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_42',
 		desc:'Lung - Radiotherapy Setting Preoperative ("spr_lung_radio_set")=1 - Lung - Date of surgery ("spr_surg_date_lung") must be subsequent to Lung - Radiotherapy - Ending date ("spr_radio_lung_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_lung_radio_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_lung", "spr_radio_lung_end", 0, ">"],
 		vars:["spr_lung_radio_set", "spr_surg_date_lung", "spr_radio_lung_end"]
 	}
@@ -5859,9 +5795,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_43',
 		desc:'Lung - Radiotherapy Setting Postoperative ("spr_lung_radio_set")=2 - Lung - Radiotherapy - Starting date ("spr_radio_lung_start") must be subsequent to Lung - Date of surgery ("spr_surg_date_lung")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_lung_radio_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_lung_start", "spr_surg_date_lung", 0, ">"],
 		vars:["spr_lung_radio_set", "spr_radio_lung_start", "spr_surg_date_lung"]
 	}
@@ -5869,9 +5805,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_44',
 		desc:'Lung - Radiotherapy Setting Palliative ("spr_lung_radio_set")=3 - Lung - Radiotherapy - Starting date ("spr_radio_lung_start") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_lung_radio_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_lung_start", "spr_date", 0, ">"],
 		vars:["spr_lung_radio_set", "spr_radio_lung_start", "spr_date"]
 	}
@@ -5879,9 +5815,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_45',
 		desc:'Lung - Radiotherapy Setting Definitive ("spr_lung_radio_set")=4 - Lung - Radiotherapy - Starting date ("spr_radio_lung_start") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_lung_radio_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_lung_start", "spr_date", 0, ">"],
 		vars:["spr_lung_radio_set", "spr_radio_lung_start", "spr_date"]
 	}
@@ -5889,9 +5825,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_46',
 		desc:'Lung - Radiotherapy Setting Definitive ("spr_lung_radio_set")=4  - Radiotherapy ("spr_radio_yn")=1 - Surgery ("spr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_lung_radio_set", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["spr_radio_yn", 1], ["spr_surg_yn", 0]],
 		vars:["spr_lung_radio_set", "spr_radio_yn", "spr_surg_yn"]
 	}
@@ -5901,7 +5837,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Liver - Radiotherapy - Starting date ("spr_radio_liver_start") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_liver_start", "spr_date", 0, ">"],
 		vars:["spr_radio_liver_start", "spr_date"]
 	}
@@ -5911,7 +5847,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Liver - Radiotherapy - Ending date ("spr_radio_liver_end") must be subsequent to Liver - Radiotherapy - Starting date ("spr_radio_liver_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_liver_end", "spr_radio_liver_start", 0, ">"],
 		vars:["spr_radio_liver_end", "spr_radio_liver_start"]
 	}
@@ -5919,9 +5855,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_49',
 		desc:'Liver - Radiotherapy Setting Preoperative ("spr_radio_liver_set")=1 - Liver - Date of surgery ("spr_surg_date_liver") must be subsequent to Liver - Radiotherapy - Ending date ("spr_radio_liver_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_liver_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_liver", "spr_radio_liver_end", 0, ">"],
 		vars:["spr_radio_liver_set", "spr_surg_date_liver", "spr_radio_liver_end"]
 	}
@@ -5929,9 +5865,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_50',
 		desc:'Liver - Radiotherapy Setting Postoperative ("spr_radio_liver_set")=2 - Liver - Radiotherapy - Starting date ("spr_radio_liver_start") must be subsequent to Liver - Date of surgery ("spr_surg_date_liver")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_liver_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_liver_start", "spr_surg_date_liver", 0, ">"],
 		vars:["spr_radio_liver_set", "spr_radio_liver_start", "spr_surg_date_liver"]
 	}
@@ -5939,9 +5875,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_51',
 		desc:'Liver - Radiotherapy Setting Palliative ("spr_radio_liver_set")=3 - Liver - Radiotherapy - Starting date ("spr_radio_liver_start") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_liver_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_liver_start", "spr_date", 0, ">"],
 		vars:["spr_radio_liver_set", "spr_radio_liver_start", "spr_date"]
 	}
@@ -5949,9 +5885,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_52',
 		desc:'Liver - Radiotherapy Setting Definitive ("spr_radio_liver_set")=4 - Liver - Radiotherapy - Starting date ("spr_radio_liver_start") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_liver_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_liver_start", "spr_date", 0, ">"],
 		vars:["spr_radio_liver_set", "spr_radio_liver_start", "spr_date"]
 	}
@@ -5959,11 +5895,11 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_53',
 		desc:'Liver - Radiotherapy Setting Definitive ("spr_radio_liver_set")=4 - Radiotherapy ("spr_radio_yn")=1 - Surgery ("spr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_liver_set", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["spr_radio_yn", 1], ["spr_surg_yn", 0]],
-		vars:["spr_radio_liver_set"]
+		vars:["spr_radio_liver_set", "spr_radio_yn", "spr_surg_yn"]
 	}
 ,
 	{
@@ -5971,7 +5907,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Bone - Radiotherapy - Starting date ("spr_radio_bone_start") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_bone_start", "spr_date", 0, ">"],
 		vars:["spr_radio_bone_start", "spr_date"]
 	}
@@ -5981,7 +5917,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Bone - Radiotherapy - Ending date ("spr_radio_bone_end") must be subsequent to Bone - Radiotherapy - Starting date ("spr_radio_bone_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_bone_end", "spr_radio_bone_start", 0, ">"],
 		vars:["spr_radio_bone_end", "spr_radio_bone_start"]
 	}
@@ -5989,9 +5925,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_56',
 		desc:'Bone - Radiotherapy Setting Preoperative ("spr_radio_bone_set")=1 - Bone - Date of surgery ("spr_surg_date_bone") must be subsequent to Bone - Radiotherapy - Ending date ("spr_radio_bone_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_bone_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_bone", "spr_radio_bone_end", 0, ">"],
 		vars:["spr_radio_bone_set", "spr_surg_date_bone", "spr_radio_bone_end"]
 	}
@@ -5999,9 +5935,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_57',
 		desc:'Bone - Radiotherapy Setting Postoperative ("spr_radio_bone_set")=2 - Bone - Radiotherapy - Starting date ("spr_radio_bone_start") must be subsequent to Bone - Date of surgery ("spr_surg_date_bone")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_bone_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_bone_start", "spr_surg_date_bone", 0, ">"],
 		vars:["spr_radio_bone_set", "spr_radio_bone_start", "spr_surg_date_bone"]
 	}
@@ -6009,9 +5945,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_58',
 		desc:'Bone - Radiotherapy Setting Palliative ("spr_radio_bone_set")=3 - Bone - Radiotherapy - Starting date ("spr_radio_bone_start") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_bone_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_bone_start", "spr_date", 0, ">"],
 		vars:["spr_radio_bone_set", "spr_radio_bone_start", "spr_date"]
 	}
@@ -6019,9 +5955,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_59',
 		desc:'Bone - Radiotherapy Setting Definitive ("spr_radio_bone_set")=4 - Bone - Radiotherapy - Starting date ("spr_radio_bone_start") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_bone_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_bone_start", "spr_date", 0, ">"],
 		vars:["spr_radio_bone_set", "spr_radio_bone_start", "spr_date"]
 	}
@@ -6029,11 +5965,11 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_60',
 		desc:'Bone - Radiotherapy Setting Definitive ("spr_radio_bone_set")=4 - Radiotherapy ("spr_radio_yn")=1 - Surgery ("spr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_bone_set", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["spr_radio_yn", 1], ["spr_surg_yn", 0]],
-		vars:["spr_radio_bone_set"]
+		vars:["spr_radio_bone_set", "spr_radio_yn", "spr_surg_yn"]
 	}
 ,
 	{
@@ -6041,7 +5977,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues - Radiotherapy - Starting date ("spr_radio_soft_start") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_soft_start", "spr_date", 0, ">"],
 		vars:["spr_radio_soft_start", "spr_date"]
 	}
@@ -6051,7 +5987,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues - Radiotherapy - Ending date ("spr_radio_soft_end") must be subsequent to Soft tissues - Radiotherapy - Starting date ("spr_radio_soft_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_soft_end", "spr_radio_soft_start", 0, ">"],
 		vars:["spr_radio_soft_end", "spr_radio_soft_start"]
 	}
@@ -6059,9 +5995,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_63',
 		desc:'Soft tissues - Radiotherapy Setting Preoperative ("spr_radio_soft_set")=1 - Soft tissues - Date of surgery ("spr_surg_date_soft") must be subsequent to Soft tissues - Radiotherapy - Ending date ("spr_radio_soft_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_soft_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_soft", "spr_radio_soft_end", 0, ">"],
 		vars:["spr_radio_soft_set", "spr_surg_date_soft", "spr_radio_soft_end"]
 	}
@@ -6069,9 +6005,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_64',
 		desc:'Soft tissues - Radiotherapy Setting Postoperative ("spr_radio_soft_set")=2 - Soft tissues - Radiotherapy - Starting date ("spr_radio_soft_start") must be subsequent to Soft tissues - Date of surgery ("spr_surg_date_soft")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_soft_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_soft_start", "spr_surg_date_soft", 0, ">"],
 		vars:["spr_radio_soft_set", "spr_radio_soft_start", "spr_surg_date_soft"]
 	}
@@ -6079,9 +6015,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_65',
 		desc:'Soft tissues - Radiotherapy Setting Palliative ("spr_radio_soft_set")=3 - Soft tissues - Radiotherapy - Starting date ("spr_radio_soft_start") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_soft_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_soft_start", "spr_date", 0, ">"],
 		vars:["spr_radio_soft_set", "spr_radio_soft_start", "spr_date"]
 	}
@@ -6089,9 +6025,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_66',
 		desc:'Soft tissues - Radiotherapy Setting Definitive ("spr_radio_soft_set")=4 - Soft tissues - Radiotherapy - Starting date ("spr_radio_soft_start") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_soft_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_soft_start", "spr_date", 0, ">"],
 		vars:["spr_radio_soft_set", "spr_radio_soft_start", "spr_date"]
 	}
@@ -6099,11 +6035,11 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_67',
 		desc:'Soft tissues - Radiotherapy Setting Definitive ("spr_radio_soft_set")=4 - Radiotherapy ("spr_radio_yn")=1 - Surgery ("spr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_soft_set", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["spr_radio_yn", 1], ["spr_surg_yn", 0]],
-		vars:["spr_radio_soft_set"]
+		vars:["spr_radio_soft_set", "spr_radio_yn", "spr_surg_yn"]
 	}
 ,
 	{
@@ -6111,7 +6047,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lymph nodes - Radiotherapy - Starting date ("spr_radio_lymph_start") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_lymph_start", "spr_date", 0, ">"],
 		vars:["spr_radio_lymph_start", "spr_date"]
 	}
@@ -6121,7 +6057,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lymph nodes - Radiotherapy - Ending date ("spr_radio_lymph_end") must be subsequent to Lymph nodes - Radiotherapy - Starting date ("spr_radio_lymph_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_lymph_end", "spr_radio_lymph_start", 0, ">"],
 		vars:["spr_radio_lymph_end", "spr_radio_lymph_start"]
 	}
@@ -6129,9 +6065,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_70',
 		desc:'Lymph nodes - Radiotherapy Setting Preoperative ("spr_radio_lymph_set")=1 - Lymph nodes - Date of surgery ("spr_surg_date_lymph") must be subsequent to Lymph nodes - Radiotherapy - Ending date ("spr_radio_lymph_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_lymph_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_lymph", "spr_radio_lymph_end", 0, ">"],
 		vars:["spr_radio_lymph_set", "spr_surg_date_lymph", "spr_radio_lymph_end"]
 	}
@@ -6139,9 +6075,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_71',
 		desc:'Lymph nodes - Radiotherapy Setting Postoperative ("spr_radio_lymph_set")=2 - Lymph nodes - Radiotherapy - Starting date ("spr_radio_lymph_start") must be subsequent to Lymph nodes - Date of surgery ("spr_surg_date_lymph")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_lymph_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_lymph_start", "spr_surg_date_lymph", 0, ">"],
 		vars:["spr_radio_lymph_set", "spr_radio_lymph_start", "spr_surg_date_lymph"]
 	}
@@ -6149,9 +6085,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_72',
 		desc:'Lymph nodes - Radiotherapy Setting Palliative ("spr_radio_lymph_set")=3 - Lymph nodes - Radiotherapy - Starting date ("spr_radio_lymph_start") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_lymph_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_lymph_start", "spr_date", 0, ">"],
 		vars:["spr_radio_lymph_set", "spr_radio_lymph_start", "spr_date"]
 	}
@@ -6159,9 +6095,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_73',
 		desc:'Lymph nodes - Radiotherapy Setting Definitive ("spr_radio_lymph_set")=4 - Lymph nodes - Radiotherapy - Starting date ("spr_radio_lymph_start") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_lymph_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_lymph_start", "spr_date", 0, ">"],
 		vars:["spr_radio_lymph_set", "spr_radio_lymph_start", "spr_date"]
 	}
@@ -6169,11 +6105,11 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_74',
 		desc:'Lymph nodes - Radiotherapy Setting Definitive ("spr_radio_lymph_set")=4 - Radiotherapy ("spr_radio_yn")=1 - Surgery ("spr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_lymph_set", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["spr_radio_yn", 1], ["spr_surg_yn", 0]],
-		vars:["spr_radio_lymph_set"]
+		vars:["spr_radio_lymph_set", "spr_radio_yn", "spr_surg_yn"]
 	}
 ,
 	{
@@ -6181,7 +6117,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Serosal - Radiotherapy - Starting date ("spr_radio_sero_start") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_sero_start", "spr_date", 0, ">"],
 		vars:["spr_radio_sero_start", "spr_date"]
 	}
@@ -6191,7 +6127,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Serosal - Radiotherapy - Ending date ("spr_radio_sero_end") must be subsequent to Serosal - Radiotherapy - Starting date ("spr_radio_sero_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_sero_end", "spr_radio_sero_start", 0, ">"],
 		vars:["spr_radio_sero_end", "spr_radio_sero_start"]
 	}
@@ -6199,9 +6135,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 //{
 //name:'dq_8_77',
 //desc:'Serosal - Radiotherapy Setting Preoperative ("spr_radio_sero_set")=1 - Serosal - Date of surgery ("spr_surg_date_sero") must be subsequent to Serosal - Radiotherapy - Ending date ("spr_radio_sero_end")',
-//prec:multiVarHasValueRepInstr,
+//prec:multiVarHasValueRepInstrREV,
 //precParams:[[["spr_radio_sero_set", 1]]],
-//func:dateCompareWithDeltaRepInstr,
+//func:dateCompareWithDeltaRepInstrREV,
 //params:["spr_surg_date_sero", "spr_radio_sero_end", 0, ">"],
 //vars:["spr_radio_sero_set", "spr_surg_date_sero", "spr_radio_sero_end"]
 //}
@@ -6209,9 +6145,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_78',
 		desc:'Serosal - Radiotherapy Setting Postoperative ("spr_radio_sero_set")=2 - Serosal - Radiotherapy - Starting date ("spr_radio_sero_start") must be subsequent to Serosal - Date of surgery ("spr_surg_date_sero")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_sero_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_sero_start", "spr_surg_date_sero", 0, ">"],
 		vars:["spr_radio_sero_set", "spr_radio_sero_start", "spr_surg_date_sero"]
 	}
@@ -6219,9 +6155,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_79',
 		desc:'Serosal - Radiotherapy Setting Palliative ("spr_radio_sero_set")=3 - Serosal - Radiotherapy - Starting date ("spr_radio_sero_start") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_sero_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_sero_start", "spr_date", 0, ">"],
 		vars:["spr_radio_sero_set", "spr_radio_sero_start", "spr_date"]
 	}
@@ -6229,9 +6165,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_80',
 		desc:'Serosal - Radiotherapy Setting Definitive ("spr_radio_sero_set")=4 - Serosal - Radiotherapy - Starting date ("spr_radio_sero_start") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_sero_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_sero_start", "spr_date", 0, ">"],
 		vars:["spr_radio_sero_set", "spr_radio_sero_start", "spr_date"]
 	}
@@ -6239,11 +6175,11 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_81',
 		desc:'Serosal - Radiotherapy Setting Definitive ("spr_radio_sero_set")=4 - Radiotherapy ("spr_radio_yn")=1 - Surgery ("spr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_sero_set", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["spr_radio_yn", 1], ["spr_surg_yn", 0]],
-		vars:["spr_radio_sero_set"]
+		vars:["spr_radio_sero_set", "spr_radio_yn", "spr_surg_yn"]
 	}
 ,
 	{
@@ -6251,7 +6187,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Other - Radiotherapy - Starting date ("spr_radio_oth_start") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_oth_start", "spr_date", 0, ">"],
 		vars:["spr_radio_oth_start", "spr_date"]
 	}
@@ -6261,7 +6197,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Other - Radiotherapy - Ending date ("spr_radio_oth_end") must be subsequent to Other - Radiotherapy - Starting date ("spr_radio_oth_start")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_oth_end", "spr_radio_oth_start", 0, ">"],
 		vars:["spr_radio_oth_end", "spr_radio_oth_start"]
 	}
@@ -6269,9 +6205,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_84',
 		desc:'Other - Radiotherapy Setting Preoperative ("spr_radio_oth_set")=1 - Other - Date of surgery ("spr_surg_date_oth") must be subsequent to Other - Radiotherapy - Ending date ("spr_radio_oth_end")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_oth_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_oth", "spr_radio_oth_end", 0, ">"],
 		vars:["spr_radio_oth_set", "spr_surg_date_oth", "spr_radio_oth_end"]
 	}
@@ -6279,9 +6215,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_85',
 		desc:'Other - Radiotherapy Setting Postoperative ("spr_radio_oth_set")=2 - Other - Radiotherapy - Starting date ("spr_radio_oth_start") must be subsequent to Other - Date of surgery ("spr_surg_date_oth")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_oth_set", 2]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_oth_start", "spr_surg_date_oth", 0, ">"],
 		vars:["spr_radio_oth_set", "spr_radio_oth_start", "spr_surg_date_oth"]
 	}
@@ -6289,9 +6225,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_86',
 		desc:'Other - Radiotherapy Setting Palliative ("spr_radio_oth_set")=3 - Other - Radiotherapy - Starting date ("spr_radio_oth_start") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_oth_set", 3]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_oth_start", "spr_date", 0, ">"],
 		vars:["spr_radio_oth_set", "spr_radio_oth_start", "spr_date"]
 	}
@@ -6299,9 +6235,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_87',
 		desc:'Other - Radiotherapy Setting Definitive ("spr_radio_oth_set")=4 - Other - Radiotherapy - Starting date ("spr_radio_oth_start") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_oth_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_radio_oth_start", "spr_date", 0, ">"],
 		vars:["spr_radio_oth_set", "spr_radio_oth_start", "spr_date"]
 	}
@@ -6309,11 +6245,11 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_88',
 		desc:'Other - Radiotherapy Setting Definitive ("spr_radio_oth_set")=4 - Radiotherapy ("spr_radio_yn")=1 - Surgery ("spr_surg_yn")=0',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_radio_oth_set", 4]]],
-		func:multiVarHasValueRepInstr,
+		func:multiVarHasValueRepInstrREV,
 		params:[["spr_radio_yn", 1], ["spr_surg_yn", 0]],
-		vars:["spr_radio_oth_set"]
+		vars:["spr_radio_oth_set", "spr_radio_yn", "spr_surg_yn"]
 	}
 ,
 	{
@@ -6321,7 +6257,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Isolated limb perfusion - Procedure date ("spr_limbperf_date") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_limbperf_date", "spr_date", 0, ">"],
 		vars:["spr_limbperf_date", "spr_date"]
 	}
@@ -6329,9 +6265,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_90',
 		desc:'Isolated limb perfusion Setting Preoperative ("spr_limbperf_set")=1 - Date of surgery ("spr_surg_date_lung") must be subsequent to Isolated limb perfusion - Procedure date ("spr_limbperf_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_limbperf_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_lung", "spr_limbperf_date", 0, ">"],
 		vars:["spr_limbperf_set", "spr_surg_date_lung", "spr_limbperf_date"]
 	}
@@ -6339,9 +6275,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_90b',
 		desc:'Isolated limb perfusion Setting Preoperative ("spr_limbperf_set")=1 - Date of surgery ("spr_surg_date_liver") must be subsequent to Isolated limb perfusion - Procedure date ("spr_limbperf_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_limbperf_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_liver", "spr_limbperf_date", 0, ">"],
 		vars:["spr_limbperf_set", "spr_surg_date_liver", "spr_limbperf_date"]
 	}
@@ -6349,9 +6285,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_90c',
 		desc:'Isolated limb perfusion Setting Preoperative ("spr_limbperf_set")=1 - Date of surgery ("spr_surg_date_bone") must be subsequent to Isolated limb perfusion - Procedure date ("spr_limbperf_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_limbperf_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_bone", "spr_limbperf_date", 0, ">"],
 		vars:["spr_limbperf_set", "spr_surg_date_bone", "spr_limbperf_date"]
 	}
@@ -6359,9 +6295,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_90d',
 		desc:'Isolated limb perfusion Setting Preoperative ("spr_limbperf_set")=1 - Date of surgery ("spr_surg_date_soft") must be subsequent to Isolated limb perfusion - Procedure date ("spr_limbperf_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_limbperf_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_soft", "spr_limbperf_date", 0, ">"],
 		vars:["spr_limbperf_set", "spr_surg_date_soft", "spr_limbperf_date"]
 	}
@@ -6369,9 +6305,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_90e',
 		desc:'Isolated limb perfusion Setting Preoperative ("spr_limbperf_set")=1 - Date of surgery ("spr_surg_date_lymph") must be subsequent to Isolated limb perfusion - Procedure date ("spr_limbperf_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_limbperf_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_lymph", "spr_limbperf_date", 0, ">"],
 		vars:["spr_limbperf_set", "spr_surg_date_lymph", "spr_limbperf_date"]
 	}
@@ -6379,9 +6315,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_90f',
 		desc:'Isolated limb perfusion Setting Preoperative ("spr_limbperf_set")=1 - Date of surgery ("spr_surg_date_serosal") must be subsequent to Isolated limb perfusion - Procedure date ("spr_limbperf_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_limbperf_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_serosal", "spr_limbperf_date", 0, ">"],
 		vars:["spr_limbperf_set", "spr_surg_date_serosal", "spr_limbperf_date"]
 	}
@@ -6389,9 +6325,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_90g',
 		desc:'Isolated limb perfusion Setting Preoperative ("spr_limbperf_set")=1 - Date of surgery ("spr_surg_date_oth") must be subsequent to Isolated limb perfusion - Procedure date ("spr_limbperf_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_limbperf_set", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_oth", "spr_limbperf_date", 0, ">"],
 		vars:["spr_limbperf_set", "spr_surg_date_oth", "spr_limbperf_date"]
 	}
@@ -6399,9 +6335,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_91',
 		desc:'Isolated limb perfusion Setting Definitive ("spr_limbperf_set")=4 - Procedure date ("spr_limbperf_date") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_limbperf_set", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_limbperf_date", "spr_date", 0, ">"],
 		vars:["spr_limbperf_set", "spr_limbperf_date", "spr_date"]
 	}
@@ -6411,7 +6347,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lung - Local ablative techniques - Procedure date ("spr_abla_date_lung") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_abla_date_lung", "spr_date", 0, ">"],
 		vars:["spr_abla_date_lung", "spr_date"]
 	}
@@ -6419,9 +6355,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_93',
 		desc:'Lung - Local ablative techniques Setting Preoperative ("spr_abla_set_lung")=1 - Lung - Date of surgery ("spr_surg_date_lung") must be subsequent to Lung - Local ablative techniques - Procedure date ("spr_abla_date_lung")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_abla_set_lung", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_lung", "spr_abla_date_lung", 0, ">"],
 		vars:["spr_abla_set_lung", "spr_surg_date_lung", "spr_abla_date_lung"]
 	}
@@ -6429,39 +6365,39 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_94',
 		desc:'Lung - Local ablative techniques - Setting Definitive ("spr_abla_set_lung")=4 - Lung - Local ablative techniques - Procedure date ("spr_abla_date_lung") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_abla_set_lung", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_abla_date_lung", "spr_date", 0, ">"],
 		vars:["spr_abla_set_lung", "spr_abla_date_lung", "spr_date"]
 	}
 ,
 	{
 		name:'dq_8_95',
-		desc:'Liver - Local ablative techniques - Procedure date ("spr_abla_date_liv") must be subsequent to Date of progression ("spr_date")',
+		desc:'Liver - Local ablative techniques - Procedure date ("spr_abla_date_liver") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
-		precParams:[null],
-		func:dateCompareWithDeltaRepInstr,
+		precParams:null,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_abla_date_liver", "spr_date", 0, ">"],
 		vars:["spr_abla_date_liver", "spr_date"]
 	}
 ,
 	{
 		name:'dq_8_96',
-		desc:'Liver - Local ablative techniques Setting Preoperative ("spr_abla_set_liv"))=1 - Liver - Date of surgery ("spr_surg_date_liv") must be subsequent to Liver - Local ablative techniques - Procedure date ("spr_abla_date_liv")',
-		prec:multiVarHasValueRepInstr,
+		desc:'Liver - Local ablative techniques Setting Preoperative ("spr_abla_set_liv"))=1 - Liver - Date of surgery ("spr_surg_date_liv") must be subsequent to Liver - Local ablative techniques - Procedure date ("spr_abla_date_liver")',
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_abla_set_liver", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_liver", "spr_abla_date_liver", 0, ">"],
 		vars:["spr_abla_set_liver", "spr_surg_date_liver", "spr_abla_date_liver"]
 	}
 ,
 	{
 		name:'dq_8_97',
-		desc:'Liver - Local ablative techniques - Setting Definitive ("spr_abla_set_liv")=4 - Liver - Local ablative techniques - Procedure date ("spr_abla_date_liv") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		desc:'Liver - Local ablative techniques - Setting Definitive ("spr_abla_set_liv")=4 - Liver - Local ablative techniques - Procedure date ("spr_abla_date_liver") must be subsequent to Date of progression ("spr_date")',
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_abla_set_liver", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_abla_date_liver", "spr_date", 0, ">"],
 		vars:["spr_abla_set_liver", "spr_abla_date_liver", "spr_date"]
 	}
@@ -6470,8 +6406,8 @@ REPLACED BY multiOR on the 4 variables (see below)
 		name:'dq_8_98',
 		desc:'Bone - Local ablative techniques - Procedure date ("spr_abla_date_bone") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
-		precParams:[null],
-		func:dateCompareWithDeltaRepInstr,
+		precParams:null,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_abla_date_bone", "spr_date", 0, ">"],
 		vars:["spr_abla_date_bone", "spr_date"]
 	}
@@ -6479,9 +6415,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_99',
 		desc:'Bone - Local ablative techniques Setting Preoperative ("spr_abla_set_bone")=1 - Bone - Date of surgery ("spr_surg_date_bone") must be subsequent to Bone - Local ablative techniques - Procedure date ("spr_abla_date_bone")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_abla_set_bone", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_bone", "spr_abla_date_bone", 0, ">"],
 		vars:["spr_abla_set_bone", "spr_surg_date_bone", "spr_abla_date_bone"]
 	}
@@ -6489,9 +6425,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_100',
 		desc:'Bone - Local ablative techniques - Setting Definitive ("spr_abla_set_bone")=4 - Bone - Local ablative techniques - Procedure date ("spr_abla_date_bone") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_abla_set_bone", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_abla_date_bone", "spr_date", 0, ">"],
 		vars:["spr_abla_set_bone", "spr_abla_date_bone", "spr_date"]
 	}
@@ -6500,8 +6436,8 @@ REPLACED BY multiOR on the 4 variables (see below)
 		name:'dq_8_101',
 		desc:'Soft tissues - Local ablative techniques - Procedure date ("spr_abla_date_soft") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
-		precParams:[null],
-		func:dateCompareWithDeltaRepInstr,
+		precParams:null,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_abla_date_soft", "spr_date", 0, ">"],
 		vars:["spr_abla_date_soft", "spr_date"]
 	}
@@ -6509,9 +6445,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_102',
 		desc:'Soft tissues - Local ablative techniques Setting Preoperative ("spr_abla_set_soft")=1 - Soft tissues - Date of surgery ("spr_surg_date_soft") must be subsequent to Soft tissues - Local ablative techniques - Procedure date ("spr_abla_date_soft")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_abla_set_soft", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_soft", "spr_abla_date_soft", 0, ">"],
 		vars:["spr_abla_set_soft", "spr_surg_date_soft", "spr_abla_date_soft"]
 	}
@@ -6519,9 +6455,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_103',
 		desc:'Soft tissues - Local ablative techniques - Setting Definitive ("spr_abla_set_soft")=4 - Soft tissues - Local ablative techniques - Procedure date ("spr_abla_date_soft") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_abla_set_soft", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_abla_date_soft", "spr_date", 0, ">"],
 		vars:["spr_abla_set_soft", "spr_abla_date_soft", "spr_date"]
 	}
@@ -6530,8 +6466,8 @@ REPLACED BY multiOR on the 4 variables (see below)
 		name:'dq_8_104',
 		desc:'Lymph nodes - Local ablative techniques - Procedure date ("spr_abla_date_lymph") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
-		precParams:[null],
-		func:dateCompareWithDeltaRepInstr,
+		precParams:null,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_abla_date_lymph", "spr_date", 0, ">"],
 		vars:["spr_abla_date_lymph", "spr_date"]
 	}
@@ -6539,9 +6475,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_105',
 		desc:'Lymph nodes - Local ablative techniques Setting Preoperative ("spr_abla_set_lymph")=1 - Lymph nodes - Date of surgery ("spr_surg_date_lymph") must be subsequent to Lymph nodes - Local ablative techniques - Procedure date ("spr_abla_date_lymph")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_abla_set_lymph", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_lymph", "spr_abla_date_lymph", 0, ">"],
 		vars:["spr_abla_set_lymph", "spr_surg_date_lymph", "spr_abla_date_lymph"]
 	}
@@ -6549,9 +6485,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_106',
 		desc:'Lymph nodes - Local ablative techniques - Setting Definitive ("spr_abla_set_lymph")=4 - Lymph nodes - Local ablative techniques - Procedure date ("spr_abla_date_lymph") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_abla_set_lymph", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_abla_date_lymph", "spr_date", 0, ">"],
 		vars:["spr_abla_set_lymph", "spr_abla_date_lymph", "spr_date"]
 	}
@@ -6560,8 +6496,8 @@ REPLACED BY multiOR on the 4 variables (see below)
 		name:'dq_8_107',
 		desc:'Serosal - Local ablative techniques - Procedure date ("spr_abla_date_serosal") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
-		precParams:[null],
-		func:dateCompareWithDeltaRepInstr,
+		precParams:null,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_abla_date_serosal", "spr_date", 0, ">"],
 		vars:["spr_abla_date_serosal", "spr_date"]
 	}
@@ -6569,9 +6505,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_108',
 		desc:'Serosal - Local ablative techniques Setting Preoperative ("spr_abla_set_serosal")=1 - Serosal - Date of surgery ("spr_surg_date_sero") must be subsequent to Serosal - Local ablative techniques - Procedure date ("spr_abla_date_serosal")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_abla_set_serosal", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_serosal", "spr_abla_date_serosal", 0, ">"],
 		vars:["spr_abla_set_serosal", "spr_surg_date_serosal", "spr_abla_date_serosal"]
 	}
@@ -6579,9 +6515,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_109',
 		desc:'Serosal - Local ablative techniques - Setting Definitive ("spr_abla_set_serosal")=4 - Serosal - Local ablative techniques - Procedure date ("spr_abla_date_serosal") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_abla_set_serosal", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_abla_date_serosal", "spr_date", 0, ">"],
 		vars:["spr_abla_set_serosal", "spr_abla_date_serosal", "spr_date"]
 	}
@@ -6590,8 +6526,8 @@ REPLACED BY multiOR on the 4 variables (see below)
 		name:'dq_8_110',
 		desc:'Other - Local ablative techniques - Procedure date ("spr_abla_date_oth") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
-		precParams:[null],
-		func:dateCompareWithDeltaRepInstr,
+		precParams:null,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_abla_date_oth", "spr_date", 0, ">"],
 		vars:["spr_abla_date_oth", "spr_date"]
 	}
@@ -6599,9 +6535,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_111',
 		desc:'Other - Local ablative techniques Setting Preoperative ("spr_abla_set_oth")=1 - Other - Date of surgery ("spr_surg_date_oth") must be subsequent to Other - Local ablative techniques - Procedure date ("spr_abla_date_oth")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_abla_set_oth", 1]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_oth", "spr_abla_date_oth", 0, ">"],
 		vars:["spr_abla_set_oth", "spr_surg_date_oth", "spr_abla_date_oth"]
 	}
@@ -6609,9 +6545,9 @@ REPLACED BY multiOR on the 4 variables (see below)
 	{
 		name:'dq_8_112',
 		desc:'Other - Local ablative techniques - Setting Definitive ("spr_abla_set_oth")=4 - Other - Local ablative techniques - Procedure date ("spr_abla_date_oth") must be subsequent to Date of progression ("spr_date")',
-		prec:multiVarHasValueRepInstr,
+		prec:multiVarHasValueRepInstrREV,
 		precParams:[[["spr_abla_set_oth", 4]]],
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_abla_date_oth", "spr_date", 0, ">"],
 		vars:["spr_abla_set_oth", "spr_abla_date_oth", "spr_date"]
 	}
@@ -6621,7 +6557,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lung - Date of surgery ("spr_surg_date_lung") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_lung", "spr_date", 0, ">"],
 		vars:["spr_surg_date_lung", "spr_date"]
 	}
@@ -6631,7 +6567,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Liver - Date of surgery ("spr_surg_date_liver") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_liver", "spr_date", 0, ">"],
 		vars:["spr_surg_date_liver", "spr_date"]
 	}
@@ -6641,7 +6577,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Bone - Date of surgery ("spr_surg_date_bone") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_bone", "spr_date", 0, ">"],
 		vars:["spr_surg_date_bone", "spr_date"]
 	}
@@ -6651,7 +6587,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues - Date of surgery ("spr_surg_date_soft") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_soft", "spr_date", 0, ">"],
 		vars:["spr_surg_date_soft", "spr_date"]
 	}
@@ -6661,7 +6597,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lymph nodes - Date of surgery ("spr_surg_date_lymph") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_lymph", "spr_date", 0, ">"],
 		vars:["spr_surg_date_lymph", "spr_date"]
 	}
@@ -6671,7 +6607,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Serosal - Date of surgery ("spr_surg_date_serosal") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_serosal", "spr_date", 0, ">"],
 		vars:["spr_surg_date_serosal", "spr_date"]
 	}
@@ -6681,7 +6617,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Other - Date of surgery ("spr_surg_date_oth") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_surg_date_oth", "spr_date", 0, ">"],
 		vars:["spr_surg_date_oth", "spr_date"]
 	}
@@ -6691,7 +6627,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lung - Size of pathological specimen ("spr_surg_specsize_lung") must be between 1 and 300',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_surg_specsize_lung", 1, 300],
 		vars:["spr_surg_specsize_lung"]
 	}
@@ -6701,7 +6637,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Liver - Size of pathological specimen ("spr_surg_specsize_liver") must be between 1 and 300',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_surg_specsize_liver", 1, 300],
 		vars:["spr_surg_specsize_liver"]
 	}
@@ -6711,7 +6647,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Bone - Size of pathological specimen ("spr_surg_specsize_bone") must be between 1 and 300',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_surg_specsize_bone", 1, 300],
 		vars:["spr_surg_specsize_bone"]
 	}
@@ -6721,7 +6657,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Soft tissues - Size of pathological specimen ("spr_surg_specsize_soft") must be between 1 and 300',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_surg_specsize_soft", 1, 300],
 		vars:["spr_surg_specsize_soft"]
 	}
@@ -6731,7 +6667,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Lymph nodes - Size of pathological specimen ("spr_surg_specsize_lymph") must be between 1 and 300',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_surg_specsize_lymph", 1, 300],
 		vars:["spr_surg_specsize_lymph"]
 	}
@@ -6741,7 +6677,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Serosal - Size of pathological specimen ("spr_surg_specsize_serosal") must be between 1 and 300',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_surg_specsize_serosal", 1, 300],
 		vars:["spr_surg_specsize_serosal"]
 	}
@@ -6751,7 +6687,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Other - Size of pathological specimen ("spr_surg_specsize_oth") must be between 1 and 300',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_surg_specsize_oth", 1, 300],
 		vars:["spr_surg_specsize_oth"]
 	}
@@ -6761,7 +6697,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of progressive site pathological diagnosis ("spr_pathol_date") must be subsequent to Date of progression ("spr_date")',
 		prec:null,
 		precParams:null,
-		func:dateCompareWithDeltaRepInstr,
+		func:dateCompareWithDeltaRepInstrREV,
 		params:["spr_pathol_date", "spr_date", 0, ">"],
 		vars:["spr_pathol_date", "spr_date"]
 	}
@@ -6771,7 +6707,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Mitotic index value ("spr_pathol_prog_mito") must be between 1 and 99',
 		prec:null,
 		precParams:null,
-		func:varWithinIntervalRepInstr,
+		func:varWithinIntervalRepInstrREV,
 		params:["spr_pathol_prog_mito", 1, 99],
 		vars:["spr_pathol_prog_mito"]
 	}
@@ -6781,7 +6717,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Date of death ("spr_dod") must be subsequent to Date of registration ("bl_dor")',
 		prec:null,
 		precParams:null,
-		func:uniqueDateCompareToFixedDateRepInstr,
+		func:uniqueDateCompareToFixedDateRepInstrREV,
 		params:["spr_dod", "bl_dor", 0, ">=", 1],
 		vars:["spr_dod", "bl_dor"]
 	}
@@ -6811,7 +6747,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Unifocal Follow Up - Surveillance - Overall best radiological response per RECIST 1.1 ("ufu_surveil_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstr,
+		func:varHasValueRepInstrREV,
 		params:["ufu_surveil_br_recist", 2, "!="],
 		vars:["lsu_status", "ufu_surveil_br_recist"]
 	}
@@ -6821,7 +6757,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Unifocal Follow Up - Surveillance - Overall best radiological response ("ufu_surveil_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstr,
+		func:varHasValueRepInstrREV,
 		params:["ufu_surveil_br", 2, "!="],
 		vars:["lsu_status", "ufu_surveil_br"]
 	}
@@ -6831,7 +6767,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Unifocal Follow Up - Systemic therapy - Overall best radiological response per RECIST 1.1 ("ufu_sys_ther_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstr,
+		func:varHasValueRepInstrREV,
 		params:["ufu_sys_ther_br_recist", 2, "!="],
 		vars:["lsu_status", "ufu_sys_ther_br_recist"]
 	}
@@ -6841,7 +6777,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Unifocal Follow Up -  Systemic therapy - Overall best radiological response ("ufu_sys_ther_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstr,
+		func:varHasValueRepInstrREV,
 		params:["ufu_sys_ther_br", 2, "!="],
 		vars:["lsu_status", "ufu_sys_ther_br"]
 	}
@@ -6851,7 +6787,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Unifocal Local Recurrence - Surveillance - Overall best radiological response per RECIST 1.1 ("ulr_surveil_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstr,
+		func:varHasValueRepInstrREV,
 		params:["ulr_surveil_br_recist", 2, "!="],
 		vars:["lsu_status", "ulr_surveil_br_recist"]
 	}
@@ -6861,7 +6797,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Unifocal Local Recurrence - Surveillance - Overall best radiological response ("ulr_surveil_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstr,
+		func:varHasValueRepInstrREV,
 		params:["ulr_surveil_br", 2, "!="],
 		vars:["lsu_status", "ulr_surveil_br"]
 	}
@@ -6871,7 +6807,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Unifocal Local Recurrence - Systemic therapy - Overall best radiological response per RECIST 1.1 ("ulr_sys_ther_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstr,
+		func:varHasValueRepInstrREV,
 		params:["ulr_sys_ther_br_recist", 2, "!="],
 		vars:["lsu_status", "ulr_sys_ther_br_recist"]
 	}
@@ -6881,7 +6817,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Unifocal Local Recurrence - Systemic therapy- Overall best radiological response ("ulr_sys_ther_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstr,
+		func:varHasValueRepInstrREV,
 		params:["ulr_sys_ther_br", 2, "!="],
 		vars:["lsu_status", "ulr_sys_ther_br"]
 	}
@@ -6931,7 +6867,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Locoregional Follow Up - Surveillance - Overall best radiological response per RECIST 1.1 ("lfu_surveil_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstr,
+		func:varHasValueRepInstrREV,
 		params:["lfu_surveil_br_recist", 2, "!="],
 		vars:["lsu_status", "lfu_surveil_br_recist"]
 	}
@@ -6941,7 +6877,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Locoregional Follow Up - Surveillance - Overall best radiological response ("lfu_surveil_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstr,
+		func:varHasValueRepInstrREV,
 		params:["lfu_surveil_br", 2, "!="],
 		vars:["lsu_status", "lfu_surveil_br"]
 	}
@@ -6951,7 +6887,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Locoregional Follow Up - Systemic therapy - Overall best radiological response per RECIST 1.1 ("lfu_sys_ther_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstr,
+		func:varHasValueRepInstrREV,
 		params:["lfu_sys_ther_br_recist", 2, "!="],
 		vars:["lsu_status", "lfu_sys_ther_br_recist"]
 	}
@@ -6961,7 +6897,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Locoregional Follow Up - Systemic therapy - Overall best radiological response ("lfu_sys_ther_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstr,
+		func:varHasValueRepInstrREV,
 		params:["lfu_sys_ther_br", 2, "!="],
 		vars:["lsu_status", "lfu_sys_ther_br"]
 	}
@@ -6971,7 +6907,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Locoregional Progression - Surveillance - Overall best radiological response per RECIST 1.1 ("spr_surveil_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstr,
+		func:varHasValueRepInstrREV,
 		params:["spr_surveil_br_recist", 2, "!="],
 		vars:["lsu_status", "spr_surveil_br_recist"]
 	}
@@ -6981,7 +6917,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Locoregional Progression - Surveillance - Overall best radiological response ("spr_surveil_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstr,
+		func:varHasValueRepInstrREV,
 		params:["spr_surveil_br", 2, "!="],
 		vars:["lsu_status", "spr_surveil_br"]
 	}
@@ -6991,7 +6927,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Locoregional Progression - Systemic therapy - Overall best radiological response per RECIST 1.1 ("spr_sys_ther_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstr,
+		func:varHasValueRepInstrREV,
 		params:["spr_sys_ther_br_recist", 2, "!="],
 		vars:["lsu_status", "spr_sys_ther_br_recist"]
 	}
@@ -7001,7 +6937,7 @@ REPLACED BY multiOR on the 4 variables (see below)
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Locoregional Progression - Systemic therapy - Overall best radiological response ("spr_sys_ther_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstr,
+		func:varHasValueRepInstrREV,
 		params:["spr_sys_ther_br", 2, "!="],
 		vars:["lsu_status", "spr_sys_ther_br"]
 	}
