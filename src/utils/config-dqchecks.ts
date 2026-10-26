@@ -7,7 +7,7 @@ import {
 	dateCompareWithDelta,
 	dateWithinIntervalWithDeltas,
 	compareAllDatesToFixed,
-	varHasValueRepInstrREV,
+	varHasValueRepInstr,
 	varHasValueWithPreviousSelfRepInstrREV,
 	multiVarHasValueRepInstrREV,
 	multiVarHasValueFirstVsLastInstRepInstrREV,
@@ -6747,7 +6747,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Unifocal Follow Up - Surveillance - Overall best radiological response per RECIST 1.1 ("ufu_surveil_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstrREV,
+		func:varHasValueRepInstr,
 		params:["ufu_surveil_br_recist", 2, "!="],
 		vars:["lsu_status", "ufu_surveil_br_recist"]
 	}
@@ -6757,7 +6757,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Unifocal Follow Up - Surveillance - Overall best radiological response ("ufu_surveil_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstrREV,
+		func:varHasValueRepInstr,
 		params:["ufu_surveil_br", 2, "!="],
 		vars:["lsu_status", "ufu_surveil_br"]
 	}
@@ -6767,7 +6767,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Unifocal Follow Up - Systemic therapy - Overall best radiological response per RECIST 1.1 ("ufu_sys_ther_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstrREV,
+		func:varHasValueRepInstr,
 		params:["ufu_sys_ther_br_recist", 2, "!="],
 		vars:["lsu_status", "ufu_sys_ther_br_recist"]
 	}
@@ -6777,7 +6777,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Unifocal Follow Up -  Systemic therapy - Overall best radiological response ("ufu_sys_ther_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstrREV,
+		func:varHasValueRepInstr,
 		params:["ufu_sys_ther_br", 2, "!="],
 		vars:["lsu_status", "ufu_sys_ther_br"]
 	}
@@ -6787,7 +6787,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Unifocal Local Recurrence - Surveillance - Overall best radiological response per RECIST 1.1 ("ulr_surveil_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstrREV,
+		func:varHasValueRepInstr,
 		params:["ulr_surveil_br_recist", 2, "!="],
 		vars:["lsu_status", "ulr_surveil_br_recist"]
 	}
@@ -6797,7 +6797,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Unifocal Local Recurrence - Surveillance - Overall best radiological response ("ulr_surveil_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstrREV,
+		func:varHasValueRepInstr,
 		params:["ulr_surveil_br", 2, "!="],
 		vars:["lsu_status", "ulr_surveil_br"]
 	}
@@ -6807,7 +6807,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Unifocal Local Recurrence - Systemic therapy - Overall best radiological response per RECIST 1.1 ("ulr_sys_ther_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstrREV,
+		func:varHasValueRepInstr,
 		params:["ulr_sys_ther_br_recist", 2, "!="],
 		vars:["lsu_status", "ulr_sys_ther_br_recist"]
 	}
@@ -6817,7 +6817,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Unifocal Local Recurrence - Systemic therapy- Overall best radiological response ("ulr_sys_ther_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstrREV,
+		func:varHasValueRepInstr,
 		params:["ulr_sys_ther_br", 2, "!="],
 		vars:["lsu_status", "ulr_sys_ther_br"]
 	}
@@ -6867,7 +6867,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Locoregional Follow Up - Surveillance - Overall best radiological response per RECIST 1.1 ("lfu_surveil_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstrREV,
+		func:varHasValueRepInstr,
 		params:["lfu_surveil_br_recist", 2, "!="],
 		vars:["lsu_status", "lfu_surveil_br_recist"]
 	}
@@ -6877,7 +6877,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Locoregional Follow Up - Surveillance - Overall best radiological response ("lfu_surveil_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstrREV,
+		func:varHasValueRepInstr,
 		params:["lfu_surveil_br", 2, "!="],
 		vars:["lsu_status", "lfu_surveil_br"]
 	}
@@ -6887,7 +6887,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Locoregional Follow Up - Systemic therapy - Overall best radiological response per RECIST 1.1 ("lfu_sys_ther_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstrREV,
+		func:varHasValueRepInstr,
 		params:["lfu_sys_ther_br_recist", 2, "!="],
 		vars:["lsu_status", "lfu_sys_ther_br_recist"]
 	}
@@ -6897,7 +6897,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Locoregional Follow Up - Systemic therapy - Overall best radiological response ("lfu_sys_ther_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstrREV,
+		func:varHasValueRepInstr,
 		params:["lfu_sys_ther_br", 2, "!="],
 		vars:["lsu_status", "lfu_sys_ther_br"]
 	}
@@ -6907,7 +6907,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Locoregional Progression - Surveillance - Overall best radiological response per RECIST 1.1 ("spr_surveil_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstrREV,
+		func:varHasValueRepInstr,
 		params:["spr_surveil_br_recist", 2, "!="],
 		vars:["lsu_status", "spr_surveil_br_recist"]
 	}
@@ -6917,7 +6917,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Locoregional Progression - Surveillance - Overall best radiological response ("spr_surveil_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstrREV,
+		func:varHasValueRepInstr,
 		params:["spr_surveil_br", 2, "!="],
 		vars:["lsu_status", "spr_surveil_br"]
 	}
@@ -6927,7 +6927,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Locoregional Progression - Systemic therapy - Overall best radiological response per RECIST 1.1 ("spr_sys_ther_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstrREV,
+		func:varHasValueRepInstr,
 		params:["spr_sys_ther_br_recist", 2, "!="],
 		vars:["lsu_status", "spr_sys_ther_br_recist"]
 	}
@@ -6937,7 +6937,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Locoregional Progression - Systemic therapy - Overall best radiological response ("spr_sys_ther_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValueRepInstrREV,
+		func:varHasValueRepInstr,
 		params:["spr_sys_ther_br", 2, "!="],
 		vars:["lsu_status", "spr_sys_ther_br"]
 	}
@@ -6947,7 +6947,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Systemic Metastases Follow Up - Surveillance - Overall best radiological response per RECIST 1.1 ("sfu_surveil_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValue,
+		func:varHasValueRepInstr,
 		params:["sfu_surveil_br_recist", 2, "!="],
 		vars:["lsu_status", "sfu_surveil_br_recist"]
 	}
@@ -6957,7 +6957,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Systemic Metastases Follow Up - Surveillance - Overall best radiological response ("sfu_surveil_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValue,
+		func:varHasValueRepInstr,
 		params:["sfu_surveil_br", 2, "!="],
 		vars:["lsu_status", "sfu_surveil_br"]
 	}
@@ -6967,7 +6967,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Systemic Metastases Follow Up - Systemic therapy - Overall best radiological response per RECIST 1.1 ("sfu_sys_ther_br_recist") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValue,
+		func:varHasValueRepInstr,
 		params:["sfu_sys_ther_br_recist", 2, "!="],
 		vars:["lsu_status", "sfu_sys_ther_br_recist"]
 	}
@@ -6977,7 +6977,7 @@ export const dqChecks: QualCheck[] = [
 		desc:'Life Status Update ("lsu_status") = 1, Alive: no evidence of disease OR 3, Dead: no evidence of disease - Systemic Metastases Follow Up - Systemic therapy - Overall best radiological response ("sfu_sys_ther_br") <> 2, PD',
 		prec:multiVarHasValueOR,
 		precParams:[["lsu_status", 1], ["lsu_status", 3]],
-		func:varHasValue,
+		func:varHasValueRepInstr,
 		params:["sfu_sys_ther_br", 2, "!="],
 		vars:["lsu_status", "sfu_sys_ther_br"],
 	}

@@ -337,12 +337,10 @@ export const multiVarHasValueOR = (
 		"==": (a: any, b: any) => a == b,
 		"!=": (a: any, b: any) => a != b,
 	};
-
 	// Array to store the results of each check.
-	const fullResults: any = [];
 	const results: any = [];
 
-	throuples.forEach(([varPath, targetValue, operator = '==']) => {
+	throuples.forEach(([varPath, targetValue, operator = "=="]) => {
 		const currentValue = getAttributeValue(recordData, varPath);
 
 		let result = false;
@@ -358,6 +356,7 @@ export const multiVarHasValueOR = (
 		// "results" and "fullResults" are logs for detail, I return only the final boolean.
 		results.push(result);
 		
+    /*
 		fullResults.push({
 			varPath,
 			operator,
@@ -365,6 +364,7 @@ export const multiVarHasValueOR = (
 			currentValue,
 			result
 		});
+    */
 	});
 
 	// Final boolean: true if all the throuple are true.
@@ -1271,8 +1271,8 @@ export const dateCompareToFixedDateRepInstr = (
 	}
 	else {
 		// The date of birth consists only of the year. I am adding "01-01" for month and day.
-		if (refDatePath == '0.bl_dob') {
-			refDateStr = refDateStr + '-01-01';
+		if (refDatePath == "bl_dob") {
+			refDateStr = refDateStr + "-01-01";
 		}
 		const iter = Object.keys(targetDateStr).length;
 		for (let i = 1; i <= iter; i++) {
@@ -1348,8 +1348,8 @@ export const dateCompareToFixedDateRepInstrREV = (
 	}
 	else {
 		// The date of birth consists only of the year. I am adding "01-01" for month and day.
-		if (refDatePath == '0.bl_dob') {
-			refDateStr = refDateStr + '-01-01';
+		if (refDatePath == "bl_dob") {
+			refDateStr = refDateStr + "-01-01";
 		}
 		if (deltaDays == null) deltaDays = 0;
 		if (isNaN(Number(deltaDays))) {
@@ -1429,7 +1429,7 @@ export const uniqueDateCompareToFixedDateRepInstr = (
 	}
 
 	// If the comparison is against the date of birth, that only includes the year. I append month and day as "01-01".
-	if (refDatePath == "0.bl_dob") {
+	if (refDatePath == "bl_dob") {
 		refDateStr = refDateStr + "-01-01";
 	}
 			
@@ -1519,7 +1519,7 @@ export const uniqueDateCompareToFixedDateRepInstrREV = (
 	}
 
 	// If the comparison is against the date of birth, that only includes the year. I append month and day as "01-01".
-	if (refDatePath == "0.bl_dob") {
+	if (refDatePath == "bl_dob") {
 		refDateStr = refDateStr + "-01-01";
 	}
 			
@@ -1597,7 +1597,7 @@ export const compareAllDatesToFixed = (
 	}
 
 	// If the comparison is against the date of birth, that only includes the year. I append month and day as "01-01".
-	if (refDatePath == "0.bl_dob") {
+	if (refDatePath == "bl_dob") {
 		refDateStr = refDateStr + "-01-01";
 	}
 			
@@ -1684,7 +1684,7 @@ export const compareAllDatesToFixedREV = (
 	}
 
 	// If the comparison is against the date of birth, that only includes the year. I append month and day as "01-01".
-	if (refDatePath == "0.bl_dob") {
+	if (refDatePath == "bl_dob") {
 		refDateStr = refDateStr + "-01-01";
 	}
 			

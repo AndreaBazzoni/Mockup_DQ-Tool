@@ -66,7 +66,7 @@ export const createExcelDQ = (
 	const workbook = XLSX.utils.book_new();
 
 	const DQ_SHEET_NAMES: Record<string, string> = {
-		dq_1: "baseline and treatment at first presentation",
+		dq_1: "baseline and treatment at fp",
 		dq_2: "unifocal fu",
 		dq_3: "unifocal local recurrence",
 		dq_4: "unifocal distant metastasis",
@@ -192,15 +192,30 @@ const transformDataForDQ2 = (
 			];
 		});
 		const checkLabel = metadataCheck?.desc || check;
-    /*
-		const row = [
+    const row = [
 			checkLabel,
 			...variableColumns,
-			...values.map(val => val === 0 ? "" : val),
-			sum
+			...values.map(val => {
+				if (val === true || val === 0 || val == null) return "";
+				if (val === false) return 1;
+				return val;
+			}),
+			values.reduce((total, val) => {
+				if (val === false) return total + 1;
+				if (typeof val === "number" && Number.isFinite(val)) {
+					return total + val;
+				}
+				return total;
+			}, 0)
 		];
-    */
-    const row = [
+    /*
+		const row = [
+
+			//checkLabel,
+			//...variableColumns,
+			//...values.map(val => val === 0 ? "" : val),
+			//sum
+			
 			checkLabel,
 			...variableColumns,
 			...values.map(val => {
@@ -211,6 +226,7 @@ const transformDataForDQ2 = (
 			}),
 			values.filter(val => val === false).length
 		];
+    */
 		grouped[dqGroup].rows.push(row);
 	});
 

@@ -700,7 +700,7 @@ export const DoDataQuality = async (
               rowsOfDataForMainVar.forEach(dataInstance => {
                 let instanceNum = (dataInstance["redcap_repeat_instance"] ? dataInstance["redcap_repeat_instance"] : 0);
 
-                partial[instanceNum] = 0;
+                partial[instanceNum] = true;
 
                 // 1 - Controlla branching
                 // Calcola branching logic di ciascuna: true se tutte true (quindi in AND).
@@ -740,7 +740,12 @@ export const DoDataQuality = async (
                   // Se esiste un precheck nel DQ, allora setto precheckAvailable a "true" e proseguo a verificarlo (-> valore di precheckPassed).
                   if (check.prec != null && typeof check.prec === "function") {
                     precheckAvailable = true;
-                    precheckPassed = check.prec(recordData, ...(check.precParams ?? []));
+                    if ((check.prec.name == "multiVarHasValueOR") || (check.prec.name == "varHasValue")) {
+											precheckPassed = check.prec(recordData, ...(check.precParams ?? []));
+										}
+										else {
+											precheckPassed = check.prec(recordData, ...(check.precParams ?? []), dataInstance);
+                    }
                   }
                   // Se non esiste un precheck nel DQ, allora setto precheckAvailable a "false".
                   else {
@@ -767,7 +772,7 @@ export const DoDataQuality = async (
 
             else {
               // Se non trovo rows del tipo che mi interessa per la valutazione della variabile, allora posso già interrompere la valutazione del check mettendo "false".
-              results[check.name + " - " + check.desc] = 1;
+              results[check.name + " - " + check.desc] = 0;
             }
 			    }
         }
