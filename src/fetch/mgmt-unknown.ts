@@ -3,7 +3,7 @@ import type { REDCapRecord, REDCapMetadataField, REDCapInstrVsEventsField, REDCa
 
 
 // Function to build the Unknown Summary
-export function buildUnknownSummary(
+export function buildUnknownSummary (
   unknownMatrix: any
 ) {
 	return Object.values(unknownMatrix).map((row: any) => {
@@ -30,7 +30,7 @@ export function buildUnknownSummary(
 
 
 // Function to build the Missing Summary
-export function buildMissingSummary(
+export function buildMissingSummary (
   missingMatrix: any
 ) {
   return Object.values(missingMatrix).map((row: any) => {
@@ -52,7 +52,7 @@ export function buildMissingSummary(
 // Processes all rows for a patient to calculate unknown values.
 //  - unknownCodes: "unknown" values ​​from the metadata for all variables that have a specification regarding this.
 //  - unknownMatrix: a cumulative structure that tracks eligible patients and those with unknown values.
-export function processUnknownRecord(
+export function processUnknownRecord (
   recordId: string,
   recordData: REDCapRecord[],
   unknownCodes: any[],
@@ -96,7 +96,7 @@ export function processUnknownRecord(
 //  - missingMetadata: metadata for the variables to be checked.
 //  - missingMatrix: a cumulative structure that tracks eligible patients and those with missing values.
 //  - rowTypeMapping: a mapping between (event + instrument) and (rowType).
-export function processMissingRecord(
+export function processMissingRecord (
   context: DQContext,
   recordData: REDCapRecord[],
   missingMetadata: REDCapMetadataField[],
@@ -145,7 +145,7 @@ export function processMissingRecord(
 // ============================================================
 // UNIFIED UNKNOWN + MISSING (SUMMARY)
 // ============================================================
-export function buildUnknownMissingSummary(
+export function buildUnknownMissingSummary_OLD (
   unknownMatrix: any,
   missingMatrix: any,
   metadata: REDCapMetadataField[]
@@ -165,13 +165,16 @@ export function buildUnknownMissingSummary(
   > = {};
 
   // Mappa il nome del form per ogni variabile
-  const formNameByField = Object.fromEntries(metadata.map(item => [item.field_name, item.form_name]));
+  //const formNameByField = Object.fromEntries(metadata.map(item => [item.field_name, item.form_name]));
+  const metadataByField = Object.fromEntries(metadata.map(item => [item.field_name, item]));
 
   // 1. Inserisco tutti i risultati UNKNOWN.
   for (const item of unknownSummary) {
     summaryMap[item.field] = {
-      field: item.field,
-      formName: (formNameByField[item.field] || "").replace(/_/g, " "),
+      //field: item.field,
+      //formName: (formNameByField[item.field] || "").replace(/_/g, " "),
+      field: (metadataByField[item.field]?.field_label || item.field).replace(/<\/?(?:div|p|u)\b[^>]*>|<br\s*\/?>/gi, "").trim(),
+      formName: (metadataByField[item.field]?.form_name || "").replace(/_/g, " "),
       denominatorMissing: 0,
       percentMissing: 0,
       denominator: item.denominator,
@@ -183,12 +186,12 @@ export function buildUnknownMissingSummary(
   for (const item of missingSummary) {
     if (!summaryMap[item.field]) {
       summaryMap[item.field] = {
-        field: item.field,
-        formName: (formNameByField[item.field] || "").replace(/_/g, " "),
-
+        //field: item.field,
+        //formName: (formNameByField[item.field] || "").replace(/_/g, " "),
+        field: (metadataByField[item.field]?.field_label || item.field).replace(/<\/?(?:div|p|u)\b[^>]*>|<br\s*\/?>/gi, "").trim(),
+        formName: (metadataByField[item.field]?.form_name || "").replace(/_/g, " "),
         denominatorMissing: item.denominatorMissing,
         percentMissing: item.percent,
-
         denominator: 0,
         percentUnknown: 0
       };
@@ -200,6 +203,60 @@ export function buildUnknownMissingSummary(
   }
   
   return Object.values(summaryMap);
+}
+
+
+// Versione che elenca TUTTE le variabili (tranne quelle "descriptive" e la variabile "version"), anche quelle con 0 (sia in missing, sia in unknown).
+// Viene mantenuto l'ordine trovato in metadata. Utilizza le label.
+export function buildUnknownMissingSummary(
+  unknownMatrix: any,
+  missingMatrix: any,
+  metadata: REDCapMetadataField[]
+) {
+  const unknownSummary = buildUnknownSummary(unknownMatrix);
+  const missingSummary = buildMissingSummary(missingMatrix);
+
+  // Indicizzo i risultati usando il nome tecnico della variabile.
+  const unknownByField = new Map(
+    unknownSummary.map(item => [item.field, item])
+  );
+  const missingByField = new Map(
+    missingSummary.map(item => [item.field, item])
+  );
+  
+  // Costruisco l'elenco seguendo l'ordine dei metadata.
+  // Escludo i campi "descriptive" e la variabile "version".
+  const seenFields = new Set();
+  const summary = [];
+
+  for (const meta of metadata) {
+    const fieldName = meta.field_name;
+
+    if (!fieldName) continue;
+    if (meta.field_type === "descriptive") continue;
+    if (fieldName === "version") continue;
+    if (seenFields.has(fieldName)) continue;
+
+    seenFields.add(fieldName);
+
+    const unknown = unknownByField.get(fieldName);
+    const missing = missingByField.get(fieldName);
+
+    const fieldLabel = (meta.field_label || fieldName)
+      .replace(/<\/?(?:div|p|u)\b[^>]*>|<br\s*\/?>/gi, "")
+      .trim();
+
+    summary.push({
+      field: fieldLabel,
+      formName: (meta.form_name || "").replace(/_/g, " "),
+      denominatorMissing: missing?.denominatorMissing ?? 0,
+      percentMissing: missing?.percent ?? 0,
+      denominator: unknown?.denominator ?? 0,
+      percentUnknown: unknown?.percent ?? 0
+    });
+  }
+
+  return summary;
 }
 
 

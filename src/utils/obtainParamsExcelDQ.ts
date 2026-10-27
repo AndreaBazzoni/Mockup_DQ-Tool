@@ -1,5 +1,5 @@
 import { fetchRecords } from "@/fetch/dq-fetch";
-import { initializeBaselineCounters,	processBaselineRecord } from '@/fetch/mgmt-complete-patients';
+import { initializeBaselineCounters,	processBaselineCompleteness } from '@/fetch/mgmt-complete-patients';
 import { buildDiseaseExtensionTimeline, updateDiseaseExtensionPatients, updateDiseaseExtensionCounters, aggregateDiseaseExtensionCounters } from '@/fetch/mgmt-disease-extension';
 import { initializeFollowupStats, buildStatusTimeline, buildTimelineSummary, analyzeFollowupCompleteness, classifyPatients } from '@/fetch/mgmt-followup';
 import { buildUnknownMissingSummary, processUnknownRecord, extractUnknownCodes, processMissingRecord } from '@/fetch/mgmt-unknown';
@@ -99,7 +99,7 @@ export const obtainParamsExcelDQ = async(
         updateDiseaseExtensionPatients(diseaseExtensionPatients, diseaseExtensionTimeline);
         updateDiseaseExtensionCounters(diseaseExtensionCounters, diseaseExtensionTimeline);
         
-        processBaselineRecord(allRecordData[i], baselineCounters);
+        processBaselineCompleteness(allRecordData[i], baselineCounters);
         analyzeFollowupCompleteness(allRecordData[i], followupStats);
 
         processUnknownRecord(cohort[i], allRecordData[i], unknownCodes, unknownMatrix);

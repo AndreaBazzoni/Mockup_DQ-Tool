@@ -202,7 +202,7 @@ export function analyzeFollowupCompleteness (
 			v => v === "2"
 		);
 		const hasIncomplete = statuses.some(
-			v => v === "0"
+			v => v === "0" || v === "1"
 		);
 		if (allComplete) {
 			followupStats[cfg.completeGroup][cfg.key]++;

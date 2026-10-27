@@ -18,7 +18,7 @@ export function initializeBaselineCounters(
 
 
 // Funtion to process the Baseline
-export function processBaselineRecord(
+export function processBaselineCompleteness(
   recordData: REDCapRecord[],
   baselineCounters: any
 ) {
@@ -44,7 +44,7 @@ export function processBaselineRecord(
   }
 
   // complete = 0
-  if (complete === "0") {
+  if (complete === "0" || complete === "1") {
     if (disExt === "") baselineCounters.complete0_blank++;
     if (disExt === "1") baselineCounters.complete0_1++;
     if (disExt === "2") baselineCounters.complete0_2++;
