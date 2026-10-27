@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CurrentAnalysis } from "@/ManageCenters"
 
 
 export default function Footer() {
@@ -9,14 +10,20 @@ export default function Footer() {
     useEffect(() => {
       fetch('/version.txt').then(r => r.text()).then(setVersion);
     }, []);
+    
     return <>{version}</>;
   }
+
+  // Select the width of the lateral divs
+  const width = "128px";
 
   return (
     <footer>
 
       {/* Logo */}
-      <img src="/DQ_Logo-nobg.png" alt="DQ Logo" width="64px" height="64px" />
+      <div style={{ width: width }}>
+        <img src="/DQ_Logo-nobg.png" alt="DQ Logo" width="64px" height="64px" />
+      </div>
 
       {/* Link to Biomeris */}
       {/*
@@ -32,9 +39,9 @@ export default function Footer() {
         Developed by Biomeris
       </span>
 
-      {/* Versione */}
-      <div style={{ width: "64px" }}>
-        {AppVersion()}
+      {/* Version */}
+      <div style={{ width: width }}>
+        {CurrentAnalysis} - {AppVersion()}
       </div>
 
     </footer>
