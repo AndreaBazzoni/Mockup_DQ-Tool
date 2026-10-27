@@ -4,6 +4,8 @@ import type { Center } from "@/utils/types";
 // ------------------------------- //
 // ---- GESTIONE COMPILAZIONE ---- //
 // ------------------------------- //
+
+// Lista dei centri
 export const ListOfCenters: Center[] = [
   {
     name: "BIOMERIS",
@@ -22,8 +24,14 @@ export const ListOfCenters: Center[] = [
   },
 ];
 
-export const CurrentAnalysis: string = "2026";
+// ID dell'analisi corrente
+export const CurrentAnalysis: string = "2026-a";
 
+// Gestione della disponibilità delle funzionalità
+export const availableQuality: boolean = true;
+export const availableAnonymous: boolean = false;
+
+// Indirizzo del Bucket S3
 export const S3_Bucket: string = "ehe-public-617528855295-eu-south-1-an";
 export const S3_Region: string = ".eu-south-1";
 // ------------------------------- //

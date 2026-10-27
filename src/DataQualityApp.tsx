@@ -7,7 +7,7 @@ import { DoAnonymizedData } from "@/DoAnonymizedData";
 import { DownloadDataQuality } from "@/DownloadDataQuality";
 import { DownloadAnonymizedData } from "@/DownloadAnonymizedData";
 import ShareModal from "@/ShareModal";
-import { ListOfCenters, CurrentAnalysis } from "@/ManageCenters";
+import { ListOfCenters, CurrentAnalysis, availableQuality, availableAnonymous } from "@/ManageCenters";
 import { ManageCohort } from "@/ManageCohort";
 import { getMetadata, getInstrVsEvents, getRepeatings } from "@/fetch/dq-fetch";
 import type { Center, REDCapRecord, DQRecord, REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
@@ -80,8 +80,22 @@ export default function DataQualityApp() {
   // -------------
   // ---- RUN ----
   // -------------
-  const handleRun = async (isAnonymous: boolean) => {
+  const handleRun = async ({ isAnonymous }: { isAnonymous: boolean }) => {
+    // Check the available of functionalities.
+    if (!isAnonymous && !availableQuality) {
+      console.log("This functionality is not available at the moment.");
+      toast.warning("This functionality is not available at the moment.");
+      return;
+    }
+    if (isAnonymous && !availableAnonymous) {
+      console.log("This functionality is not available at the moment.");
+      toast.warning("This functionality is not available at the moment.");
+      return;
+    }
+
+    // Check if there are missing input.
     if (!selectedCenter || !token) {
+      console.log("Select a center and insert the token.");
       toast.error("Select a center and insert the token.");
       return;
     }
@@ -176,7 +190,7 @@ export default function DataQualityApp() {
 
 
   // Download (Data Quality or Anonymous Data)
-  const downloadResult = async (isAnonymous: boolean) => {
+  const downloadResult = async ({ isAnonymous }: { isAnonymous: boolean }) => {
     if (!selectedCenter) {
       console.error("Error during the download.");
       toast.error("Error during the download.");
@@ -217,7 +231,7 @@ export default function DataQualityApp() {
 
 
   // Result sharing (Data Quality o Anonymous Data)
-  const shareResult = (isAnonymous: boolean) => {
+  const shareResult = ({ isAnonymous }: { isAnonymous: boolean }) => {
     const result = isAnonymous ? resultAnonymous : resultQuality;
     if (!result) return;
 
@@ -308,7 +322,7 @@ export default function DataQualityApp() {
             className="manageButton"
             onClick={() => {
               setResultQuality(null);
-              handleRun(false)
+              handleRun({ isAnonymous: false })
             }}
             disabled={loading}
           >
@@ -321,7 +335,7 @@ export default function DataQualityApp() {
             className="manageButton"
             onClick={() => {
               setResultAnonymous(null);
-              handleRun(true)
+              handleRun({ isAnonymous: true })
             }}
             disabled={loading}
           >
@@ -360,7 +374,7 @@ export default function DataQualityApp() {
                   </ul>
                   <button
                     id="downloadResults"
-                    onClick={() => downloadResult(false)}
+                    onClick={() => downloadResult({ isAnonymous: false })}
                     className="manageButton"
                     disabled={loading}
                   >
@@ -368,7 +382,7 @@ export default function DataQualityApp() {
                   </button>
                   <button
                     id="shareResults"
-                    onClick={() => shareResult(false)}
+                    onClick={() => shareResult({ isAnonymous: false })}
                     className="manageButton"
                     disabled={loading}
                   >
@@ -432,7 +446,7 @@ export default function DataQualityApp() {
                   </ul>
                   <button
                     id="downloadResults"
-                    onClick={() => downloadResult(true)}
+                    onClick={() => downloadResult({ isAnonymous: true })}
                     className="manageButton"
                     disabled={loading}
                   >
@@ -440,7 +454,7 @@ export default function DataQualityApp() {
                   </button>
                   <button
                     id="shareResults"
-                    onClick={() => shareResult(true)}
+                    onClick={() => shareResult({ isAnonymous: true })}
                     className="manageButton"
                     disabled={loading}
                   >

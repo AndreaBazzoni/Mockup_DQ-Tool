@@ -41,7 +41,7 @@ export default function Footer() {
 
       {/* Version */}
       <div style={{ width: width }}>
-        {CurrentAnalysis} - {AppVersion()}
+        {CurrentAnalysis} <span style={{ fontSize: '24px' }}>|</span> {AppVersion()}
       </div>
 
     </footer>

@@ -9,8 +9,8 @@ export default function App() {
       <Toaster
         // I add the X
         closeButton
-        // Disappear after 3000ms (default = 4000)
-        duration={3000}
+        // Disappear after 5000ms (default = 4000)
+        duration={5000}
       />
       <Footer />
     </>
