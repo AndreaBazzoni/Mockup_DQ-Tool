@@ -33,10 +33,10 @@ export async function DownloadDataQuality(
 
   // Obtain parameters for file building.
   const rslt = await obtainParamsExcelDQ(center.url, token, allRecordData, cohort, metadata, instrumentsVsEvents, repeatings);
-  const {unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState} = rslt;
+  const {unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState, treatmentSummaryState} = rslt;
 
   // Creation of the Blob (Binary Large Object).
-  const dataBlob = createExcelDQ(resultQuality, metadata, unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState);
+  const dataBlob = createExcelDQ(resultQuality, metadata, unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState, treatmentSummaryState);
 
   // Create a link element to download the file.
   const urlBlob = window.URL.createObjectURL(dataBlob);

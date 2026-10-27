@@ -25,8 +25,8 @@ const handleShareResultQuality = async (
     const presignedUrl = `https://${S3_Bucket}.s3${S3_Region}.amazonaws.com/DQ_${CurrentAnalysis}_${center.id}_${timestamp}.xlsx`;
     // File creation
     const rslt = await obtainParamsExcelDQ(center.url, token, allRecordData, cohort, metadata, instrumentsVsEvents, repeatings);
-    const {unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState} = rslt;
-    const file = createExcelDQ(result, metadata, unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState);
+    const {unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState, treatmentSummaryState} = rslt;
+    const file = createExcelDQ(result, metadata, unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState, treatmentSummaryState);
     // ------------------------
     // Direct Upload to S3
     await shareResultsToS3(presignedUrl, file);

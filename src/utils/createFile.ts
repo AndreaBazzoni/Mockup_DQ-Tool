@@ -2,6 +2,7 @@ import * as XLSX from 'xlsx';
 import { dqChecks } from '@/utils/config-dqchecks';
 import { buildTimelineSummary } from '@/fetch/mgmt-followup';
 import type { REDCapRecord, DQRecord, REDCapMetadataField } from "@/utils/types";
+import { buildTreatmentSummarySheet } from "@/fetch/mgmt-treatments";
 
 
 // Life Status Type
@@ -61,7 +62,8 @@ export const createExcelDQ = (
   lifeStatusTimeline: lifeStatusType[] | undefined,
   noLifeStatusUnifocalTimeline: lifeStatusType[] | undefined,
   noLifeStatusLocoregionalTimeline: lifeStatusType[] | undefined,
-  noLifeStatusSystemicTimeline: lifeStatusType[] | undefined
+  noLifeStatusSystemicTimeline: lifeStatusType[] | undefined,
+  treatmentSummaryState: any
 ) => {
 	const workbook = XLSX.utils.book_new();
 
@@ -100,6 +102,10 @@ export const createExcelDQ = (
 	const completePatientsSheet = buildCompletePatientsSheet(baselineCounters);
 	const completePatientsWs = XLSX.utils.aoa_to_sheet(completePatientsSheet);
 	XLSX.utils.book_append_sheet(workbook,completePatientsWs,"complete patients");
+
+  const treatmentSheet = buildTreatmentSummarySheet(treatmentSummaryState);
+	const treatmentWs = XLSX.utils.aoa_to_sheet(treatmentSheet);
+	XLSX.utils.book_append_sheet(workbook,treatmentWs,"treatments");
 
 	const unknownSheet = buildUnknownSheet(unknownSummary);
 	const unknownWs = XLSX.utils.aoa_to_sheet(unknownSheet);

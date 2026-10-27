@@ -3,6 +3,7 @@ import { initializeBaselineCounters,	processBaselineCompleteness } from '@/fetch
 import { buildDiseaseExtensionTimeline, updateDiseaseExtensionPatients, updateDiseaseExtensionCounters, aggregateDiseaseExtensionCounters } from '@/fetch/mgmt-disease-extension';
 import { initializeFollowupStats, buildStatusTimeline, buildTimelineSummary, analyzeFollowupCompleteness, classifyPatients } from '@/fetch/mgmt-followup';
 import { buildUnknownMissingSummary, processUnknownRecord, extractUnknownCodes, processMissingRecord } from '@/fetch/mgmt-unknown';
+import { calculateTreatmentSummary } from '@/fetch/mgmt-treatments';
 import type { REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField, REDCapRecord, DQContext } from "@/utils/types";
 
 
@@ -17,7 +18,7 @@ export const obtainParamsExcelDQ = async(
 ) => {
   // Values ​​that I need to return (DO NOT USE useState!)
   let unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState;
-  let lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState;
+  let lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState, treatmentSummaryState;
 
   try {
     let fetchedRecords = await fetchRecords(centerUrl, token, 'bl_record_id');
@@ -98,10 +99,8 @@ export const obtainParamsExcelDQ = async(
         const diseaseExtensionTimeline = buildDiseaseExtensionTimeline(cohort[i], allRecordData[i], baselineDiseaseExtensionMap);
         updateDiseaseExtensionPatients(diseaseExtensionPatients, diseaseExtensionTimeline);
         updateDiseaseExtensionCounters(diseaseExtensionCounters, diseaseExtensionTimeline);
-        
         processBaselineCompleteness(allRecordData[i], baselineCounters);
         analyzeFollowupCompleteness(allRecordData[i], followupStats);
-
         processUnknownRecord(cohort[i], allRecordData[i], unknownCodes, unknownMatrix);
       }
     }
@@ -110,7 +109,6 @@ export const obtainParamsExcelDQ = async(
     const classificationByRecord = new Map(
       allPatientClassification.map(p => [p.record, p])
     );
-
     const lifeStatusTimeline = [];
     const noLifeStatusUnifocalTimeline = [];
     const noLifeStatusLocoregionalTimeline = [];
@@ -155,6 +153,9 @@ export const obtainParamsExcelDQ = async(
     noLifeStatusUnifocalTimelineState = noLifeStatusUnifocalTimeline;
     noLifeStatusLocoregionalTimelineState = noLifeStatusLocoregionalTimeline;
     noLifeStatusSystemicTimelineState = noLifeStatusSystemicTimeline;
+
+    const treatmentSummary = calculateTreatmentSummary(allRecordData);
+    treatmentSummaryState = treatmentSummary;
   }
     
   catch (err) {
@@ -163,6 +164,6 @@ export const obtainParamsExcelDQ = async(
   } 
     
   finally {
-    return {unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState};
+    return {unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState, treatmentSummaryState};
   }
 }
