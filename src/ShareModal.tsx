@@ -33,7 +33,8 @@ const handleShareResultQuality = async (
     // User confirm
     toast.success("Data Quality sharing successfully completed!");
 
-  } catch (err: any) {
+  }
+  catch (err: any) {
     console.error(err.message || "Error during the Data Sharing.");
     toast.error(err.message || "Error during the Data Sharing.");
   }
@@ -55,7 +56,8 @@ const handleShareResultAnonymous = async (
     // User confirm
     toast.success("Anonymous Data sharing successfully completed!");
 
-  } catch (err: any) {
+  } 
+  catch (err: any) {
     console.error(err.message || "Error during the Data Sharing.");
     toast.error(err.message || "Error during the Data Sharing.");
   }
@@ -70,7 +72,7 @@ export default function ShareModal(props: ShareModalProps) {
     setIsSharing(true);
 
     // -- Date/Time generation for the file name --
-    // Generate a timestamp for the file name
+    // Generate a timestamp for the file name.
     const now = new Date();
 
     // Year = presence
@@ -112,7 +114,7 @@ export default function ShareModal(props: ShareModalProps) {
 
     finally {
       setIsSharing(false);
-      onClose(); // Close the modal after sending
+      onClose();  // Close the modal after sending
     }
   }
 
@@ -155,6 +157,17 @@ export default function ShareModal(props: ShareModalProps) {
           Cancel
         </button>
       </div>
+
+      {/* LOADING */}
+      {/* sr-only = screen-reader accessibility */}
+      <div role="status" className="sr-only">
+        {isSharing ? "Caricamento in corso..." : ""}
+      </div>
+      {isSharing && (
+        <div className="loading-overlay" aria-hidden="true">
+          <div className="spinner" />
+        </div>
+      )}
 
     </div>
   );

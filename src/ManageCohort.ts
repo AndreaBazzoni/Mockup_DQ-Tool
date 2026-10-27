@@ -35,7 +35,8 @@ export const ManageCohort = async (
 
   if (fileCohortExists) {
     cohort = await getCohort(center.url, token, fileCohortExists.doc_id);
-  } else {
+  }
+  else {
     const totalData = await fetchCohort(center.url, token);
     const recordIds = [...new Set(totalData.map((patient: any) => patient.bl_record_id))] as string[];
     const cohortTxtFile = createTxtFile(recordIds, nameFileCohort);
@@ -44,6 +45,5 @@ export const ManageCohort = async (
   }
 
   const allRecordData = await achieveAllRecordData(center.url, token, cohort);
-
   return { cohort, allRecordData };
 };

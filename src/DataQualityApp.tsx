@@ -43,6 +43,7 @@ export default function DataQualityApp() {
   }, []);
   */
 
+  
   // List of centers, but arranged in alphabetical order.
   const sortedCenters = [...ListOfCenters].sort((a, b) => a.name.localeCompare(b.name));
 
@@ -158,12 +159,14 @@ export default function DataQualityApp() {
 
       // -- Completed --
       toast.success(isAnonymous ? "Anonymization completed!" : "Data Quality completed!");
-
-    } catch (err: any) {
+    }
+    
+    catch (err: any) {
       console.error(err.message || "Error during the operation.");
       toast.error(err.message || "Error during the operation.");
-
-    } finally {
+    }
+    
+    finally {
       setLoading(false);
     }
   };

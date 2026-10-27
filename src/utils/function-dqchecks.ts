@@ -1,6 +1,6 @@
 export const getAttributeValue = (
   recordData: any,
-  target_attr: any
+  target_attr: string
 ) => {
 	let result = null;
 
@@ -40,7 +40,7 @@ export const getAttributeValue = (
 // Function to get the value assigned to a variable in all the instances of the repeating instrument it belongs to. [ RESULT = ARRAY ]
 const getAttributeValueRepInstr = (
   recordData: any,
-  target_attr: any
+  target_attr: string
 ) => {
 	// List of names of repeating instruments.
 	let lu_instr = {
@@ -87,9 +87,15 @@ const getAttributeValueRepInstr = (
 
 // Function to get the value assigned to a variable in an instances of the repeating instrument it belongs to.
 const getAttributeValueRepInstrREV = (
-  target_attr: any,
+  recordData: any,
+  target_attr: string,
   dataInstance: any
 ) => {
+  // To avoid an "unused variable" error.
+  if (recordData === null) {
+    console.log("Record Data null.");
+  }
+
 	// List of names of repeating instruments.
 	let lu_instr = {
 		ufu:{event:"unifocal_arm_1",instrument:"unifocal_followup"}
@@ -441,7 +447,8 @@ export const varHasValueRepInstr = (
 
 // Function to check if a single variable (existing in varPath) has the required targetValue (dq_9_xx).
 export const varHasValueRepInstrREV = (
-  varPath: any,
+  recordData: any,
+  varPath: string,
   targetValue: any,
   operator = '==',
   datainstance: any
@@ -461,7 +468,7 @@ export const varHasValueRepInstrREV = (
 		throw new Error(`Unsupported operator: ${operator}`);
 	}
 	// Count of instances
-	const currentValue = getAttributeValueRepInstrREV(varPath, datainstance);
+	const currentValue = getAttributeValueRepInstrREV(recordData, varPath, datainstance);
 	
 	let result = false;
 
@@ -720,8 +727,8 @@ export const varHasValueWithPreviousSelfRepInstrREV = (
 // "later" and "earlier" are arrays with varname and expected value.
 export const multiVarHasValueFirstVsLastInstRepInstr = (
   recordData: any,
-  later: any[],
-  earlier: any[]
+  later: string,
+  earlier: string
 ) => {
 	let instCountL = getAttributeValueRepInstr(recordData, later[0]);
 	let instCountE = getAttributeValueRepInstr(recordData, earlier[0]);
@@ -754,8 +761,8 @@ export const multiVarHasValueFirstVsLastInstRepInstr = (
 // "later" and "earlier" are arrays with varname and expected value.
 export const multiVarHasValueFirstVsLastInstRepInstrREV = (
   recordData: any,
-  later: any[],
-  earlier: any[]
+  later: string,
+  earlier: string
 ) => {
 	let instCountL = getAttributeValueRepInstr(recordData, later[0]);
 	let instCountE = getAttributeValueRepInstr(recordData, earlier[0]);
@@ -788,8 +795,8 @@ export const multiVarHasValueFirstVsLastInstRepInstrREV = (
 // "later" and "earlier" are arrays with varname and expected value.
 export const multiVarHasValueFixedVsLastInstRepInstr = (
   recordData: any,
-  later: any[],
-  earlier: any[]
+  later: string,
+  earlier: string
 ) => {
 	let instCountL = getAttributeValue(recordData, later[0]);
 	let instCountE = getAttributeValueRepInstr(recordData, earlier[0]);
@@ -822,8 +829,8 @@ export const multiVarHasValueFixedVsLastInstRepInstr = (
 // "later" and "earlier" are arrays with varname and expected value.
 export const multiVarHasValueFixedVsLastInstRepInstrREV = (
   recordData: any,
-  later: any[],
-  earlier: any[]
+  later: string,
+  earlier: string
 ) => {
 	let instCountL = getAttributeValue(recordData, later[0]);
 	let instCountE = getAttributeValueRepInstr(recordData, earlier[0]);
@@ -841,8 +848,8 @@ export const multiVarHasValueFixedVsLastInstRepInstrREV = (
 // Function to compare a date from a non repeating instrument and one from a repeating instrument over all instances of the latter.
 export const multiDateCompareFixedVsLastInstRepInstr = (
   recordData: any,
-  later: any[],
-  earlier: any[]
+  later: string,
+  earlier: string
 ) => {
 	let instCountL = getAttributeValue(recordData, later);
 	let instCountE = getAttributeValueRepInstr(recordData, earlier);
@@ -863,8 +870,8 @@ export const multiDateCompareFixedVsLastInstRepInstr = (
 
 export const multiDateCompareFirstVsLastInstRepInstr = (
   recordData: any,
-  later: any[],
-  earlier: any[]
+  later: string,
+  earlier: string
 ) => {
 	let instCountL = getAttributeValueRepInstr(recordData, later);
 	let instCountE = getAttributeValueRepInstr(recordData, earlier);
@@ -885,8 +892,8 @@ export const multiDateCompareFirstVsLastInstRepInstr = (
 
 export const multiDateCompareFirstVsLastInstRepInstrREV = (
   recordData: any,
-  later: any[],
-  earlier: any[]
+  later: string,
+  earlier: string
 ) => {
 	let instCountL = getAttributeValueRepInstr(recordData, later);
 	let instCountE = getAttributeValueRepInstr(recordData, earlier);
@@ -937,7 +944,8 @@ export const multiVarHasValueRepInstr = (
 // Function to check if # checks of VarHasValue are ALL true within the same instance of the Repeating instrument.
 // The check is performed for all the instances of the r.i.
 export const multiVarHasValueRepInstrREV = (
-  couples: any[],
+  recordData: any,
+  couples: string[],
   dataInstance: any
 ) => {
 	// "couples" is an array containing a list of couples: [[varPath1,targetValue1], [varPath2,targetValue2], ...].
@@ -945,7 +953,7 @@ export const multiVarHasValueRepInstrREV = (
 	let results = true;
 
 	for (const couple of couples) {
-		let currentValue = getAttributeValueRepInstrREV(couple[0], dataInstance);
+		let currentValue = getAttributeValueRepInstrREV(recordData, couple[0], dataInstance);
 		if (currentValue == "" || currentValue == null || currentValue != couple[1]) {
 			results = false;
 			break;
@@ -980,12 +988,13 @@ export const varWithinIntervalRepInstr = (
 
 // Function to check if a value is within an interval in all the instances of the repeating instrument it belongs to.
 export const varWithinIntervalRepInstrREV = (
-  attribute: any,
+  recordData: any,
+  attribute: string,
   min: any,
   max: any,
   datainstance: any
 ) => {
-	let currentValue = getAttributeValueRepInstrREV(attribute, datainstance);
+	let currentValue = getAttributeValueRepInstrREV(recordData, attribute, datainstance);
 	let results = true;
 
 	if ((currentValue >= min) && (currentValue <= max)) {
@@ -1064,15 +1073,16 @@ export const dateCompareWithDeltaRepInstr = (
 
 // Function to compare two variables belonging to the same repeating instrument, within the same instance.
 export const dateCompareWithDeltaRepInstrREV = (
-  targetDatePath: any,
-  refDatePath: any,
+  recordData: any,
+  targetDatePath: string,
+  refDatePath: string,
   deltaDays: any,
   operator: any,
   datainstance: any
 ) => {
 	// Retrieve date strings from the record data.
-	let targetDateStr = getAttributeValueRepInstrREV(targetDatePath, datainstance);
-	let refDateStr = getAttributeValueRepInstrREV(refDatePath, datainstance);
+	let targetDateStr = getAttributeValueRepInstrREV(recordData, targetDatePath, datainstance);
+	let refDateStr = getAttributeValueRepInstrREV(recordData, refDatePath, datainstance);
 	
 	let results = null;
 
@@ -1330,14 +1340,14 @@ export const dateCompareToFixedDateRepInstr = (
 // Function to compare a date from a repeating instrument to a fixed date from a non repeating one (e.g. date of followup).
 export const dateCompareToFixedDateRepInstrREV = (
   recordData: any,
-  targetDatePath: any,
-  refDatePath: any,
+  targetDatePath: string,
+  refDatePath: string,
   deltaDays: any,
   operator: any,
   datainstance: any
 ) => {
 	// Retrieve date strings from the record data.
-	let targetDateStr = getAttributeValueRepInstrREV(targetDatePath, datainstance);
+	let targetDateStr = getAttributeValueRepInstrREV(recordData, targetDatePath, datainstance);
 	let refDateStr = getAttributeValue(recordData, refDatePath);
 
 	let results = true;

@@ -7,7 +7,6 @@ export const getEventOfInstrument = (
   instrument: string
 ) => {
 	let instrumentsVsEvents = dqContext.instrumentsVsEvents;
-
   const found = instrumentsVsEvents.find(item => item.form === instrument);
 
   if (found === undefined) {
@@ -41,7 +40,8 @@ export const isVarRepeating = (
 export const varHasBranchingLogic = (metadataElem: REDCapMetadataField) => {
 	if (metadataElem.branching_logic) {
 		return true;
-	} else {
+	}
+  else {
 		return false;
 	}
 };
@@ -300,7 +300,8 @@ export const extractRedcapVariables = (
 				const idx = m[2];
 				variable.realVar = base;
 				variable.realField = `${base}___${idx}`;  // convenzione REDCap per checkbox
-			} else {
+			}
+      else {
 				variable.realVar = variable.field;
 				variable.realField = variable.field;
 			}
@@ -527,7 +528,8 @@ function findVarsInStructure(
     for (const element of value) {
       findVarsInStructure(element, varsSet, foundSet);
     }
-  } else if (typeof value === "string" && varsSet.has(value)) {
+  }
+  else if (typeof value === "string" && varsSet.has(value)) {
     foundSet.add(value);
   }
 };
@@ -611,10 +613,13 @@ export const DoDataQuality = async (
 			let nonExistingVars = nonexistentVars(dqContext, check.vars);
 
       if (nonExistingVars.length > 0) {
+        /*
 				console.log("Error in the vars list for check " + check.name + ": ");
 				nonExistingVars.forEach(function (v) {
 					console.log(" - ", v);
 				});
+        */
+
 				return;
 			}
 
