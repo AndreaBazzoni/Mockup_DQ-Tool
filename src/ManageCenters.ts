@@ -29,7 +29,7 @@ export const CurrentAnalysis: string = "2026-a";
 
 // Gestione della disponibilità delle funzionalità
 export const availableQuality: boolean = true;
-export const availableAnonymous: boolean = false;
+export const availableAnonymous: boolean = true;
 
 // Indirizzo del Bucket S3
 export const S3_Bucket: string = "ehe-public-617528855295-eu-south-1-an";

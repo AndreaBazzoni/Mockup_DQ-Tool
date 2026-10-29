@@ -28,7 +28,7 @@ export const DoAnonymizedData = async (
   let patientCounter = 1;
 
   // Chiave per l'anonimizzazione
-  let secret = "prova_segreto";
+  let secret = "";
 
   try {
     // Faccio una copia di allRecordDataResult così non lo sovrascrivo.
