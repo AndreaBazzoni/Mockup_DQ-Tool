@@ -33,6 +33,7 @@ All the following commands must be run from this folder.
 ### 3. Install dependencies
 
 ```bash
+# NOTE: required: { node: '^20.19.0 || ^22.13.0 || >=24' }
 npm install
 ```
 
