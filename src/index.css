@@ -2,12 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
-
-
-/* Tailwind Dependence */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 
 /* Minimum to avoid overflow */
@@ -164,7 +159,7 @@ button.eye {
   align-items: center;
   justify-content: center;
   position: absolute;
-  right: 4px;
+  right: 12px;
   top: 8%;
 }
 

@@ -1,4 +1,3 @@
-import * as XLSX from 'xlsx';
 import { dqChecks } from '@/utils/config-dqchecks';
 import { buildTimelineSummary } from '@/fetch/mgmt-followup';
 import type { REDCapRecord, DQRecord, REDCapMetadataField } from "@/utils/types";
@@ -28,9 +27,12 @@ export const createTxtFile = (
 
 
 // Create generic .xlsx file
-export const createXlsxFile = (
+export const createXlsxFile = async(
   allRecordData: REDCapRecord[][]
 ) => {
+  // Load xlsx only when used.
+  const XLSX = await import("xlsx");
+
   // allRecordData is an Object that becomes an Object Array.
   const rows = Object.values(allRecordData).flat();
 
@@ -52,7 +54,7 @@ export const createXlsxFile = (
 
 
 // Create Excel file fot DQ
-export const createExcelDQ = (
+export const createExcelDQ = async(
   dataQualityResults: Record<string, DQRecord>,
   metadata: REDCapMetadataField[],
   unknownSummary: any,
@@ -65,6 +67,9 @@ export const createExcelDQ = (
   noLifeStatusSystemicTimeline: lifeStatusType[] | undefined,
   treatmentSummaryState: any
 ) => {
+    // Load xlsx only when used.
+  const XLSX = await import("xlsx");
+
 	const workbook = XLSX.utils.book_new();
 
   /*

@@ -281,11 +281,11 @@ export default function DataQualityApp() {
             </SelectTrigger>
             <SelectContent side="bottom" align="start">
               <SelectItem key="empty" value="empty">
-                - Select center -
+                &nbsp;- Select center -
               </SelectItem>
               {sortedCenters.map((c) => (
                 <SelectItem key={c.id} value={c.id}>
-                  {c.name}
+                  &nbsp;{c.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -303,7 +303,7 @@ export default function DataQualityApp() {
             />
             <button
               type="button"
-              className="eye mr-[8px]"
+              className="eye"
               disabled={loading}
               onClick={() => setShowToken((v) => !v)}
             >

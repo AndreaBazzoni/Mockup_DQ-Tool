@@ -25,7 +25,7 @@ export async function DownloadAnonymizedData(
   const fileName = `${CurrentAnalysis}_${center.id}_${timestamp}.xlsx`;
 
   // Creation of the Blob (Binary Large Object).
-  const dataBlob = createXlsxFile(resultAnonymous);
+  const dataBlob = await createXlsxFile(resultAnonymous);
 
   // Create a link element to download the file.
   const urlBlob = window.URL.createObjectURL(dataBlob);
