@@ -10,11 +10,6 @@ body {
   min-width: 600px;
 }
 
-/* Minimum to avoid overflow */
-body {
-  min-width: 600px;
-}
-
 :root {
   --text: black;
   --text-h: rgb(20, 20, 20, 0.9);
