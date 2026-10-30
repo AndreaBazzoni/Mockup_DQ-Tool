@@ -1,13 +1,14 @@
+/* Library */
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
+@import "tailwindcss";
 
 
-/* Dipendenza Tailwind */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
+/* Minimum to avoid overflow */
+body {
+  min-width: 600px;
+}
 
 /* Minimum to avoid overflow */
 body {
@@ -163,7 +164,7 @@ button.eye {
   align-items: center;
   justify-content: center;
   position: absolute;
-  right: 4px;
+  right: 12px;
   top: 8%;
 }
 
@@ -310,8 +311,8 @@ svg {
   border-radius: 8px;
 }
 [data-slot="dialog-overlay"] {
-  background-color: rgba(0, 0, 0, 0.7); /* aumenta/diminuisci l'opacità */
-  backdrop-filter: blur(2px); /* effetto vetro smerigliato */
+  background-color: rgba(0, 0, 0, 0.7); /* increase/decrease opacity */
+  backdrop-filter: blur(2px); /* frosted glass effect */
 }
 .scrollText {
   overflow: auto;
@@ -404,8 +405,8 @@ footer {
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.7); /* aumenta/diminuisci l'opacità */
-  backdrop-filter: blur(2px); /* effetto vetro smerigliato */
+  background-color: rgba(0, 0, 0, 0.7); /* increase/decrease opacity */
+  backdrop-filter: blur(2px); /* frosted glass effect */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -437,7 +438,7 @@ footer {
 }
 
 
-/* ERRORE (Centri duplicati) */
+/* ERROR (duplicates Centers) */
 .errorMessage {
   padding: 16px;
   border: 2px solid var(--text);

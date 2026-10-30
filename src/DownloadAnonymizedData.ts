@@ -7,12 +7,12 @@ export async function DownloadAnonymizedData(
   CurrentAnalysis: string,
   resultAnonymous: REDCapRecord[][]
 ) {
-  // Generate a timestamp for the file name
+  // Generate a timestamp for the file name.
   const now = new Date();
 
-  // Anno = presente
+  // Year = presence
   const dateString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  // Anno = assente
+  // Year = absence
   //const dateString = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
   const hourString = `${String(now.getHours()).padStart(2, '0')}`;
@@ -21,23 +21,23 @@ export async function DownloadAnonymizedData(
 
   const timestamp = `${dateString}_${hourString}${minuteString}${secondString}`;
 
-  // Construct the file name
+  // Construct the file name.
   const fileName = `${CurrentAnalysis}_${center.id}_${timestamp}.xlsx`;
 
-  // Creation of the Blob (Binary Large Object)
-  const dataBlob = createXlsxFile(resultAnonymous);
+  // Creation of the Blob (Binary Large Object).
+  const dataBlob = await createXlsxFile(resultAnonymous);
 
-  // Create a link element to download the file
+  // Create a link element to download the file.
   const urlBlob = window.URL.createObjectURL(dataBlob);
   const linkBlob = document.createElement('a');
   linkBlob.href = urlBlob;
   linkBlob.download = fileName;
 
-  // Append the link to the document and trigger a click
+  // Append the link to the document and trigger a click.
   document.body.appendChild(linkBlob);
   linkBlob.click();
 
-  // Clean up
+  // Clean up.
   document.body.removeChild(linkBlob);
   window.URL.revokeObjectURL(urlBlob);
 };

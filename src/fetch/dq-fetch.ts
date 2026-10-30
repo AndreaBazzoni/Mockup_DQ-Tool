@@ -29,7 +29,7 @@ export const getMetadata = async (
   }
   const resultText = await response.text();
 
-  // N.B.: { response.ok = true } solo se status = 200÷299
+  // NOTE: { response.ok = true } only if status = 200÷299
   if (!response.ok) {
     if (response.status === 403) {
       throw new Error("Invalid token or insufficient permissions.");
@@ -76,7 +76,7 @@ export const getInstrVsEvents = async (
   }
   const resultText = await response.text();
 
-  // N.B.: { response.ok = true } solo se status = 200÷299
+  // NOTE: { response.ok = true } only if status = 200÷299
   if (!response.ok) {
     if (response.status === 403) {
       throw new Error("Invalid token or insufficient permissions.");
@@ -123,7 +123,7 @@ export const getRepeatings = async (
   }
   const resultText = await response.text();
 
-  // N.B.: { response.ok = true } solo se status = 200÷299
+  // NOTE: { response.ok = true } only if status = 200÷299
   if (!response.ok) {
     if (response.status === 403) {
       throw new Error("Invalid token or insufficient permissions.");
@@ -172,7 +172,7 @@ export const fetchRecords = async (
   }
   const resultText = await response.text();
 
-  // N.B.: { response.ok = true } solo se status = 200÷299
+  // NOTE: { response.ok = true } only if status = 200÷299
   if (!response.ok) {
     if (response.status === 403) {
       throw new Error("Invalid token or insufficient permissions.");
@@ -188,7 +188,7 @@ export const fetchRecords = async (
   }
   const records: string[] = recordsRaw.map((record: any) => record[idAttr]);
 
-  // Elimino i duplicati
+  // I remove the duplicates
   const uniqueRecords: string[] = [...new Set(records)];
 
 	return uniqueRecords;

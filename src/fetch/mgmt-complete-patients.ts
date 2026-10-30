@@ -1,8 +1,9 @@
 import type { REDCapRecord } from "@/utils/types";
 
 
-// Funzione per inizializzare la Baseline Counters
-export function initializeBaselineCounters() {
+// Function to initialize the Baseline Counters
+export function initializeBaselineCounters(
+) {
 	return {
 		complete2_blank: 0,
 		complete2_1: 0,
@@ -16,8 +17,11 @@ export function initializeBaselineCounters() {
 }
 
 
-// Funzione per processare la Baseline
-export function processBaselineRecord(recordData: REDCapRecord[], baselineCounters: any) {
+// Funtion to process the Baseline
+export function processBaselineCompleteness(
+  recordData: REDCapRecord[],
+  baselineCounters: any
+) {
   const baselineRow = recordData.find(
     (row) =>
       row.redcap_event_name === "baseline_arm_1" &&
@@ -40,7 +44,7 @@ export function processBaselineRecord(recordData: REDCapRecord[], baselineCounte
   }
 
   // complete = 0
-  if (complete === "0") {
+  if (complete === "0" || complete === "1") {
     if (disExt === "") baselineCounters.complete0_blank++;
     if (disExt === "1") baselineCounters.complete0_1++;
     if (disExt === "2") baselineCounters.complete0_2++;

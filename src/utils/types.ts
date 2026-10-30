@@ -27,9 +27,9 @@ export interface AnonCheck {
 export interface QualCheck {
   name: string;
   desc: string;
-  prec: any | null;
+  prec: ((recordData: any, ...args: any[]) => any) | null;
   precParams: any[] | null;
-  func: (recordData: any, ...throuples: any[]) => any;
+  func: (recordData: any, ...args: any[]) => boolean | boolean[];
   params: any[];
   vars: string[];
 }
@@ -44,6 +44,8 @@ interface ShareModalQualityProps {
   metadata: REDCapMetadataField[];
   instrumentsVsEvents: REDCapInstrVsEventsField[];
   repeatings: REDCapRepeatingsField[];
+  allRecordData: REDCapRecord[][];
+  cohort: string[];
 }
 
 interface ShareModalAnonymousProps {
@@ -112,4 +114,5 @@ export interface VariableRef {
   realField: string;
   realVar: string;
   raw: string[] | null;
+  targetInstance?: number | null;
 }

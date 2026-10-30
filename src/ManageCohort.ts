@@ -1,14 +1,14 @@
 import { fetchFileRepository, fetchCohort, getCohort, createFileCohort, createDirectory } from "@/fetch/redcap-fetch";
 import type { Center, REDCapRecord } from "@/utils/types";
 import { createTxtFile } from "@/utils/createFile";
-import { achieveRecordData } from "@/utils/achieveRecordData";
+import { achieveAllRecordData } from "@/utils/achieveAllRecordData";
 
 
 export const ManageCohort = async (
   center: Center,
   token: string,
   currentAnalysis: string
-): Promise<{ cohort: string[] | null; recordData: REDCapRecord[][] | null }> => {
+): Promise<{ cohort: string[] | null; allRecordData: REDCapRecord[][] | null }> => {
 
   // ------------------------------- //
   // ---- GESTIONE COMPILAZIONE ---- //
@@ -35,7 +35,8 @@ export const ManageCohort = async (
 
   if (fileCohortExists) {
     cohort = await getCohort(center.url, token, fileCohortExists.doc_id);
-  } else {
+  }
+  else {
     const totalData = await fetchCohort(center.url, token);
     const recordIds = [...new Set(totalData.map((patient: any) => patient.bl_record_id))] as string[];
     const cohortTxtFile = createTxtFile(recordIds, nameFileCohort);
@@ -43,7 +44,6 @@ export const ManageCohort = async (
     cohort = recordIds;
   }
 
-  const recordData = await achieveRecordData(center.url, token, cohort);
-
-  return { cohort, recordData };
+  const allRecordData = await achieveAllRecordData(center.url, token, cohort);
+  return { cohort, allRecordData };
 };

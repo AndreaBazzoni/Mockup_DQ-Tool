@@ -1,4 +1,7 @@
-export const getAttributeValue = (recordData: any, target_attr: any) => {
+export const getAttributeValue = (
+  recordData: any,
+  target_attr: string
+) => {
 	let result = null;
 
 	let lu_instr = {
@@ -25,7 +28,7 @@ export const getAttributeValue = (recordData: any, target_attr: any) => {
 		let instr = data['redcap_repeat_instrument'];
 		let event = data['redcap_event_name'];
 
-		if((event == target_event) && (instr == target_instr)) {
+		if ((event == target_event) && (instr == target_instr)) {
 			result = data[target_attr];
 			return result;			
 		}
@@ -34,9 +37,12 @@ export const getAttributeValue = (recordData: any, target_attr: any) => {
 }
 
 
-//Function to get the value assigned to a variable in all the instances of the repeating instrument it belongs to
-const getAttributeValueRepInstr = (recordData: any, target_attr: any) => {
-	// List of names of repeating instruments
+// Function to get the value assigned to a variable in all the instances of the repeating instrument it belongs to. [ RESULT = ARRAY ]
+const getAttributeValueRepInstr = (
+  recordData: any,
+  target_attr: string
+) => {
+	// List of names of repeating instruments.
 	let lu_instr = {
 		ufu:{event:"unifocal_arm_1",instrument:"unifocal_followup"}
 		,ulr:{event:"unifocal_arm_1",instrument:"unifocal_local_recurrence"}
@@ -63,8 +69,8 @@ const getAttributeValueRepInstr = (recordData: any, target_attr: any) => {
 		let instr = data['redcap_repeat_instrument'];
 		let instance = data['redcap_repeat_instance'];
 		let event = data['redcap_event_name'];
-		//if the value is found (match of instrument, event and instance) 
-		if((event == target_event) && (instr == target_instr) && (instance !== '')) {
+		// If the value is found (match of instrument, event and instance):
+		if ((event == target_event) && (instr == target_instr) && (instance !== "")) {
 			count = count + 1;
 			results[instance] = data[target_attr];
 		}
@@ -79,16 +85,64 @@ const getAttributeValueRepInstr = (recordData: any, target_attr: any) => {
 };
 
 
-// Function to add days to a Date object
-const addDays = (date: any, days: any) => {
+// Function to get the value assigned to a variable in an instances of the repeating instrument it belongs to.
+const getAttributeValueRepInstrREV = (
+  recordData: any,
+  target_attr: string,
+  dataInstance: any
+) => {
+  // To avoid an "unused variable" error.
+  if (recordData === null) {
+    console.log("Record Data null.");
+  }
+
+	// List of names of repeating instruments.
+	let lu_instr = {
+		ufu:{event:"unifocal_arm_1",instrument:"unifocal_followup"}
+		,ulr:{event:"unifocal_arm_1",instrument:"unifocal_local_recurrence"}
+//		,udm:{event:"unifocal_arm_1",instrument:"unifocal_distant_metastases"}
+		,lfu:{event:"locoregional_arm_1",instrument:"locoregional_followup"}
+		,lpr:{event:"locoregional_arm_1",instrument:"locoregional_progression"}
+		,sfu:{event:"systemic_metastase_arm_1",instrument:"systemic_metastases_followup"}
+		,spr:{event:"systemic_metastase_arm_1",instrument:"systemic_metastases_progression"}
+//		,lsu:{event:"life_status__clini_arm_1",instrument:"life_status_update"}
+	};
+		
+	let results = null;
+  const targetKey = target_attr.split('_')[0] as keyof typeof lu_instr;
+	let target_instr = lu_instr[targetKey]["instrument"];
+	let target_event = lu_instr[targetKey]["event"];
+	let data = dataInstance;
+	let instr = dataInstance.redcap_repeat_instrument;
+	let instance = dataInstance.redcap_repeat_instance;
+	let event = dataInstance['redcap_event_name'];
+	// If the value is found (match of instrument, event and instance):
+	if ((event == target_event) && (instr == target_instr) && (instance !== "")) {
+		results = data[target_attr];
+	}
+
+	return results;
+};
+
+
+// Function to add days to a Date object.
+const addDays = (
+  date: any,
+  days: any
+) => {
 	const result = new Date(date);
 	result.setDate(result.getDate() + days);
 	return result;
 };
 
 
-// Function to check if a single variable (existing in varPath) has the required targetValue
-export const varHasValue = (recordData: any, varPath: any, targetValue: any, operator = '==') => {
+// Function to check if a single variable (existing in varPath) has the required targetValue in a non repeating instrument.
+export const varHasValue = (
+  recordData: any,
+  varPath: any,
+  targetValue: any,
+  operator = "=="
+) => {
 	const currentValue = getAttributeValue(recordData, varPath);
 	if (currentValue == null) {
 		return false;
@@ -113,26 +167,38 @@ export const varHasValue = (recordData: any, varPath: any, targetValue: any, ope
 };
 
 
-// Function to check if a single variable (existing in varPath) has the required targetValue
-export const varHasValueOLD = (recordData: any, varPath: any, targetValue: any, operator = '==') => {
+/*
+// Function to check if a single variable (existing in varPath) has the required targetValue.
+export const varHasValueOLD = (
+  recordData: any,
+  varPath: any,
+  targetValue: any,
+  operator = '=='
+) => {
 	let currentValue = getAttributeValue(recordData, varPath);
 	if (currentValue == null) return false;
 
 	let results = {};
 	results = (currentValue == targetValue);
 
-  // N.B.: "operator" non viene usata in questa funzione, ma serve per la struttura del codice. NON RIMUOVERE!
+  // NOTE: "patientId" is not used in this function, but it is required for the code structure. DO NOT REMOVE!
   if (recordData === null) {
-    console.log("Operator: ", operator);  // Evito il warning di inutilizzo stampando in console.
+    console.log("Operator: ", operator);  // To avoid an "unused variable" error.
   }
 
 	return (results);
 };
+*/
 
 
 /*
-// Function to check if a single variable (existing in varPath) has the required targetValue
-export const varHasValueSwitch = (recordData, varPath, targetValue, operator) => {
+// Function to check if a single variable (existing in varPath) has the required targetValue.
+export const varHasValueSwitch = (
+  recordData: any,
+  varPath: any,
+  targetValue: any,
+  operator = '=='
+) => {
 	//console.log('varHasValue');
 	let currentValue = getAttributeValue(recordData, varPath);
 	if (currentValue == null) return false;
@@ -167,8 +233,13 @@ export const varHasValueSwitch = (recordData, varPath, targetValue, operator) =>
 */
 
 
-// Function to check if a single variable (existing in varPath) has the required targetValue
-export const varHasValueNeg = (recordData: any, varPath: any, targetValue: any) => {
+/*
+// Function to check if a single variable (existing in varPath) has the required targetValue.
+export const varHasValueNeg = (
+  recordData: any,
+  varPath: any,
+  targetValue: any
+) => {
 	let currentValue = getAttributeValue(recordData, varPath);
 	if (currentValue == null) return false;
 
@@ -177,12 +248,16 @@ export const varHasValueNeg = (recordData: any, varPath: any, targetValue: any) 
 
 	return (results);
 };
+*/
 
 
-// Function to check if # checks of VarHasValue are ALL true on NON repeating instrument
-export const multiVarHasValueAND = (recordData: any, ...throuples: any[]) => {
-	// "throuples" is an array containing a list of throuples: [[varPath1,targetValue1], [varPath2,targetValue2], ...]
-	// "results" is an array containing the result of each check: [true, false, ...]
+// Function to check if # checks of VarHasValue are ALL true on NON repeating instrument.
+export const multiVarHasValueAND = (
+  recordData: any,
+  ...throuples: any[]
+) => {
+	// "throuples" is an array containing a list of throuples: [[varPath1,targetValue1], [varPath2,targetValue2], ...].
+	// "results" is an array containing the result of each check: [true, false, ...].
 	const operators = {
 		">":  (a: any, b: any) => a > b,
 		">=": (a: any, b: any) => a >= b,
@@ -192,7 +267,7 @@ export const multiVarHasValueAND = (recordData: any, ...throuples: any[]) => {
 		"!=": (a: any, b: any) => a != b,
 	};
 
-	// Array per tenere i risultati di ogni verifica
+	// Array to store the results of each check.
 	const fullResults: any = [];
 	const results: any = [];
 
@@ -209,7 +284,7 @@ export const multiVarHasValueAND = (recordData: any, ...throuples: any[]) => {
 			result = compare(currentValue, targetValue);
 		}
 
-		// results e fullResults sono log miei per il dettaglio, ritorno solo il booleano finale
+		// "results" and "fullResults" are logs for detail, I return only the final boolean.
 		results.push(result);
 		
 		fullResults.push({
@@ -221,17 +296,21 @@ export const multiVarHasValueAND = (recordData: any, ...throuples: any[]) => {
 		});
 	});
 
-	// Booleano finale: true se tutte le throuple sono vere
+	// Final boolean: true if all the throuple are true.
 	const finalResult = results.every(Boolean);
 
 	return finalResult;
 };
 
 
-// Function to check if # checks of VarHasValue are ALL true on NON repeating instrument
-export const multiVarHasValue_OLD = (recordData: any, ...couples: any[]) => {
-	// "couples" is an array containing a list of couples: [[varPath1,targetValue1], [varPath2,targetValue2], ...]
-	// "results" is an array containing the result of each check: [true, false, ...]
+/*
+// Function to check if # checks of VarHasValue are ALL true on NON repeating instrument.
+export const multiVarHasValue_OLD = (
+  recordData: any,
+  ...couples: any[]
+) => {
+	// "couples" is an array containing a list of couples: [[varPath1,targetValue1], [varPath2,targetValue2], ...].
+	// "results" is an array containing the result of each check: [true, false, ...].
 	let results = [];
 
 	for (const couple of couples) {
@@ -246,12 +325,16 @@ export const multiVarHasValue_OLD = (recordData: any, ...couples: any[]) => {
 
 	return results.every(value => value === true);
 };
+*/
 
 
-// Function to check if # checks of VarHasValue are ALL true on NON repeating instrument
-export const multiVarHasValueOR = (recordData: any, ...throuples: any[]) => {
-	// "throuples" is an array containing a list of throuples: [[varPath1,targetValue1], [varPath2,targetValue2], ...]
-	// "results" is an array containing the result of each check: [true, false, ...]
+// Function to check if # checks of VarHasValue are ALL true on NON repeating instrument.
+export const multiVarHasValueOR = (
+  recordData: any,
+  ...throuples: any[]
+) => {
+	// "throuples" is an array containing a list of throuples: [[varPath1,targetValue1], [varPath2,targetValue2], ...].
+	// "results" is an array containing the result of each check: [true, false, ...].
 	const operators = {
 		">":  (a: any, b: any) => a > b,
 		">=": (a: any, b: any) => a >= b,
@@ -260,12 +343,10 @@ export const multiVarHasValueOR = (recordData: any, ...throuples: any[]) => {
 		"==": (a: any, b: any) => a == b,
 		"!=": (a: any, b: any) => a != b,
 	};
-
-	// Array per tenere i risultati di ogni verifica
-	const fullResults: any = [];
+	// Array to store the results of each check.
 	const results: any = [];
 
-	throuples.forEach(([varPath, targetValue, operator = '==']) => {
+	throuples.forEach(([varPath, targetValue, operator = "=="]) => {
 		const currentValue = getAttributeValue(recordData, varPath);
 
 		let result = false;
@@ -278,9 +359,10 @@ export const multiVarHasValueOR = (recordData: any, ...throuples: any[]) => {
 			result = compare(currentValue, targetValue);
 		}
 
-		// results e fullResults sono log miei per il dettaglio, ritorno solo il booleano finale
+		// "results" and "fullResults" are logs for detail, I return only the final boolean.
 		results.push(result);
 		
+    /*
 		fullResults.push({
 			varPath,
 			operator,
@@ -288,19 +370,24 @@ export const multiVarHasValueOR = (recordData: any, ...throuples: any[]) => {
 			currentValue,
 			result
 		});
+    */
 	});
 
-	// Booleano finale: true se almeno una throuple è vera
+	// Final boolean: true if all the throuple are true.
 	const finalResult = results.some(Boolean);
 
 	return finalResult;
 };
 
 
-// Function to check if ANY of the # checks of VarHasValue are true on NON repeating instrument
-export const multiVarHasValueOR_OLD = (recordData: any, ...couples: any[]) => {
-	// "couples" is an array containing a list of couples: [[varPath1,targetValue1], [varPath2,targetValue2], ...]
-	// "results" is a single value that becomes true if ANY of the checks is true
+/*
+// Function to check if ANY of the # checks of VarHasValue are true on NON repeating instrument.
+export const multiVarHasValueOR_OLD = (
+  recordData: any,
+  ...couples: any[]
+) => {
+	// "couples" is an array containing a list of couples: [[varPath1,targetValue1], [varPath2,targetValue2], ...].
+	// "results" is a single value that becomes true if ANY of the checks is true.
 	let results = false;
 
 	for (const couple of couples) {
@@ -312,10 +399,16 @@ export const multiVarHasValueOR_OLD = (recordData: any, ...couples: any[]) => {
 
 	return results;
 };
+*/
 
 
-// Function to check if a single variable (existing in varPath) has the required targetValue
-export const varHasValueRepInstr = (recordData: any, varPath: any, targetValue: any, operator = '==') => {
+// Function to check if a single variable (existing in varPath) has the required targetValue (dq_9_xx).
+export const varHasValueRepInstr = (
+  recordData: any,
+  varPath: any,
+  targetValue: any,
+  operator = '=='
+) => {
 	const operators = {
     ">":  (a: any, b: any) => a > b,
 		">=": (a: any, b: any) => a >= b,
@@ -325,12 +418,12 @@ export const varHasValueRepInstr = (recordData: any, varPath: any, targetValue: 
 		"!=": (a: any, b: any) => a != b,
 	};
 
-	// "compare" è un booleano risultato dell'operazione specificata
+	// "compare" is a boolean from the specified operation.
 	const compare = operators[operator as keyof typeof operators];
 	if (!compare) {
 		throw new Error(`Unsupported operator: ${operator}`);
 	}
-	// Conteggio delle istanze
+	// Count of instances
 	const attrValues = getAttributeValueRepInstr(recordData, varPath);
 	const iter = Object.keys(attrValues || {}).length;
 
@@ -346,15 +439,57 @@ export const varHasValueRepInstr = (recordData: any, varPath: any, targetValue: 
 		}
 		results.push(result);
 	}
-	return results;
+
+  // I return the cumulative boolean, "true" if all are true, otherwise "false".
+	return Object.values(results).every(value => value === true);
 };
 
 
+// Function to check if a single variable (existing in varPath) has the required targetValue (dq_9_xx).
+export const varHasValueRepInstrREV = (
+  recordData: any,
+  varPath: string,
+  targetValue: any,
+  operator = '==',
+  datainstance: any
+) => {
+	const operators = {
+    ">":  (a: any, b: any) => a > b,
+		">=": (a: any, b: any) => a >= b,
+		"<":  (a: any, b: any) => a < b,
+		"<=": (a: any, b: any) => a <= b,
+		"==": (a: any, b: any) => a === b,
+		"!=": (a: any, b: any) => a != b,
+	};
+
+  // "compare" is a boolean from the specified operation.
+	const compare = operators[operator as keyof typeof operators];
+	if (!compare) {
+		throw new Error(`Unsupported operator: ${operator}`);
+	}
+	// Count of instances
+	const currentValue = getAttributeValueRepInstrREV(recordData, varPath, datainstance);
+	
+	let result = false;
+
+	if (currentValue && currentValue != null &&	currentValue !== "") {
+		result = compare(currentValue, targetValue);
+	}
+	
+	// I return the boolean.
+	return result;
+};
+
+
+/*
 // Function to check if # checks of VarHasValue are ALL true within the same instance of the Repeating instrument.
 // The check is performed for all the instances of the r.i.
-export const varHasValueRepInstr_OLD = (recordData: any, couple: any[]) => {
-	// "couples" is an array containing a list of couples: [[varPath1,targetValue1], [varPath2,targetValue2], ...]
-	// "results" is an array containing the result of each check: [true, false, ...]
+export const varHasValueRepInstr_OLD = (
+  recordData: any,
+  couple: any[]
+) => {
+	// "couples" is an array containing a list of couples: [[varPath1,targetValue1], [varPath2,targetValue2], ...].
+	// "results" is an array containing the result of each check: [true, false, ...].
 	let results: any = {};
 
 	let instCount = getAttributeValueRepInstr(recordData, couple[0]);
@@ -365,7 +500,7 @@ export const varHasValueRepInstr_OLD = (recordData: any, couple: any[]) => {
 
 		let currentValue = getAttributeValueRepInstr(recordData, couple[0]);
 
-		if (currentValue[i] == '' || currentValue[i] == null || currentValue[i] != couple[1]) {
+		if (currentValue[i] == "" || currentValue[i] == null || currentValue[i] != couple[1]) {
 			results[i] = Boolean(false);
 			break;
 		}
@@ -374,10 +509,16 @@ export const varHasValueRepInstr_OLD = (recordData: any, couple: any[]) => {
 
 	return results;
 };
+*/
 
 
-// Function to check if a value is within an interval on NON repeating instrument
-export const varWithinInterval = (recordData: any, attribute: any, min: any, max: any) => {
+// Function to check if a value is within an interval on NON repeating instrument.
+export const varWithinInterval = (
+  recordData: any,
+  attribute: any,
+  min: any,
+  max: any
+) => {
 	let currentValue = getAttributeValue(recordData, attribute);
 
 	return currentValue >= min && currentValue <= max;
@@ -385,9 +526,15 @@ export const varWithinInterval = (recordData: any, attribute: any, min: any, max
 
 
 // Function to compare a date variable to a fixed date string (not a different variable) on NON repeating instrument. 
-// A delta (# of days) can be set to an int >= 0 or left to Null
-export const dateCompareWithDateString = (recordData: any, targetDatePath: any, refDateStr: any, deltaDays: any, operator: any) => {
-	// Retrieve date strings from the record data
+// A delta (# of days) can be set to an int >= 0 or left to Null.
+export const dateCompareWithDateString = (
+  recordData: any,
+  targetDatePath: any,
+  refDateStr: any,
+  deltaDays: any,
+  operator: any
+) => {
+	// Retrieve date strings from the record data.
 	let targetDateStr = getAttributeValue(recordData, targetDatePath);
 	
 	// Checks
@@ -402,14 +549,14 @@ export const dateCompareWithDateString = (recordData: any, targetDatePath: any, 
     throw new Error("Delta is not a number");
   }
 
-	// Convert date strings to Date objects
+	// Convert date strings to Date objects.
 	let targetDate = new Date(targetDateStr);
 	let refDate = new Date(refDateStr);
 
-	// Apply delta to the reference date
+	// Apply delta to the reference date.
 	refDate = addDays(refDate, deltaDays);
 
-	// Perform the comparison based on the provided operator
+	// Perform the comparison based on the provided operator.
 	switch (operator) {
 		case ">":
 			return targetDate > refDate;
@@ -430,10 +577,15 @@ export const dateCompareWithDateString = (recordData: any, targetDatePath: any, 
 
 
 // Function to compare two date variables on NON repeating instrument. 
-// A delta (# of days) can be set to an int >= 0 or left to Null
-export const dateCompareWithDelta = (recordData: any, targetDatePath: any, refDatePath: any, deltaDays: any, operator: any) => {
-	// Retrieve date strings from the record data
-	
+// A delta (# of days) can be set to an int >= 0 or left to Null.
+export const dateCompareWithDelta = (
+  recordData: any,
+  targetDatePath: any,
+  refDatePath: any,
+  deltaDays: any,
+  operator: any
+) => {
+	// Retrieve date strings from the record data.
 	let targetDateStr = getAttributeValue(recordData, targetDatePath);
 	let refDateStr = getAttributeValue(recordData, refDatePath);
 
@@ -449,14 +601,14 @@ export const dateCompareWithDelta = (recordData: any, targetDatePath: any, refDa
 		throw new Error("Delta is not a number");
 	}
 
-	// Convert date strings to Date objects
+	// Convert date strings to Date objects.
 	let targetDate = new Date(targetDateStr);
 	let refDate = new Date(refDateStr);
 
-	// Apply delta to the reference date
+	// Apply delta to the reference date.
 	refDate = addDays(refDate, deltaDays);
 
-	// Perform the comparison based on the provided operator
+	// Perform the comparison based on the provided operator.
 	switch (operator) {
 		case ">":
 			return targetDate > refDate;
@@ -477,8 +629,15 @@ export const dateCompareWithDelta = (recordData: any, targetDatePath: any, refDa
 
 
 // Function to check if a date is within an interval (not necessarily symmetric) on NON repeating instrument. 
-// Two deltas (# of days, one for the left interval, one for the right one) can be set to int >= 0 or left to Null
-export const dateWithinIntervalWithDeltas = (recordData: any, targetDatePath: any, leftDatePath: any, deltaDaysLeft: any, rightDatePath: any, deltaDaysRight: any) => {
+// Two deltas (# of days, one for the left interval, one for the right one) can be set to int >= 0 or left to Null.
+export const dateWithinIntervalWithDeltas = (
+  recordData: any,
+  targetDatePath: any,
+  leftDatePath: any,
+  deltaDaysLeft: any,
+  rightDatePath: any,
+  deltaDaysRight: any
+) => {
 	// Retrieve date strings from the record data
 	let targetDateStr = getAttributeValue(recordData, targetDatePath);
 	let leftDateStr = getAttributeValue(recordData, leftDatePath);
@@ -502,7 +661,7 @@ export const dateWithinIntervalWithDeltas = (recordData: any, targetDatePath: an
 		throw new Error(`Delta right is not a number`);
 	}
 
-	// Convert date strings to Date objects
+	// Convert date strings to Date objects.
 	let targetDate = new Date(targetDateStr);
 	let leftDate = new Date(leftDateStr);
 	let rightDate = new Date(rightDateStr);
@@ -514,8 +673,12 @@ export const dateWithinIntervalWithDeltas = (recordData: any, targetDatePath: an
 }
 
 
-// Function to check if a variable from a repeating instrument has a specific value in two subsequent instances
-export const varHasValueWithPreviousSelfRepInstr = (recordData: any, varPath: any, targetValue: any) => {
+// Function to check if a variable from a repeating instrument has a specific value in two subsequent instances.
+export const varHasValueWithPreviousSelfRepInstr = (
+  recordData: any,
+  varPath: any,
+  targetValue: any
+) => {
 	let currentValue = getAttributeValueRepInstr(recordData, varPath);
 
 	const iter = Object.keys(currentValue).length;
@@ -523,9 +686,9 @@ export const varHasValueWithPreviousSelfRepInstr = (recordData: any, varPath: an
 	let results: any = {};
 	results[1] = Boolean(true);
 	
-	if(iter > 1) {
+	if (iter > 1) {
 		for (let i = 2; i <= iter; i++) {
-			if((currentValue[i] == targetValue) && (currentValue[i-1] == targetValue)) {
+			if ((currentValue[i] == targetValue) && (currentValue[i-1] == targetValue)) {
 				results[i] = Boolean(true);
 			}
 			else results[i] = Boolean(false);
@@ -536,27 +699,54 @@ export const varHasValueWithPreviousSelfRepInstr = (recordData: any, varPath: an
 };
 
 
+// Function to check if a variable from a repeating instrument has a specific value in two subsequent instances.
+export const varHasValueWithPreviousSelfRepInstrREV = (
+  recordData: any,
+  varPath: any,
+  targetValue: any,
+  datainstance: any
+) => {
+	let currentValue = getAttributeValueRepInstr(recordData, varPath);
+	let currentInstance = datainstance.redcap_repeat_instance;
+	
+	let results = true;
+	
+	if (currentInstance > 1) {
+		if ((currentValue[currentInstance] == targetValue) && (currentValue[currentInstance-1] == targetValue)) {
+			results = true;
+		}
+		else results = false;
+	}
+
+	return results;
+};
+
+
 // Function to check if two variables (usually carrying the same info) belonging to different Rep Instr have the required values.
 // The check is performed between the last instance of the earlier instrument and the first instance of the later instrument.
 // "later" and "earlier" are arrays with varname and expected value.
-export const multiVarHasValueFirstVsLastInstRepInstr = (recordData: any, later: any[], earlier: any[]) => {
+export const multiVarHasValueFirstVsLastInstRepInstr = (
+  recordData: any,
+  later: string,
+  earlier: string
+) => {
 	let instCountL = getAttributeValueRepInstr(recordData, later[0]);
 	let instCountE = getAttributeValueRepInstr(recordData, earlier[0]);
 
-	// get the last value of the variable in the earlier Rep instr
+	// Get the last value of the variable in the earlier Rep instr.
 	const iterE = Object.keys(instCountE).length;
 
 	let earlierValue = instCountE[iterE];
 	let laterValue = instCountL[1];
 
-	return(!(earlierValue == '' || earlierValue == null || earlierValue != earlier[1] || laterValue == "" || laterValue == null || laterValue != later[1]));
+	return(!(earlierValue == "" || earlierValue == null || earlierValue != earlier[1] || laterValue == "" || laterValue == null || laterValue != later[1]));
 	/*
 	for (let i = 1; i <= iterE; i++) {
 		results[i] = Boolean(true);
 		for (const couple of couples) {
 			let currentValue = getAttributeValueRepInstr(recordData, couple[0]);
 
-			if (currentValue[i] == '' || currentValue[i] == null || currentValue[i] != couple[1]) {
+			if (currentValue[i] == "" || currentValue[i] == null || currentValue[i] != couple[1]) {
 				results[i] = Boolean(false);
 				break;
 			}
@@ -569,24 +759,28 @@ export const multiVarHasValueFirstVsLastInstRepInstr = (recordData: any, later: 
 // Function to check if two variables (usually carrying the same info) belonging to different Rep Instr have the required values.
 // The check is performed between the last instance of the earlier instrument and the first instance of the later instrument.
 // "later" and "earlier" are arrays with varname and expected value.
-export const multiVarHasValueFixedVsLastInstRepInstr = (recordData: any, later: any[], earlier: any[]) => {
-	let instCountL = getAttributeValue(recordData, later[0]);
+export const multiVarHasValueFirstVsLastInstRepInstrREV = (
+  recordData: any,
+  later: string,
+  earlier: string
+) => {
+	let instCountL = getAttributeValueRepInstr(recordData, later[0]);
 	let instCountE = getAttributeValueRepInstr(recordData, earlier[0]);
 
-	// get the last value of the variable in the earlier Rep instr
+	// Get the last value of the variable in the earlier Rep instr.
 	const iterE = Object.keys(instCountE).length;
 
 	let earlierValue = instCountE[iterE];
-	let laterValue = instCountL;
+	let laterValue = instCountL[1];
 
-	return(!(earlierValue == '' || earlierValue == null || earlierValue != earlier[1] || laterValue == '' || laterValue == null || laterValue != later[1]));
+	return(!(earlierValue == "" || earlierValue == null || earlierValue != earlier[1] || laterValue == "" || laterValue == null || laterValue != later[1]));
 	/*
 	for (let i = 1; i <= iterE; i++) {
 		results[i] = Boolean(true);
 		for (const couple of couples) {
 			let currentValue = getAttributeValueRepInstr(recordData, couple[0]);
 
-			if (currentValue[i] == '' || currentValue[i] == null || currentValue[i] != couple[1]) {
+			if (currentValue[i] == "" || currentValue[i] == null || currentValue[i] != couple[1]) {
 				results[i] = Boolean(false);
 				break;
 			}
@@ -596,18 +790,77 @@ export const multiVarHasValueFixedVsLastInstRepInstr = (recordData: any, later: 
 }
 
 
-// Function to compare a date from a non repeating instrument and one from a repeating instrument over all instances of the latter.
-export const multiDateCompareFixedVsLastInstRepInstr = (recordData: any, later: any[], earlier: any[]) => {
-	let instCountL = getAttributeValue(recordData, later);
-	let instCountE = getAttributeValueRepInstr(recordData, earlier);
+// Function to check if two variables, the first from a NON repeating instrument and the second from a repeating instrument, have the required values.
+// The check is performed between the only instance of the later instrument and the last instance of the earlier instrument.
+// "later" and "earlier" are arrays with varname and expected value.
+export const multiVarHasValueFixedVsLastInstRepInstr = (
+  recordData: any,
+  later: string,
+  earlier: string
+) => {
+	let instCountL = getAttributeValue(recordData, later[0]);
+	let instCountE = getAttributeValueRepInstr(recordData, earlier[0]);
 
-	// get the last value of the variable in the earlier Rep instr
+	// Get the last value of the variable in the earlier Rep instr.
 	const iterE = Object.keys(instCountE).length;
 
 	let earlierValue = instCountE[iterE];
 	let laterValue = instCountL;
 
-	// Convert date strings to Date objects
+	return(!(earlierValue == "" || earlierValue == null || earlierValue != earlier[1] || laterValue == "" || laterValue == null || laterValue != later[1]));
+	/*
+	for (let i = 1; i <= iterE; i++) {
+		results[i] = Boolean(true);
+		for (const couple of couples) {
+			let currentValue = getAttributeValueRepInstr(recordData, couple[0]);
+
+			if (currentValue[i] == "" || currentValue[i] == null || currentValue[i] != couple[1]) {
+				results[i] = Boolean(false);
+				break;
+			}
+		}
+	}
+	*/
+}
+
+
+// Function to check if two variables, the first from a NON repeating instrument and the second from a repeating instrument, have the required values.
+// The check is performed between the only instance of the later instrument and the last instance of the earlier instrument.
+// "later" and "earlier" are arrays with varname and expected value.
+export const multiVarHasValueFixedVsLastInstRepInstrREV = (
+  recordData: any,
+  later: string,
+  earlier: string
+) => {
+	let instCountL = getAttributeValue(recordData, later[0]);
+	let instCountE = getAttributeValueRepInstr(recordData, earlier[0]);
+
+	// Get the last value of the variable in the earlier Rep instr.
+	const iterE = Object.keys(instCountE).length;
+
+	let earlierValue = instCountE[iterE];
+	let laterValue = instCountL;
+
+	return(!(earlierValue == "" || earlierValue == null || earlierValue != earlier[1] || laterValue == "" || laterValue == null || laterValue != later[1]));
+}
+
+
+// Function to compare a date from a non repeating instrument and one from a repeating instrument over all instances of the latter.
+export const multiDateCompareFixedVsLastInstRepInstr = (
+  recordData: any,
+  later: string,
+  earlier: string
+) => {
+	let instCountL = getAttributeValue(recordData, later);
+	let instCountE = getAttributeValueRepInstr(recordData, earlier);
+
+	// Get the last value of the variable in the earlier Rep instr.
+	const iterE = Object.keys(instCountE).length;
+
+	let earlierValue = instCountE[iterE];
+	let laterValue = instCountL;
+
+	// Convert date strings to Date objects.
 	let earlierDate = new Date(earlierValue);
 	let laterDate = new Date(laterValue);
 
@@ -615,17 +868,43 @@ export const multiDateCompareFixedVsLastInstRepInstr = (recordData: any, later: 
 }
 
 
-export const multiDateCompareFirstVsLastInstRepInstr = (recordData: any, later: any[], earlier: any[]) => {
+export const multiDateCompareFirstVsLastInstRepInstr = (
+  recordData: any,
+  later: string,
+  earlier: string
+) => {
 	let instCountL = getAttributeValueRepInstr(recordData, later);
 	let instCountE = getAttributeValueRepInstr(recordData, earlier);
 
-	// get the last value of the variable in the earlier Rep instr
+	// Get the last value of the variable in the earlier Rep instr.
 	const iterE = Object.keys(instCountE).length;
 
 	let earlierValue = instCountE[iterE];
 	let laterValue = instCountL[1];
 
-	// Convert date strings to Date objects
+	// Convert date strings to Date objects.
+	let earlierDate = new Date(earlierValue);
+	let laterDate = new Date(laterValue);
+
+	return(laterDate > earlierDate);
+}
+
+
+export const multiDateCompareFirstVsLastInstRepInstrREV = (
+  recordData: any,
+  later: string,
+  earlier: string
+) => {
+	let instCountL = getAttributeValueRepInstr(recordData, later);
+	let instCountE = getAttributeValueRepInstr(recordData, earlier);
+
+	// Get the last value of the variable in the earlier Rep instr.
+	const iterE = Object.keys(instCountE).length;
+
+	let earlierValue = instCountE[iterE];
+	let laterValue = instCountL[1];
+
+	// Convert date strings to Date objects.
 	let earlierDate = new Date(earlierValue);
 	let laterDate = new Date(laterValue);
 
@@ -635,9 +914,12 @@ export const multiDateCompareFirstVsLastInstRepInstr = (recordData: any, later: 
 
 // Function to check if # checks of VarHasValue are ALL true within the same instance of the Repeating instrument.
 // The check is performed for all the instances of the r.i.
-export const multiVarHasValueRepInstr = (recordData: any, couples: any[]) => {
-	// "couples" is an array containing a list of couples: [[varPath1,targetValue1], [varPath2,targetValue2], ...]
-	// "results" is an array containing the result of each check: [true, false, ...]
+export const multiVarHasValueRepInstr = (
+  recordData: any,
+  couples: any[]
+) => {
+	// "couples" is an array containing a list of couples: [[varPath1,targetValue1], [varPath2,targetValue2], ...].
+	// "results" is an array containing the result of each check: [true, false, ...].
 	let results: any = {};
 
 	let instCount = getAttributeValueRepInstr(recordData, couples[0][0]);
@@ -648,7 +930,7 @@ export const multiVarHasValueRepInstr = (recordData: any, couples: any[]) => {
 		for (const couple of couples) {
 			let currentValue = getAttributeValueRepInstr(recordData, couple[0]);
 
-			if (currentValue[i] == '' || currentValue[i] == null || currentValue[i] != couple[1]) {
+			if (currentValue[i] == "" || currentValue[i] == null || currentValue[i] != couple[1]) {
 				results[i] = Boolean(false);
 				break;
 			}
@@ -659,28 +941,80 @@ export const multiVarHasValueRepInstr = (recordData: any, couples: any[]) => {
 };
 
 
-// Function to check if a value is within an interval in all the instances of the repeating instrument it belongs to
-export const varWithinIntervalRepInstr = (recordData: any, attribute: any, min: any, max: any) => {
+// Function to check if # checks of VarHasValue are ALL true within the same instance of the Repeating instrument.
+// The check is performed for all the instances of the r.i.
+export const multiVarHasValueRepInstrREV = (
+  recordData: any,
+  couples: string[],
+  dataInstance: any
+) => {
+	// "couples" is an array containing a list of couples: [[varPath1,targetValue1], [varPath2,targetValue2], ...].
+	// "results" is an array containing the result of each check: [true, false, ...].
+	let results = true;
+
+	for (const couple of couples) {
+		let currentValue = getAttributeValueRepInstrREV(recordData, couple[0], dataInstance);
+		if (currentValue == "" || currentValue == null || currentValue != couple[1]) {
+			results = false;
+			break;
+		}
+	}
+
+	return results;   
+};
+
+
+// Function to check if a value is within an interval in all the instances of the repeating instrument it belongs to.
+export const varWithinIntervalRepInstr = (
+  recordData: any,
+  attribute: any,
+  min: any,
+  max: any
+) => {
 	let currentValue = getAttributeValueRepInstr(recordData, attribute);
-	
 	const iter = Object.keys(currentValue).length;
-	
 	let results: any = {};
 	
 	for (let i = 1; i <= iter; i++) {
-		if((currentValue[i] >= min) && (currentValue[i] <= max)) {
-			results[i] = Boolean(true);
+		if ((currentValue[i] >= min) && (currentValue[i] <= max)) {
+			results[i] = true;
 		}
-		else results[i] = Boolean(false);
+		else results[i] = false;
 	}
 
 	return results;
 };
 
 
-// Function to compare two variables belonging to the same repeating instrument, within the same instance
-export const dateCompareWithDeltaRepInstr = (recordData: any, targetDatePath: any, refDatePath: any, deltaDays: any, operator: any) => {
-	// Retrieve date strings from the record data
+// Function to check if a value is within an interval in all the instances of the repeating instrument it belongs to.
+export const varWithinIntervalRepInstrREV = (
+  recordData: any,
+  attribute: string,
+  min: any,
+  max: any,
+  datainstance: any
+) => {
+	let currentValue = getAttributeValueRepInstrREV(recordData, attribute, datainstance);
+	let results = true;
+
+	if ((currentValue >= min) && (currentValue <= max)) {
+		results = true;
+	}
+	else results = false;
+
+	return results;
+};
+
+
+// Function to compare two variables belonging to the same repeating instrument, within the same instance.
+export const dateCompareWithDeltaRepInstr = (
+  recordData: any,
+  targetDatePath: any,
+  refDatePath: any,
+  deltaDays: any,
+  operator: any
+) => {
+	// Retrieve date strings from the record data.
 	let targetDateStr = getAttributeValueRepInstr(recordData, targetDatePath);
 	let refDateStr = getAttributeValueRepInstr(recordData, refDatePath);
 	
@@ -692,11 +1026,11 @@ export const dateCompareWithDeltaRepInstr = (recordData: any, targetDatePath: an
 
 		if (!targetDateStr[i]) {
 			results[i] = 1;
-//			throw new Error(`The target date is null in instance ${i}`);
+      // throw new Error(`The target date is null in instance ${i}`);
 		}
 		if (!refDateStr[i]) {
 			results[i] = 1;
-//			throw new Error(`The reference date is null in instance ${i}`);
+      // throw new Error(`The reference date is null in instance ${i}`);
 		}
 
 		if (deltaDays == null) deltaDays = 0;
@@ -705,7 +1039,7 @@ export const dateCompareWithDeltaRepInstr = (recordData: any, targetDatePath: an
 			throw new Error(`Delta is not a number`);
 		}
 
-		// Convert date strings to Date objects
+		// Convert date strings to Date objects.
 		let targetDate = new Date(targetDateStr[i]);
 		let refDate = new Date(refDateStr[i]);
 
@@ -737,9 +1071,73 @@ export const dateCompareWithDeltaRepInstr = (recordData: any, targetDatePath: an
 };
 
 
-// Function to compare a date variable to itself in the current and previous instance of the repeating instrument it belongs to
-export const dateCompareWithPreviousSelfRepInstr = (recordData: any, targetDatePath: any, deltaDays: any, operator: any) => {
-	// Retrieve date strings from the record data
+// Function to compare two variables belonging to the same repeating instrument, within the same instance.
+export const dateCompareWithDeltaRepInstrREV = (
+  recordData: any,
+  targetDatePath: string,
+  refDatePath: string,
+  deltaDays: any,
+  operator: any,
+  datainstance: any
+) => {
+	// Retrieve date strings from the record data.
+	let targetDateStr = getAttributeValueRepInstrREV(recordData, targetDatePath, datainstance);
+	let refDateStr = getAttributeValueRepInstrREV(recordData, refDatePath, datainstance);
+	
+	let results = null;
+
+		if (!targetDateStr) {
+			results = false;
+		}
+		if (!refDateStr) {
+			results = false;
+		}
+
+		if (deltaDays == null) deltaDays = 0;
+
+		if (isNaN(Number(deltaDays))) {
+			throw new Error(`Delta is not a number`);
+		}
+		
+		// Convert date strings to Date objects.
+		let targetDate = new Date(targetDateStr);
+		let refDate = new Date(refDateStr);
+
+		switch (operator) {
+			case ">":
+				results = (targetDate > addDays(refDate, deltaDays));
+				break;
+			case ">=":
+				results = (targetDate >= addDays(refDate, deltaDays));
+				break;
+			case "<":
+				results = (targetDate < addDays(refDate, deltaDays));
+				break;
+			case "<=":
+				results = (targetDate <= addDays(refDate, deltaDays));
+				break;
+			case "==":
+				results = (targetDate === addDays(refDate, deltaDays));
+				break;
+			case "!=":
+				results = (targetDate !== addDays(refDate, deltaDays));
+				break;
+			default:
+				throw new Error(`Unsupported operator: ${operator}`);
+		}
+
+	return results;
+};
+
+
+// Function to compare a date variable to itself in the current and previous instance of the repeating instrument it belongs to.
+export const dateCompareWithPreviousSelfRepInstr = (
+  recordData: any,
+  targetDatePath: any,
+  deltaDays: any,
+  operator: any
+) => {
+	// Retrieve date strings from the record data.
 	let targetDateStr = getAttributeValueRepInstr(recordData, targetDatePath);
 	
 	const iter = Object.keys(targetDateStr).length;
@@ -747,7 +1145,7 @@ export const dateCompareWithPreviousSelfRepInstr = (recordData: any, targetDateP
 	let results: any = {};
 	results[1] = Boolean(true);
 	
-	if(iter > 1) {
+	if (iter > 1) {
 		for (let i = 2; i <= iter; i++) {
 			if (!targetDateStr[i]) { 
 				//console.log(`The date is null in instance ${i}`);
@@ -766,7 +1164,7 @@ export const dateCompareWithPreviousSelfRepInstr = (recordData: any, targetDateP
 				throw new Error(`Delta is not a number`);
 			}
 
-			// Convert date strings to Date objects
+			// Convert date strings to Date objects.
 			let targetDate = new Date(targetDateStr[i]);
 			let targetDatePrev = new Date(targetDateStr[i-1]);
 
@@ -798,9 +1196,79 @@ export const dateCompareWithPreviousSelfRepInstr = (recordData: any, targetDateP
 	return results;
 };
 
-// Function to compare a date from a repeating instrument to a fixed date from a non repeating one (e.g. date of followup)
-export const dateCompareToFixedDateRepInstr = (recordData: any, targetDatePath: any, refDatePath: any, deltaDays: any, operator: any, acceptNull: any) => {
-	// Retrieve date strings from the record data
+
+// Function to compare a date variable to itself in the current and previous instance of the repeating instrument it belongs to.
+export const dateCompareWithPreviousSelfRepInstrREV = (
+  recordData: any,
+  targetDatePath: any,
+  deltaDays: any,
+  operator: any,
+  datainstance: any
+) => {
+	// Retrieve date strings from the record data.
+	let targetDateStr = getAttributeValueRepInstr(recordData, targetDatePath);
+	let currentInstance = datainstance.redcap_repeat_instance;
+	let results = true;
+
+	if (currentInstance > 1) {
+	
+		if (!targetDateStr[currentInstance]) { 
+			return false; 
+		}
+		if (!targetDateStr[currentInstance-1]) {
+			return false; 
+		}
+
+		if (deltaDays == null) {
+			deltaDays = 0;
+		}
+
+		if (isNaN(Number(deltaDays))) {
+			throw new Error(`Delta is not a number`);
+		}
+
+		// Convert date strings to Date objects.
+		let targetDate = new Date(targetDateStr[currentInstance]);
+		let targetDatePrev = new Date(targetDateStr[currentInstance-1]);
+
+    switch (operator) {
+      case ">":
+        results = (targetDate > addDays(targetDatePrev, deltaDays));
+        break;
+      case ">=":
+        results = (targetDate >= addDays(targetDatePrev, deltaDays));
+        break;
+      case "<":
+        results = (targetDate < addDays(targetDatePrev, deltaDays));
+        break;
+      case "<=":
+        results = (targetDate <= addDays(targetDatePrev, deltaDays));
+        break;
+      case "==":
+        results = (targetDate === addDays(targetDatePrev, deltaDays));
+        break;
+      case "!=":
+        results = (targetDate !== addDays(targetDatePrev, deltaDays));
+        break;
+      default:
+        throw new Error(`Unsupported operator: ${operator}`);
+    }
+	}
+
+	return results;
+};
+
+
+// Function to compare a date from a repeating instrument to a fixed date from a non repeating one (e.g. date of followup).
+export const dateCompareToFixedDateRepInstr = (
+  recordData: any,
+  targetDatePath: any,
+  refDatePath: any,
+  deltaDays: any,
+  operator: any,
+  acceptNull: any
+) => {
+	// Retrieve date strings from the record data.
 	let targetDateStr = getAttributeValueRepInstr(recordData, targetDatePath);
 	let refDateStr = getAttributeValue(recordData, refDatePath);
 	
@@ -812,9 +1280,9 @@ export const dateCompareToFixedDateRepInstr = (recordData: any, targetDatePath: 
 		//results[1] = 1;
 	}
 	else {
-		// La data di nascita è solo anno. Attacco mese e giorno 01-01
-		if (refDatePath == '0.bl_dob') {
-			refDateStr = refDateStr + '-01-01';
+		// The date of birth consists only of the year. I am adding "01-01" for month and day.
+		if (refDatePath == "bl_dob") {
+			refDateStr = refDateStr + "-01-01";
 		}
 		const iter = Object.keys(targetDateStr).length;
 		for (let i = 1; i <= iter; i++) {
@@ -822,7 +1290,7 @@ export const dateCompareToFixedDateRepInstr = (recordData: any, targetDatePath: 
 			if (isNaN(Number(deltaDays))) {
 				throw new Error(`Delta is not a number`);
 			}
-			// Se non è accettabile che il valore della data da comparare sia nullo, triggero un errore
+			// If it is unacceptable for the value of the date being compared to be null, I trigger an error.
 			if (acceptNull == 0) {
 				if (!targetDateStr[i]) {
 			    //throw new Error(`The date is null in instance ${i}`);
@@ -836,7 +1304,7 @@ export const dateCompareToFixedDateRepInstr = (recordData: any, targetDatePath: 
 				}
 			}
 			
-			// Convert date strings to Date objects
+			// Convert date strings to Date objects.
 			let targetDate = new Date(targetDateStr[i]);
 			let refDate = new Date(refDateStr);
 
@@ -869,16 +1337,91 @@ export const dateCompareToFixedDateRepInstr = (recordData: any, targetDatePath: 
 };
 
 
+// Function to compare a date from a repeating instrument to a fixed date from a non repeating one (e.g. date of followup).
+export const dateCompareToFixedDateRepInstrREV = (
+  recordData: any,
+  targetDatePath: string,
+  refDatePath: string,
+  deltaDays: any,
+  operator: any,
+  datainstance: any
+) => {
+	// Retrieve date strings from the record data.
+	let targetDateStr = getAttributeValueRepInstrREV(recordData, targetDatePath, datainstance);
+	let refDateStr = getAttributeValue(recordData, refDatePath);
+
+	let results = true;
+
+	if (!refDateStr) {
+		results = false;
+		//console.log(`The reference date is null`);
+	}
+	else {
+		// The date of birth consists only of the year. I am adding "01-01" for month and day.
+		if (refDatePath == "bl_dob") {
+			refDateStr = refDateStr + "-01-01";
+		}
+		if (deltaDays == null) deltaDays = 0;
+		if (isNaN(Number(deltaDays))) {
+			throw new Error(`Delta is not a number`);
+		}
+		// If it is unacceptable for the value of the date being compared to be null, I trigger an error.
+		if (targetDateStr) {
+			// Convert date strings to Date objects.
+			let targetDate = new Date(targetDateStr);
+			let refDate = new Date(refDateStr);
+
+			switch (operator) {
+				case ">":
+					results = (targetDate > addDays(refDate, deltaDays));
+					break;
+				case ">=":
+					results = (targetDate >= addDays(refDate, deltaDays));
+					break;
+				case "<":
+					results = (targetDate < addDays(refDate, deltaDays));
+					break;
+				case "<=":
+					results = (targetDate <= addDays(refDate, deltaDays));
+					break;
+				case "==":
+					results = (targetDate === addDays(refDate, deltaDays));
+					break;
+				case "!=":
+					results = (targetDate !== addDays(refDate, deltaDays));
+					break;
+				default:
+					throw new Error(`Unsupported operator: ${operator}`);
+			}
+		}	
+		else {
+      //!targetDateStr
+			results = false;
+			//console.log('The date is null in instance ' + instanceNum);
+		}
+	}
+
+	return results;
+};
+
+
 // The following is used in case there is a comparison between a date that must be unique but is featured in repeating instruments,
 // so it might appear in more than one instance, and a date coming from a non-repeating instrument (e.g., date of menopause > date of birth). 
-// If the unique value appears in multiple instances, these are expected to be identical, otherwise triggering error
-export const uniqueDateCompareToFixedDateRepInstr = (recordData: any, targetDatePath: any, refDatePath: any, deltaDays: any, operator: any, acceptNull: any) => {
+// If the unique value appears in multiple instances, these are expected to be identical, otherwise triggering error.
+export const uniqueDateCompareToFixedDateRepInstr = (
+  recordData: any,
+  targetDatePath: any,
+  refDatePath: any,
+  deltaDays: any,
+  operator: any,
+  acceptNull: any
+) => {
 	// Retrieve date strings from the record data
 	let targetDateObj = getAttributeValueRepInstr(recordData, targetDatePath);
 
-	// Array of distinct non null/blank values of the unique date. Supposed max length = 1
+	// Array of distinct non null/blank values of the unique date. Supposed max length = 1.
 	const values = Object.values(targetDateObj);
-	const filteredDates = values.filter(date => date); // this will filter out any falsy values (including empty strings)
+	const filteredDates = values.filter(date => date);  // this will filter out any falsy values (including empty strings)
 	const targetDateArr = Array.from(new Set(filteredDates));
 
 	if (targetDateArr.length > 1) {
@@ -895,30 +1438,30 @@ export const uniqueDateCompareToFixedDateRepInstr = (recordData: any, targetDate
 		return false;
 	}
 
-	// Se il confronto è con la la data di nascita, quella è solo anno. Attacco mese e giorno 01-01
-	if (refDatePath == '0.bl_dob') {
-		refDateStr = refDateStr + '-01-01';
+	// If the comparison is against the date of birth, that only includes the year. I append month and day as "01-01".
+	if (refDatePath == "bl_dob") {
+		refDateStr = refDateStr + "-01-01";
 	}
 			
 	if (deltaDays == null) deltaDays = 0;
 	if (isNaN(Number(deltaDays))) throw new Error(`Delta is not a number`);
 
-	// Se non è accettabile che il valore della data da comparare sia nullo, triggero un errore
+	// If it is unacceptable for the value of the date being compared to be null, I trigger an error.
 	if (acceptNull == 0) {
 		if (!targetDateArr) {
 			return false;
 		  //throw new Error(`The date is null in instance ${i}`);
 		}
 	}
-	// Se la data da comparare può essere nulla (e.g. data di menopausa)
+	// If the date to be compared can be null:
 	else if  (acceptNull == 1) {
-		// Se è nulla, il risultato del confronto è assunto vero
+		// If it is null, the result of the comparison is assumed to be true.
 		if (targetDateArr.length == 0) {
 			results = true;
 		}
-		// Altrimenti faccio il confronto
+		// Otherwise, I make a comparison.
 		else {
-			// Convert date strings to Date objects
+			// Convert date strings to Date objects.
 			let targetDateStr = targetDateArr[0];
 	
 			let targetDate = new Date(targetDateStr);
@@ -953,11 +1496,107 @@ export const uniqueDateCompareToFixedDateRepInstr = (recordData: any, targetDate
 };
 
 
+// The following is used in case there is a comparison between a date that must be unique but is featured in repeating instruments,
+// so it might appear in more than one instance, and a date coming from a non-repeating instrument (e.g., date of menopause > date of birth). 
+// If the unique value appears in multiple instances, these are expected to be identical, otherwise triggering error.
+export const uniqueDateCompareToFixedDateRepInstrREV = (
+  recordData: any,
+  targetDatePath: any,
+  refDatePath: any,
+  deltaDays: any,
+  operator: any,
+  acceptNull: any,
+) => {
+	// Retrieve date strings from the record data.
+	let targetDateObj = getAttributeValueRepInstr(recordData, targetDatePath);
+
+	// Array of distinct non null/blank values of the unique date. Supposed max length = 1.
+	const values = Object.values(targetDateObj);
+	const filteredDates = values.filter(date => date);  // this will filter out any falsy values (including empty strings)
+	const targetDateArr = Array.from(new Set(filteredDates));
+
+	if (targetDateArr.length > 1) {
+    //throw new Error(`There are multiple values for the date in the repeating instrument (expected one)`);
+		return false;
+	}
+	let refDateStr = getAttributeValue(recordData, refDatePath);
+	
+	let results = false;
+
+	if (!refDateStr) {
+    //throw new Error(`The reference date is null`);
+		return false;
+	}
+
+	// If the comparison is against the date of birth, that only includes the year. I append month and day as "01-01".
+	if (refDatePath == "bl_dob") {
+		refDateStr = refDateStr + "-01-01";
+	}
+			
+	if (deltaDays == null) deltaDays = 0;
+	if (isNaN(Number(deltaDays))) throw new Error(`Delta is not a number`);
+
+	// If it is unacceptable for the value of the date being compared to be null, I trigger an error.
+	if (acceptNull == 0) {
+		if (!targetDateArr) {
+			return false;
+		}
+	}
+	// If the date to be compared can be null:
+	else if  (acceptNull == 1) {
+		// If it is null, the result of the comparison is assumed to be true.
+		if (targetDateArr.length == 0) {
+			results = true;
+		}
+		// Otherwise, I make a comparison.
+		else {
+			// Convert date strings to Date objects.
+			let targetDateStr = targetDateArr[0];
+	
+			let targetDate = new Date(targetDateStr);
+			let refDate = new Date(refDateStr);
+
+			switch (operator) {
+				case ">":
+					results = (targetDate > addDays(refDate, deltaDays));
+					break;
+				case ">=":
+					results = (targetDate >= addDays(refDate, deltaDays));
+					break;
+				case "<":
+					results = (targetDate < addDays(refDate, deltaDays));
+					break;
+				case "<=":
+					results = (targetDate <= addDays(refDate, deltaDays));
+					break;
+				case "==":
+					results = (targetDate === addDays(refDate, deltaDays));
+					break;
+				case "!=":
+					results = (targetDate !== addDays(refDate, deltaDays));
+					break;
+				default:
+					throw new Error(`Unsupported operator: ${operator}`);
+			}
+		}
+	}
+
+	return results;
+};
+
+
 // The following is used in case there is a comparison between a date that must be unique but is featured in repeating instruments
 // so it might appear in more than one instance, and a date coming from a non-repeating instrument (e.g., date of menopause > date of birth). 
-// If the unique value appears in multiple instances, these are expected to be identical, otherwise triggering error
-export const compareAllDatesToFixed = (recordData: any, targetDateArr: any, refDatePath: any, deltaDays: any, operator: any, acceptNull: any) => {
-	// Verifiche sulla data con cui comparare le altre
+// If the unique value appears in multiple instances, these are expected to be identical, otherwise triggering error.
+export const compareAllDatesToFixed = (
+  recordData: any,
+  targetDateArr: any,
+  refDatePath: any,
+  deltaDays: any,
+  operator: any,
+  acceptNull: any
+) => {
+	// Checks regarding the date against which others are to be compared.
 	let refDateStr = getAttributeValue(recordData, refDatePath);
 	
 	let results: any = {};
@@ -967,9 +1606,9 @@ export const compareAllDatesToFixed = (recordData: any, targetDateArr: any, refD
 		return false;
 	}
 
-	// Se il confronto è con la la data di nascita, quella è solo anno. Attacco mese e giorno 01-01
-	if (refDatePath == '0.bl_dob') {
-		refDateStr = refDateStr + '-01-01';
+	// If the comparison is against the date of birth, that only includes the year. I append month and day as "01-01".
+	if (refDatePath == "bl_dob") {
+		refDateStr = refDateStr + "-01-01";
 	}
 			
 	if (deltaDays == null) deltaDays = 0;
@@ -1034,19 +1673,111 @@ export const compareAllDatesToFixed = (recordData: any, targetDateArr: any, refD
 
 
 // The following is used in case there is a comparison between a date that must be unique but is featured in repeating instruments
+// so it might appear in more than one instance, and a date coming from a non-repeating instrument (e.g., date of menopause > date of birth). 
+// If the unique value appears in multiple instances, these are expected to be identical, otherwise triggering error.
+export const compareAllDatesToFixedREV = (
+  recordData: any,
+  targetDateArr: any,
+  refDatePath: any,
+  deltaDays: any,
+  operator: any,
+  acceptNull: any
+) => {
+	// Checks regarding the date against which others are to be compared.
+	let refDateStr = getAttributeValue(recordData, refDatePath);
+	
+	let results: any = {};
+
+	if (!refDateStr) {
+    //throw new Error(`The reference date is null`);
+		return false;
+	}
+
+	// If the comparison is against the date of birth, that only includes the year. I append month and day as "01-01".
+	if (refDatePath == "bl_dob") {
+		refDateStr = refDateStr + "-01-01";
+	}
+			
+	if (deltaDays == null) deltaDays = 0;
+	if (isNaN(Number(deltaDays))) throw new Error(`Delta is not a number`);
+
+	const iterArray = Object.keys(targetDateArr).length;
+	
+	let dateValues: any = {};
+	
+	for (let j = 0; j < iterArray; j++) {	
+		dateValues[j] = getAttributeValue(recordData, targetDateArr[j]);
+	}
+
+	const trueValues: any[] = Object.values(dateValues);
+
+	for (let j = 0; j < trueValues.length; j++) {
+		let targetDateStr = trueValues[j];
+		
+		if (!targetDateStr) {
+			if (acceptNull === 0) {
+        // throw new Error('One or more dates to compare are null');
+				return false;
+			}
+			else {
+				results[j] = true;
+			}
+		}
+		else {
+			let targetDate = new Date(targetDateStr);
+			let refDate = new Date(refDateStr);
+
+			switch (operator) {
+				case ">":
+					results[j] = (targetDate > addDays(refDate, deltaDays));
+					break;
+				case ">=":
+					results[j] = (targetDate >= addDays(refDate, deltaDays));
+					break;
+				case "<":
+					results[j] = (targetDate < addDays(refDate, deltaDays));
+					break;
+				case "<=":
+					results[j] = (targetDate <= addDays(refDate, deltaDays));
+					break;
+				case "==":
+					results[j] = (targetDate === addDays(refDate, deltaDays));
+					break;
+				case "!=":
+					results[j] = (targetDate !== addDays(refDate, deltaDays));
+					break;
+				default:
+					throw new Error(`Unsupported operator: ${operator}`);
+			}
+		}
+	}
+
+	return results;
+};
+
+
+// The following is used in case there is a comparison between a date that must be unique but is featured in repeating instruments
 // so it might appear in more than one instance, and the max value of a date coming from a repeating instrument (e.g., date of death > date of last follow up). 
-// If the unique value appears in multiple instances, these are expected to be identical, otherwise triggering error
-export const uniqueDateCompareToMaxDateRepInstr = (recordData: any, targetDatePath: any, refDatePath: any, deltaDays: any, operator: any, acceptNull: any) => {
+// If the unique value appears in multiple instances, these are expected to be identical, otherwise triggering error.
+export const uniqueDateCompareToMaxDateRepInstr = (
+  recordData: any,
+  targetDatePath: any,
+  refDatePath: any,
+  deltaDays: any,
+  operator: any,
+  acceptNull: any
+) => {
 	// Retrieve date strings from the record data
 	let targetDateObj = getAttributeValueRepInstr(recordData, targetDatePath);
 
 	let refDateObj = getAttributeValueRepInstr(recordData, refDatePath);
 
-	// Array of distinct non null/blank values of the unique date. Supposed max length = 1
+	// Array of distinct non null/blank values of the unique date. Supposed max length = 1.
 	const values = Object.values(targetDateObj);
 	const filteredDates = values.filter(date => date); // this will filter out any falsy values (including empty strings)
 	const targetDateArr = Array.from(new Set(filteredDates));
 
+  // If I have more than one value in targetDateArr, it means that I have set a fixed date to a different values (registration error).
 	if (targetDateArr.length > 1) {
     //throw new Error("There are multiple values for " + targetDatePath + " in the repeating instrument (expected one)");
 		return false;
@@ -1065,7 +1796,7 @@ export const uniqueDateCompareToMaxDateRepInstr = (recordData: any, targetDatePa
 	if (deltaDays == null) deltaDays = 0;
 	if (isNaN(Number(deltaDays))) throw new Error(`Delta is not a number`);
 
-	// Se non è accettabile che il valore della data da comparare sia nullo, triggero un errore
+	// If it is unacceptable for the value of the date being compared to be null, I trigger an error.
 	if (acceptNull == 0) {
 		if (!targetDateArr || targetDateArr.length === 0) {
       //throw new Error(targetDatePath + " is always null");
@@ -1074,13 +1805,13 @@ export const uniqueDateCompareToMaxDateRepInstr = (recordData: any, targetDatePa
 	}
   // Se la data da comparare può essere nulla (e.g. data di menopausa)
   else if (acceptNull == 1) {
-		// Se E' nulla, il risultato del confronto è assunto vero
+		// If the date to be compared can be null.
 		if (targetDateArr.length === 0) {
 			results = true;
 		}
-    // Altrimenti faccio il confronto
+    // Otherwise, I make a comparison.
     else {
-			// Convert date strings to Date objects
+			// Convert date strings to Date objects.
 			let targetDateStr = targetDateArr[0];
 			let targetDate = new Date(targetDateStr);
 			let maxRefDate = new Date(Math.max(...refDateArr.map(d => new Date(d).getTime())));
