@@ -1,6 +1,7 @@
 import type { REDCapRecord } from "@/utils/types";
 
 
+
 interface DiseaseExtensionCounter {
   diagnosisYear: number;
   baselineDiseaseExtension: string;
@@ -38,7 +39,7 @@ export function updateDiseaseExtensionPatients(
     return null;
   }
   // It happened that "baseline" was undefined, which caused it to return "undefined".
-  // Naturally, I cannot extract values ​​from an "undefined" parameter.
+  // Naturally, I cannot extract values from an "undefined" parameter.
   // -----------------
 
   const diagnosisYear = latest.diagnosisYear;
@@ -79,7 +80,7 @@ export function updateDiseaseExtensionCounters(
     return null;
   }
   // It happened that "baseline" was undefined, which caused it to return "undefined".
-  // Naturally, I cannot extract values ​​from an "undefined" parameter.
+  // Naturally, I cannot extract values from an "undefined" parameter.
   // -----------------
 
   const diagnosisYear = latest.diagnosisYear;
@@ -205,6 +206,7 @@ export function buildDiseaseExtensionTimeline(
 		if (isNaN(date.getTime())) {
 			continue;
 		}
+    
 		timeline.push({
 			record: recordId,
 			diagnosisDate,

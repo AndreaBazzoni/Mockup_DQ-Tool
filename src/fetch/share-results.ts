@@ -26,12 +26,14 @@ export const shareResultsToS3 = async (
       status: response.status,
       ok: response.ok,
     });
-
-  } catch (err) {
-    if (err instanceof TypeError) {
-      throw new Error("Impossible to contact the storage server.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to contact the storage server: ${err.message}`, { cause: err });
     }
-    throw err;
+    else {
+      throw new Error("Impossible to contact the storage server.", { cause: err });
+    }
   }
 
   if (!response.ok) {

@@ -1,4 +1,3 @@
-import { fetchRecords } from "@/fetch/dq-fetch";
 import { initializeBaselineCounters,	processBaselineCompleteness } from '@/fetch/mgmt-complete-patients';
 import { buildDiseaseExtensionTimeline, updateDiseaseExtensionPatients, updateDiseaseExtensionCounters, aggregateDiseaseExtensionCounters } from '@/fetch/mgmt-disease-extension';
 import { initializeFollowupStats, buildStatusTimeline, buildTimelineSummary, analyzeFollowupCompleteness, classifyPatients } from '@/fetch/mgmt-followup';
@@ -8,27 +7,20 @@ import type { REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsFie
 
 
 export const obtainParamsExcelDQ = async(
-  centerUrl: string,
-  token: string,
   allRecordData: REDCapRecord[][],
   cohort: string[],
   metadata: REDCapMetadataField[],
   instrumentsVsEvents: REDCapInstrVsEventsField[],
   repeatings: REDCapRepeatingsField[]
 ) => {
-  // Values ​​that I need to return (DO NOT USE useState!)
+  // Values that I need to return (DO NOT USE useState!)
   let unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState;
   let lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState, treatmentSummaryState;
 
   try {
-    let fetchedRecords = await fetchRecords(centerUrl, token, 'bl_record_id');
-
     // Vector for the processing of selected records.
     // If empty, processing is performed on all existing records.
-    let whiteRecords: string[] = [];
-
-    const patientNr = fetchedRecords.length;
-    console.log("Total nr of patients = " + patientNr);
+    const whiteRecords: string[] = [];
     
     // I process the extracted records twice. 
     // First pass -> for handling all descriptive counts and populating the corresponding Excel sheets.
@@ -101,7 +93,7 @@ export const obtainParamsExcelDQ = async(
         updateDiseaseExtensionCounters(diseaseExtensionCounters, diseaseExtensionTimeline);
         processBaselineCompleteness(allRecordData[i], baselineCounters);
         analyzeFollowupCompleteness(allRecordData[i], followupStats);
-        processUnknownRecord(cohort[i], allRecordData[i], unknownCodes, unknownMatrix);
+        processUnknownRecord(context, cohort[i], allRecordData[i], unknownCodes, unknownMatrix, missingMetadata);
       }
     }
 
@@ -160,10 +152,8 @@ export const obtainParamsExcelDQ = async(
     
   catch (err) {
     console.error("Failed to obtain parameters of Data Quality: ", err);
-    throw new Error("Failed to obtain parameters of Data Quality.");
-  } 
-    
-  finally {
-    return {unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState, treatmentSummaryState};
+    throw new Error("Failed to obtain parameters of Data Quality.", { cause: err });
   }
+
+  return {unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, treatmentSummaryState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState};
 }

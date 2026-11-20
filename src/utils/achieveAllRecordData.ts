@@ -6,12 +6,12 @@ export const achieveAllRecordData = async (
   token: string,
   cohort: string[]
 ): Promise<REDCapRecord[][] | null> => {
-  let recordDataTotal: REDCapRecord[][] = [];
+  const recordDataTotal: REDCapRecord[][] = [];
 
   try {
     // Process each record
     for (const recordId of cohort) {
-      let recordData = await getRecordData(centerUrl, token, recordId);
+      const recordData = await getRecordData(centerUrl, token, recordId);
       recordDataTotal.push(recordData);
     }
     return recordDataTotal;

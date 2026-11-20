@@ -1,6 +1,7 @@
 import type { REDCapRecord } from "@/utils/types";
 
 
+
 const STATUS_VARIABLES_MAP = {
   unifocal_followup: {
     date: "ufu_date",
@@ -265,9 +266,16 @@ export function buildStatusTimeline(
 		const instrument = row.redcap_repeat_instrument;
 		const key = `${event}||${instrument}`;
 		const tipoRow = rowTypeMap.get(key);
+    // I skip the baseline and treatment at first presentation, as it is not a followup.
 		if (!tipoRow || tipoRow === "baseline_and_treatment_at_first_presentation") {
 			continue;
 		}
+    // Only consider complete followups, otherwise skip the row.
+		const completeField = `${tipoRow}_complete`;
+		if (row[completeField] !== "2") {
+			continue;
+		}
+    // Only consider rows that have a valid status mapping, otherwise skip the row.
     if (!(tipoRow in STATUS_VARIABLES_MAP)) {
       continue;
     }
@@ -280,6 +288,7 @@ export function buildStatusTimeline(
 			record: recordId,
 			diagnosisYear,
 			statusYear: getYear(statusDate),
+      statusDate,
 			status,
 			instrument,
 			event,
@@ -306,12 +315,15 @@ export function classifyPatients(
       const instrument = row.redcap_repeat_instrument || "";
       const key = `${event}||${instrument}`;
       const tipoRow = rowTypeMap.get(key);
-      return {
-        row,
-        tipoRow
-      };
+      return {row, tipoRow};
     })
-    .filter((item): item is { row: REDCapRecord; tipoRow: string } => !!item.tipoRow);
+    // I filter the followup about completeness.
+    .filter((item: any) => {
+			if (!item.tipoRow) return false;
+			const completeField = `${item.tipoRow}_complete`;
+			return item.row[completeField] === "2";
+		});
+    //.filter((item): item is { row: REDCapRecord; tipoRow: string } => !!item.tipoRow);
       
   // LIFE STATUS UPDATE
   const hasLifeStatusUpdate = rowsWithType.some(item => 

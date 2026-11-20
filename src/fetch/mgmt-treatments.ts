@@ -190,7 +190,7 @@ export function buildTreatmentSummarySheet(
     return [["No treatment summary available"]];
   }
 
-  const formatDistribution = (items: any) =>
+  const formatDistribution = (items: any[] = []) =>
     items.map(
       (item: any) => `${item.label} = ${item.percentage}% (${item.count})`
     ).join("    ");
@@ -202,7 +202,7 @@ export function buildTreatmentSummarySheet(
 
       ["Distribution at diagnosis", "", ""],
       ["Sex", "", formatDistribution(summary.sex)],
-      ["Average Age", "", summary.averageAge === null
+      ["Average Age", "", (summary.averageAge === null || summary.averageAge === undefined)
           ? "N/A"
           : Number(summary.averageAge.toFixed(1))],
       ["Stage at diagnosis (unifocal, locoregional, metastatic)", "", formatDistribution(summary.stage)],

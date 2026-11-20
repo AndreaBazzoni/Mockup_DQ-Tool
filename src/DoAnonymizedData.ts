@@ -24,11 +24,11 @@ export const DoAnonymizedData = async (
   allRecordDataResults: REDCapRecord[][]
 ) => {
   // Inizializzo il vettore risultante e il conteggio dei pazienti.
-  let anonymizedResults: Record<number, REDCapRecord[]> = {};
+  const anonymizedResults: Record<number, REDCapRecord[]> = {};
   let patientCounter = 1;
 
   // Chiave per l'anonimizzazione
-  let secret = "";
+  const secret = "JxMEeDYnE7qC$Ly";
 
   try {
     // Faccio una copia di allRecordDataResult così non lo sovrascrivo.
@@ -42,7 +42,7 @@ export const DoAnonymizedData = async (
         return;
       }
       // -- Anonymization Function --
-      let anon = anonymazeData(recordRows, patientCounter, secret);
+      const anon = anonymazeData(recordRows, patientCounter, secret);
       // Salvo le righe del Record.
       anonymizedResults[patientCounter] = anon;
       // Incremento il Counter.
@@ -52,8 +52,8 @@ export const DoAnonymizedData = async (
     return anonymizedResults;
   }
 
-  catch (err: any) {
-    console.error(err.message || "Error during the Data Anonymization.");
+  catch (err: unknown) {
+    console.error((err as Error).message || "Error during the Data Anonymization.");
     return null;
   }
 };

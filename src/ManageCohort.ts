@@ -4,12 +4,12 @@ import { createTxtFile } from "@/utils/createFile";
 import { achieveAllRecordData } from "@/utils/achieveAllRecordData";
 
 
+
 export const ManageCohort = async (
   center: Center,
   token: string,
   currentAnalysis: string
 ): Promise<{ cohort: string[] | null; allRecordData: REDCapRecord[][] | null }> => {
-
   // ------------------------------- //
   // ---- GESTIONE COMPILAZIONE ---- //
   // ------------------------------- //

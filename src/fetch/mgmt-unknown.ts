@@ -2,21 +2,15 @@ import { runBranchingLogic, isVarRepeating } from "@/DoDataQuality";
 import type { REDCapRecord, REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField, DQContext } from "@/utils/types";
 
 
+
 // Function to build the Unknown Summary
 export function buildUnknownSummary (
-  unknownMatrix: any
+  unknownMatrix: any,
+  missingMatrix: any
 ) {
-	return Object.values(unknownMatrix).map((row: any) => {
-		let denominator = 0;
-		let matches = 0;
-		for (const key of Object.keys(row)) {
-			if (key.startsWith("elig_")) {
-				denominator += row[key];
-			}
-			if (key.startsWith("match_")) {
-				matches += row[key];
-			}
-		}
+	return Object.values(missingMatrix).map((row: any) => {
+		const denominator = row.denominatorPatients.size;
+		const matches = unknownMatrix[row.field]?.unknownPatients.size ?? 0;
 		return {
 			field: row.field,
 			denominator,
@@ -50,44 +44,58 @@ export function buildMissingSummary (
 
 
 // Processes all rows for a patient to calculate unknown values.
-//  - unknownCodes: "unknown" values ​​from the metadata for all variables that have a specification regarding this.
+//  - unknownCodes: "unknown" values from the metadata for all variables that have a specification regarding this.
 //  - unknownMatrix: a cumulative structure that tracks eligible patients and those with unknown values.
 export function processUnknownRecord (
+  context: DQContext,
   recordId: string,
   recordData: REDCapRecord[],
   unknownCodes: any[],
-  unknownMatrix: any
+  unknownMatrix: any,
+  missingMetadata: any
 ) {
-  for (const row of recordData) {
-    unknownCodes.forEach((codeObj) => {
+  for (const rowData of recordData) {
+    const rowType = getRowType(rowData);
+
+    if (!rowType) {
+      continue;
+    }
+
+    // Considero esclusivamente le righe complete
+    const completeField = `${rowType}_complete`;
+    if (rowData[completeField] !== "2") {
+        continue;
+    }
+
+    // Stessa logica di branching utilizzata da Missing
+    const expectedVariables = missingMetadata.filter((item: any) =>
+      item.form_name === rowType
+    );
+    const expectedVarBranch = getExpectedVariablesBranching(context, expectedVariables, rowData);
+    const expectedFields = new Set(expectedVarBranch.map((item: any) =>
+      item.field_name
+    ));
+
+    for (const codeObj of unknownCodes) {
       const fieldName = codeObj.field_name;
-      const eligible = (codeObj.event_name === row.redcap_event_name && codeObj.form_name === row.redcap_repeat_instrument)
-        ? 1
-        : 0;
-      const match = (eligible && row[fieldName] === codeObj.val)
-        ? 1
-        : 0;
-
-      if (!unknownMatrix[fieldName]) {
-        unknownMatrix[fieldName] = {
-          field: fieldName
-        };
+      const eligible =
+        codeObj.event_name === rowData.redcap_event_name &&
+        codeObj.form_name === rowData.redcap_repeat_instrument &&
+        expectedFields.has(fieldName);
+      if (!eligible) {
+        continue;
       }
-
-      const eligKey = `elig_${recordId}`;
-      const matchKey = `match_${recordId}`;
-
-      if (!unknownMatrix[fieldName][eligKey]) {
-        unknownMatrix[fieldName][eligKey] = 0;
+      if (rowData[fieldName] === codeObj.val) {
+        if (!unknownMatrix[fieldName]) {
+          unknownMatrix[fieldName] = {
+            field: fieldName,
+            unknownPatients: new Set()
+          };
+        }
+        // At least one: il paziente viene contato una sola volta
+        unknownMatrix[fieldName].unknownPatients.add(recordId);
       }
-
-      if (!unknownMatrix[fieldName][matchKey]) {
-        unknownMatrix[fieldName][matchKey] = 0;
-      }
-
-      unknownMatrix[fieldName][eligKey] += eligible;
-      unknownMatrix[fieldName][matchKey] += match;
-    });
+    }
   }
 }
 
@@ -110,6 +118,12 @@ export function processMissingRecord (
     if (!rowType) {
       continue;
     }
+
+    const completeField = `${rowType}_complete`;
+    if (row[completeField] !== "2") {
+      continue;
+    }
+
     // I take from metadata only variables that belong to this type of row.
     const expectedVariables = missingMetadata.filter(
       metadataItem => metadataItem.form_name === rowType
@@ -145,67 +159,6 @@ export function processMissingRecord (
 // ============================================================
 // UNIFIED UNKNOWN + MISSING (SUMMARY)
 // ============================================================
-export function buildUnknownMissingSummary_OLD (
-  unknownMatrix: any,
-  missingMatrix: any,
-  metadata: REDCapMetadataField[]
-) {
-  const unknownSummary = buildUnknownSummary(unknownMatrix);
-  const missingSummary = buildMissingSummary(missingMatrix);
-  const summaryMap: Record<
-    string,
-    {
-      field: string;
-      formName: string;
-      denominatorMissing: number;
-      percentMissing: number;
-      denominator: number;
-      percentUnknown: number;
-    }
-  > = {};
-
-  // Mappa il nome del form per ogni variabile
-  //const formNameByField = Object.fromEntries(metadata.map(item => [item.field_name, item.form_name]));
-  const metadataByField = Object.fromEntries(metadata.map(item => [item.field_name, item]));
-
-  // 1. Inserisco tutti i risultati UNKNOWN.
-  for (const item of unknownSummary) {
-    summaryMap[item.field] = {
-      //field: item.field,
-      //formName: (formNameByField[item.field] || "").replace(/_/g, " "),
-      field: (metadataByField[item.field]?.field_label || item.field).replace(/<\/?(?:div|p|u)\b[^>]*>|<br\s*\/?>/gi, "").trim(),
-      formName: (metadataByField[item.field]?.form_name || "").replace(/_/g, " "),
-      denominatorMissing: 0,
-      percentMissing: 0,
-      denominator: item.denominator,
-      percentUnknown: item.percent
-    };
-  }
-
-  // 2. Aggiungo/completo i risultati MISSING.
-  for (const item of missingSummary) {
-    if (!summaryMap[item.field]) {
-      summaryMap[item.field] = {
-        //field: item.field,
-        //formName: (formNameByField[item.field] || "").replace(/_/g, " "),
-        field: (metadataByField[item.field]?.field_label || item.field).replace(/<\/?(?:div|p|u)\b[^>]*>|<br\s*\/?>/gi, "").trim(),
-        formName: (metadataByField[item.field]?.form_name || "").replace(/_/g, " "),
-        denominatorMissing: item.denominatorMissing,
-        percentMissing: item.percent,
-        denominator: 0,
-        percentUnknown: 0
-      };
-    }
-    else {
-      summaryMap[item.field].denominatorMissing = item.denominatorMissing;
-      summaryMap[item.field].percentMissing = item.percent;
-    }
-  }
-  
-  return Object.values(summaryMap);
-}
-
-
 // Versione che elenca TUTTE le variabili (tranne quelle "descriptive" e la variabile "version"), anche quelle con 0 (sia in missing, sia in unknown).
 // Viene mantenuto l'ordine trovato in metadata. Utilizza le label.
 export function buildUnknownMissingSummary(
@@ -213,7 +166,7 @@ export function buildUnknownMissingSummary(
   missingMatrix: any,
   metadata: REDCapMetadataField[]
 ) {
-  const unknownSummary = buildUnknownSummary(unknownMatrix);
+  const unknownSummary = buildUnknownSummary(unknownMatrix, missingMatrix);
   const missingSummary = buildMissingSummary(missingMatrix);
 
   // Indicizzo i risultati usando il nome tecnico della variabile.
@@ -243,7 +196,7 @@ export function buildUnknownMissingSummary(
     const missing = missingByField.get(fieldName);
 
     const fieldLabel = (meta.field_label || fieldName)
-      .replace(/<\/?(?:div|p|u)\b[^>]*>|<br\s*\/?>/gi, "")
+      .replace(/<\/?(?:div|p|u|strong)\b[^>]*>|<br\s*\/?>/gi, "")
       .trim();
 
     summary.push({
@@ -251,8 +204,9 @@ export function buildUnknownMissingSummary(
       formName: (meta.form_name || "").replace(/_/g, " "),
       denominatorMissing: missing?.denominatorMissing ?? 0,
       percentMissing: missing?.percent ?? 0,
-      denominator: unknown?.denominator ?? 0,
       percentUnknown: unknown?.percent ?? 0
+      //percentMissing: `${Math.round(missing?.percent ?? 0)} %`,
+      //percentUnknown: `${Math.round(unknown?.percent ?? 0)} %`
     });
   }
 
@@ -260,7 +214,7 @@ export function buildUnknownMissingSummary(
 }
 
 
-// Function to extract "unknown" values ​​from the metadata for all variables that have a specification regarding this.
+// Function to extract "unknown" values from the metadata for all variables that have a specification regarding this.
 // These specifications are found in the "select_choices_or_calculations" field (for dropdowns) or in the "field_note" field (for text variables).
 // I am not concerned with variables that have notes such as "if DD unknown...".
 export const extractUnknownCodes = (
@@ -269,15 +223,16 @@ export const extractUnknownCodes = (
   repeatings: REDCapRepeatingsField[]
 ) => {
     if (!Array.isArray(metadata)) return [];
+    
     const results: any[] = [];
 
     metadata.forEach(block => {
-      let fieldName = block.field_name;
+      const fieldName = block.field_name;
       let instrumentName = block.form_name;
 
       const found = instrumentsVsEvents.find(item => item.form === instrumentName);
       if (found === undefined) return [];
-      let eventName = found.unique_event_name;
+      const eventName = found.unique_event_name;
 
       if (!(isVarRepeating(repeatings, instrumentName, eventName))) {
         instrumentName = "";
@@ -375,7 +330,7 @@ const getRowType = (
 // ====================
 // MISSING MANAGEMENT
 // ====================
-const ROW_TYPE_MAPPING = [
+export const ROW_TYPE_MAPPING = [
   {
     instrument: "",
     event: "baseline_arm_1",

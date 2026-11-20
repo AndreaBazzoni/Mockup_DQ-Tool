@@ -5,7 +5,6 @@ import type { Center, REDCapRecord, DQRecord, REDCapMetadataField, REDCapInstrVs
 
 export async function DownloadDataQuality(
   center: Center,
-  token: string,
   allRecordData: REDCapRecord[][],
   cohort: string[],
   metadata: REDCapMetadataField[],
@@ -32,11 +31,11 @@ export async function DownloadDataQuality(
   const fileName = `${CurrentAnalysis}_${center.id}_${timestamp}.xlsx`;
 
   // Obtain parameters for file building.
-  const rslt = await obtainParamsExcelDQ(center.url, token, allRecordData, cohort, metadata, instrumentsVsEvents, repeatings);
-  const {unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState, treatmentSummaryState} = rslt;
+  const rslt = await obtainParamsExcelDQ(allRecordData, cohort, metadata, instrumentsVsEvents, repeatings);
+  const {unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, treatmentSummaryState} = rslt;
 
   // Creation of the Blob (Binary Large Object).
-  const dataBlob = await createExcelDQ(resultQuality, metadata, unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, lifeStatusTimelineState, noLifeStatusUnifocalTimelineState, noLifeStatusLocoregionalTimelineState, noLifeStatusSystemicTimelineState, treatmentSummaryState);
+  const dataBlob = await createExcelDQ(resultQuality, metadata, unknownSummaryState, allTimelineSummaryState, baselineCountersState, aggregatedDiseaseExtensionCountersState, treatmentSummaryState);
 
   // Create a link element to download the file.
   const urlBlob = window.URL.createObjectURL(dataBlob);

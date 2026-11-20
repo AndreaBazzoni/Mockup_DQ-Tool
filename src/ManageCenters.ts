@@ -1,10 +1,10 @@
 import type { Center } from "@/utils/types";
 
 
+
 // ------------------------------- //
 // ---- GESTIONE COMPILAZIONE ---- //
 // ------------------------------- //
-
 // Lista dei centri
 export const ListOfCenters: Center[] = [
   {

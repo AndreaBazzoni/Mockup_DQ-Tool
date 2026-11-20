@@ -1,6 +1,7 @@
 import type { REDCapRecord } from "@/utils/types";
 
 
+
 export const fetchFileRepository = async (
   centerUrl: string,
   token: string,
@@ -23,11 +24,14 @@ export const fetchFileRepository = async (
   let response: Response;
   try {
     response = await fetch(centerUrl, requestOptions);
-  } catch (err) {
-    if (err instanceof TypeError) {
-      throw new Error("Impossible to contact REDCap Server.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to contact REDCap Server. Details: ${err.message}`, { cause: err });
     }
-    throw err;
+    else {
+      throw new Error(`Unexpected error: ${String(err)}`, { cause: err });
+    }
   }
   const resultText = await response.text();
 
@@ -42,8 +46,14 @@ export const fetchFileRepository = async (
   let result;
   try {
     result = JSON.parse(resultText);
-  } catch {
-    throw new Error("Invalid REDCap response (unexpected format).");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Invalid REDCap response (unexpected format): ${err.message}`, { cause: err });
+    }
+    else {
+      throw new Error("Invalid REDCap response (unexpected format).", { cause: err });
+    }
   }
 
   return result;
@@ -71,11 +81,14 @@ export const getCohort = async (
   let response: Response;
   try {
     response = await fetch(centerUrl, requestOptions);
-  } catch (err) {
-    if (err instanceof TypeError) {
-      throw new Error("Impossible to contact REDCap Server.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to contact REDCap Server. Details: ${err.message}`, { cause: err });
     }
-    throw err;
+    else {
+      throw new Error(`Unexpected error: ${String(err)}`, { cause: err });
+    }
   }
   const resultText = await response.text();
 
@@ -95,8 +108,14 @@ export const getCohort = async (
       .map((line) => line.trim())
       .filter((line) => line.length > 0);
       // I divide rows in elements, I clean them, I remove empty elements.
-  } catch {
-    throw new Error("Impossible to read the cohort.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to read the cohort: ${err.message}`, { cause: err });
+    }
+    else {
+      throw new Error("Impossible to read the cohort.", { cause: err });
+    }
   }
 
   return result;
@@ -129,11 +148,14 @@ export const fetchCohort = async (
   let response: Response;
   try {
     response = await fetch(centerUrl, requestOptions);
-  } catch (err) {
-    if (err instanceof TypeError) {
-      throw new Error("Impossible to contact REDCap Server.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to contact REDCap Server. Details: ${err.message}`, { cause: err });
     }
-    throw err;
+    else {
+      throw new Error(`Unexpected error: ${String(err)}`, { cause: err });
+    }
   }
   const resultText = await response.text();
 
@@ -148,8 +170,14 @@ export const fetchCohort = async (
   let result;
   try {
     result = JSON.parse(resultText);
-  } catch {
-    throw new Error("Impossible to download the cohort.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to download the cohort: ${err.message}`, { cause: err });
+    }
+    else {
+      throw new Error("Impossible to download the cohort.", { cause: err });
+    }
   }
 
   return result;
@@ -179,11 +207,14 @@ export const createFileCohort = async (
   let response: Response;
   try {
     response = await fetch(centerUrl, requestOptions);
-  } catch (err) {
-    if (err instanceof TypeError) {
-      throw new Error("Impossible to contact REDCap Server.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to contact REDCap Server. Details: ${err.message}`, { cause: err });
     }
-    throw err;
+    else {
+      throw new Error(`Unexpected error: ${String(err)}`, { cause: err });
+    }
   }
   const resultText = await response.text();
 
@@ -220,11 +251,14 @@ export const createDirectory = async (
   let response: Response;
   try {
     response = await fetch(centerUrl, requestOptions);
-  } catch (err) {
-    if (err instanceof TypeError) {
-      throw new Error("Impossible to contact REDCap Server.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to contact REDCap Server. Details: ${err.message}`, { cause: err });
     }
-    throw err;
+    else {
+      throw new Error(`Unexpected error: ${String(err)}`, { cause: err });
+    }
   }
   const resultText = await response.text();
 
@@ -255,6 +289,7 @@ export const getRecordData = async (
   formdata.append("exportCheckboxLabel", "false");
   formdata.append("exportSurveyFields", "false");
   formdata.append("exportDataAccessGroups", "false");
+  formdata.append("exportBlankForGrayFormStatus", "true");
   formdata.append("returnFormat", "json");
 
   const requestOptions: RequestInit = {
@@ -266,11 +301,14 @@ export const getRecordData = async (
   let response: Response;
   try {
     response = await fetch(centerUrl, requestOptions);
-  } catch (err) {
-    if (err instanceof TypeError) {
-      throw new Error("Impossible to contact REDCap Server.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to contact REDCap Server. Details: ${err.message}`, { cause: err });
     }
-    throw err;
+    else {
+      throw new Error(`Unexpected error: ${String(err)}`, { cause: err });
+    }
   }
   const resultText = await response.text();
 
@@ -285,8 +323,14 @@ export const getRecordData = async (
   let result: REDCapRecord[];
   try {
     result = JSON.parse(resultText);
-  } catch {
-    throw new Error("Impossible to achieve Data from the cohort.");
+  } 
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to achieve Data from the cohort: ${err.message}`, { cause: err });
+    }
+    else {
+      throw new Error("Impossible to achieve Data from the cohort.", { cause: err });
+    }
   }
 
   return result;

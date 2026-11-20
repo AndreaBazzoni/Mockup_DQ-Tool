@@ -1,6 +1,7 @@
 import type { REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
 
 
+
 // get Metadata
 export const getMetadata = async (
   centerUrl: string,
@@ -21,11 +22,14 @@ export const getMetadata = async (
   let response: Response;
   try {
     response = await fetch(centerUrl, requestOptions);
-  } catch (err) {
-    if (err instanceof TypeError) {
-      throw new Error("Impossible to contact REDCap Server.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to contact REDCap Server. Details: ${err.message}`, { cause: err });
     }
-    throw err;
+    else {
+      throw new Error(`Unexpected error: ${String(err)}`, { cause: err });
+    }
   }
   const resultText = await response.text();
 
@@ -40,8 +44,14 @@ export const getMetadata = async (
   let result;
   try {
     result = JSON.parse(resultText);
-  } catch {
-    throw new Error("Impossible to get Metadata.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to get Metadata. Details: ${err.message}`, { cause: err });
+    }
+    else {
+      throw new Error("Impossible to get Metadata.", { cause: err });
+    }
   }
 
   return result;
@@ -68,11 +78,14 @@ export const getInstrVsEvents = async (
   let response: Response;
   try {
     response = await fetch(centerUrl, requestOptions);
-  } catch (err) {
-    if (err instanceof TypeError) {
-      throw new Error("Impossible to contact REDCap Server.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to contact REDCap Server. Details: ${err.message}`, { cause: err });
     }
-    throw err;
+    else {
+      throw new Error(`Unexpected error: ${String(err)}`, { cause: err });
+    }
   }
   const resultText = await response.text();
 
@@ -87,8 +100,14 @@ export const getInstrVsEvents = async (
   let result;
   try {
     result = JSON.parse(resultText);
-  } catch {
-    throw new Error("Impossible to get Instruments VS Events.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to get Instruments VS Events. Details: ${err.message}`, { cause: err });
+    }
+    else {
+      throw new Error("Impossible to get Instruments VS Events.", { cause: err });
+    }
   }
 
   return result;
@@ -115,11 +134,14 @@ export const getRepeatings = async (
   let response: Response;
   try {
     response = await fetch(centerUrl, requestOptions);
-  } catch (err) {
-    if (err instanceof TypeError) {
-      throw new Error("Impossible to contact REDCap Server.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to contact REDCap Server. Details: ${err.message}`, { cause: err });
     }
-    throw err;
+    else {
+      throw new Error(`Unexpected error: ${String(err)}`, { cause: err });
+    }
   }
   const resultText = await response.text();
 
@@ -134,8 +156,14 @@ export const getRepeatings = async (
   let result;
   try {
     result = JSON.parse(resultText);
-  } catch {
-    throw new Error("Impossible to get Repeating Forms Events.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to get Repeating Forms Events. Details: ${err.message}`, { cause: err });
+    }
+    else {
+      throw new Error("Impossible to get Repeating Forms Events.", { cause: err });
+    }
   }
 
   return result;
@@ -164,11 +192,14 @@ export const fetchRecords = async (
   let response: Response;
   try {
     response = await fetch(centerUrl, requestOptions);
-  } catch (err) {
-    if (err instanceof TypeError) {
-      throw new Error("Impossible to contact REDCap Server.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to contact REDCap Server. Details: ${err.message}`, { cause: err });
     }
-    throw err;
+    else {
+      throw new Error(`Unexpected error: ${String(err)}`, { cause: err });
+    }
   }
   const resultText = await response.text();
 
@@ -183,8 +214,14 @@ export const fetchRecords = async (
   let recordsRaw: Record<string, string>[];
   try {
     recordsRaw = JSON.parse(resultText);
-  } catch {
-    throw new Error("Impossible to fetch Records.");
+  }
+  catch (err: unknown) {
+    if (err instanceof Error) {
+      throw new Error(`Impossible to fetch Records. Details: ${err.message}`, { cause: err });
+    }
+    else {
+      throw new Error("Impossible to fetch Records.", { cause: err });
+    }
   }
   const records: string[] = recordsRaw.map((record: any) => record[idAttr]);
 

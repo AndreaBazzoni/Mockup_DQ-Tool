@@ -2,6 +2,8 @@ import DataQualityApp from "@/DataQualityApp";
 import { Toaster } from "@/components/ui/sonner";
 import Footer from "@/Footer";
 
+
+
 export default function App() {
   return (
     <>

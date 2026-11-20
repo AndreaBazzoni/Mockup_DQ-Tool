@@ -15,7 +15,7 @@ It connects to a REDCap project, retrieves the data and checks it for issues suc
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/biomeris/redcap-webdq-2.git
+git clone https://github.com/AndreaBazzoni/Mockup_DQ-Tool.git
 ```
 
 Downloads a local copy of the project, including the full commit history.
@@ -24,7 +24,7 @@ Downloads a local copy of the project, including the full commit history.
 ### 2. Enter the project folder
 
 ```bash
-cd redcap-webdq-2
+cd Mockup_DQ-Tool
 ```
 
 All the following commands must be run from this folder.
@@ -46,4 +46,18 @@ Reads the "package.json" file and downloads all the libraries required by the pr
 npm run dev
 ```
 
-Starts the Vite development server. The terminal will show the local address (usually `http://localhost:5173`) to open in your browser. The server reloads automatically whenever the code changes.
+Starts the Vite development server. The terminal will display the local URL (usually `http://localhost:5173`) to open in your browser. The server supports Hot Module Replacement (HMR), automatically reflecting code changes in the browser during development.
+Note: If the default port (:5173) is already in use, Vite will automatically try the next available port.
+
+
+### 5. Start the application in preview mode
+
+```bash
+npm run build && npm run preview
+```
+
+Builds the application for production and starts the Vite preview server to locally test the production build. The terminal will display the local URL (usually `http://localhost:4173`) to open in your browser.
+Note: If the default port (:4173) is already in use, Vite will automatically try the next available port.
+
+NOTE: to change the REDCap Directory name and the Cohort File name, see the corresponding section in "ManageCohort".
+To manage everything else (centers, analysis, bucket), see the corresponding section in "ManageCenters".

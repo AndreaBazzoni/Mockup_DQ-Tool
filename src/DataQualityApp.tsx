@@ -13,7 +13,9 @@ import { getMetadata, getInstrVsEvents, getRepeatings } from "@/fetch/dq-fetch";
 import type { Center, REDCapRecord, DQRecord, REDCapMetadataField, REDCapInstrVsEventsField, REDCapRepeatingsField } from "@/utils/types";
 
 
+
 export default function DataQualityApp() {
+  // Variables
   const [selectedCenter, setSelectedCenter] = useState<Center | null>(null);
   const [token, setToken] = useState("");
   const [showToken, setShowToken] = useState(false);
@@ -137,22 +139,22 @@ export default function DataQualityApp() {
         const qualityResult: Record<string, DQRecord> = {};
         // API calls to get Data.
           // Metadata
-        let metadataAPI = await getMetadata(selectedCenter.url, token);
+        const metadataAPI = await getMetadata(selectedCenter.url, token);
           // Instrument vs Event
-        let instrumentsVsEventsAPI = await getInstrVsEvents(selectedCenter.url, token);
+        const instrumentsVsEventsAPI = await getInstrVsEvents(selectedCenter.url, token);
           // Repeatings
-        let repeatingInstrumentsAndEventsAPI = await getRepeatings(selectedCenter.url, token);
+        const repeatingInstrumentsAndEventsAPI = await getRepeatings(selectedCenter.url, token);
         // I verify that none of the required values are null.
         if (metadataAPI === null || instrumentsVsEventsAPI === null || repeatingInstrumentsAndEventsAPI === null) {
           throw new Error("Failed to fetch information for Data Quality.");
         }
-        // If none of the values ​​are null, I save them.
+        // If none of the values are null, I save them.
         setMetadata(metadataAPI);
         setInstrumentsVsEvents(instrumentsVsEventsAPI);
         setRepeatingInstrumentsAndEvents(repeatingInstrumentsAndEventsAPI);
         // Start DQ cycles.
         for (let i = 0; i < cohort.length; i++) {
-          let dq = await DoDataQuality(allRecordData[i], metadataAPI, instrumentsVsEventsAPI, repeatingInstrumentsAndEventsAPI);
+          const dq = await DoDataQuality(allRecordData[i], metadataAPI, instrumentsVsEventsAPI, repeatingInstrumentsAndEventsAPI);
           if (dq === null) {
             throw new Error("Failed during Data Quality.");
           }
@@ -175,9 +177,9 @@ export default function DataQualityApp() {
       toast.success(isAnonymous ? "Anonymization completed!" : "Data Quality completed!");
     }
     
-    catch (err: any) {
-      console.error(err.message || "Error during the operation.");
-      toast.error(err.message || "Error during the operation.");
+    catch (err: unknown) {
+      console.error((err as Error).message || "Error during the operation.");
+      toast.error((err as Error).message || "Error during the operation.");
     }
     
     finally {
@@ -212,7 +214,7 @@ export default function DataQualityApp() {
           toast.error("The Cohort is null.");
         }
         else {
-          await DownloadDataQuality(selectedCenter, token, allRecordDataResults, cohortResults, metadata, instrumentsVsEvents, repeatingInstrumentsAndEvents, CurrentAnalysis, resultQuality);
+          await DownloadDataQuality(selectedCenter, allRecordDataResults, cohortResults, metadata, instrumentsVsEvents, repeatingInstrumentsAndEvents, CurrentAnalysis, resultQuality);
         }
       }
       else if (isAnonymous && resultAnonymous !== null) {

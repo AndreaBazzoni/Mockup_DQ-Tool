@@ -4,18 +4,6 @@ import type { REDCapRecord, DQRecord, REDCapMetadataField } from "@/utils/types"
 import { buildTreatmentSummarySheet } from "@/fetch/mgmt-treatments";
 
 
-// Life Status Type
-interface lifeStatusType {
-  record: string;
-  diagnosisYear: any;
-  statusYear: any;
-  status: any;
-  instrument: any;
-  event: any;
-  tipoRow: any;
-}
-
-
 // Create generic .txt file
 export const createTxtFile = (
   ids: string[],
@@ -61,48 +49,12 @@ export const createExcelDQ = async(
   allTimelineSummary: any,
   baselineCounters: any,
   aggregatedDiseaseExtensionCounters: any,
-  lifeStatusTimeline: lifeStatusType[] | undefined,
-  noLifeStatusUnifocalTimeline: lifeStatusType[] | undefined,
-  noLifeStatusLocoregionalTimeline: lifeStatusType[] | undefined,
-  noLifeStatusSystemicTimeline: lifeStatusType[] | undefined,
   treatmentSummaryState: any
 ) => {
     // Load xlsx only when used.
   const XLSX = await import("xlsx");
 
 	const workbook = XLSX.utils.book_new();
-
-  /*
-	const DQ_SHEET_NAMES: Record<string, string> = {
-		dq_1: "baseline and treatment at fp",
-		dq_2: "unifocal fu",
-		dq_3: "unifocal local recurrence",
-		dq_4: "unifocal distant metastasis",
-		dq_5: "locoregional fu",
-		dq_6: "locoregional progression",
-		dq_7: "sys met fu",
-		dq_8: "sys met progression",
-		dq_9: "life status update"
-	};
-
-	// Get grouped sheets: { dq_1: [...rows], dq_2: [...rows], ... }
-	const groupedSheets = transformDataForDQ2(dataQualityResults, metadata);
-
-  Object.entries(groupedSheets).forEach(([dqGroup, rows]) => {
-    // Use the mapping to name the sheets
-    const sheetName = DQ_SHEET_NAMES[dqGroup] || dqGroup;
-    const worksheet = XLSX.utils.aoa_to_sheet(rows);
-    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-  });
-  */
-
-  const checksRows = transformDataForDQ2(dataQualityResults, metadata);
-	const checksWorksheet = XLSX.utils.aoa_to_sheet(checksRows);
-	XLSX.utils.book_append_sheet(workbook, checksWorksheet, "checks");
-
-  //const missingSheet = buildMissingSheet(dataQualityResults);
-  //const missingWs = XLSX.utils.aoa_to_sheet(missingSheet);
-  //XLSX.utils.book_append_sheet(workbook, missingWs, "missing");
 
 	const completePatientsSheet = buildCompletePatientsSheet(baselineCounters);
 	const completePatientsWs = XLSX.utils.aoa_to_sheet(completePatientsSheet);
@@ -112,28 +64,41 @@ export const createExcelDQ = async(
 	const treatmentWs = XLSX.utils.aoa_to_sheet(treatmentSheet);
 	XLSX.utils.book_append_sheet(workbook,treatmentWs,"treatments");
 
+  const diseaseExtensionSheet = buildDiseaseExtensionSheet(aggregatedDiseaseExtensionCounters);
+	const diseaseExtensionWs = XLSX.utils.aoa_to_sheet(diseaseExtensionSheet);
+	XLSX.utils.book_append_sheet(workbook, diseaseExtensionWs, "disease extension");
+
 	const unknownSheet = buildUnknownSheet(unknownSummary);
 	const unknownWs = XLSX.utils.aoa_to_sheet(unknownSheet);
-	XLSX.utils.book_append_sheet(workbook, unknownWs, "unknown");
+	XLSX.utils.book_append_sheet(workbook, unknownWs, "missing & unknown");
 
-	const followUpSheet = buildFollowUpSheet(allTimelineSummary, lifeStatusTimeline, noLifeStatusUnifocalTimeline, noLifeStatusLocoregionalTimeline, noLifeStatusSystemicTimeline);
+	const followUpSheet = buildFollowUpSheet(allTimelineSummary);
 	const followUpWs = XLSX.utils.aoa_to_sheet(followUpSheet);
 	XLSX.utils.book_append_sheet(workbook,followUpWs,"follow-up");
 
-	const diseaseExtensionSheet = buildDiseaseExtensionSheet(aggregatedDiseaseExtensionCounters);
-	const diseaseExtensionWs = XLSX.utils.aoa_to_sheet(diseaseExtensionSheet);
-	XLSX.utils.book_append_sheet(workbook, diseaseExtensionWs, "diagnosis year");
+  const checksRows = transformDataForDQ(dataQualityResults, metadata);
+	const checksWorksheet = XLSX.utils.aoa_to_sheet(checksRows);
+	XLSX.utils.book_append_sheet(workbook, checksWorksheet, "checks");
 
   const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
   return new Blob([excelBuffer], { type: 'application/octet-stream' });
 };
 
 
-const transformDataForDQ2 = (
+const transformDataForDQ = (
   data: Record<string, DQRecord>,
   metadata: REDCapMetadataField[]
 ) => {
-  const recordNames = Object.keys(data);
+  const allRecordNames = Object.keys(data);
+
+	if (!allRecordNames.length) return [];
+
+	// Mantengo solo i record che hanno almeno un controllo fallito.
+	const recordNames = allRecordNames.filter(recordId => {
+		return Object.values(data[recordId]).some((value: any) =>
+			value === false || (typeof value === "number" && value > 0)
+		);
+	});
 
   if (!recordNames.length) return [];
 
@@ -245,135 +210,6 @@ const transformDataForDQ2 = (
 };
 
 
-/*
-const transformDataForDQ2 = (
-  data: Record<string, DQRecord>,
-  metadata: REDCapMetadataField[]
-) => {
-	const recordNames = Object.keys(data);
-	if (!recordNames.length) return {};
-
-	const checksMap = Object.fromEntries(
-		dqChecks.map(check => [check.name, check])
-	);
-	const checks = dqChecks.map(c => c.name);
-	const grouped: Record<string, { maxVars: number; rows: (string | number)[][] }> = {};
-
-	checks.forEach(check => {
-		const dqGroup = check.match(/^dq_\d+/)?.[0] || "other";
-		if (!grouped[dqGroup]) {
-			const groupChecks = dqChecks.filter(
-				c => c.name.startsWith(dqGroup + "_")
-			);
-			const maxVars = Math.max(
-				...groupChecks.map(c => c.vars?.length || 0),
-				0
-			);
-			const variableHeaders = Array.from(
-				{ length: maxVars },
-				(_, i) => [
-					`Instrument ${i + 1}`,
-					`Variable to check ${i + 1}`
-				]
-			).flat();
-			grouped[dqGroup] = {
-				maxVars,
-				rows: [[
-					"Data quality check",
-					...variableHeaders,
-					...recordNames,
-					"TOTAL"
-				]]
-			};
-		}
-		const values = recordNames.map(rec => {
-			const key = getResultKey(check, data[rec]);
-			return key ? data[rec][key] : 0;
-		});
-    ////
-		const sum = values.reduce(
-			(acc, val) => acc + (typeof val === "number" ? val : 0),
-			0
-		);
-    ////
-		const metadataCheck = checksMap[check];
-		let mainVar = metadataCheck?.params?.[0];
-		if (Array.isArray(mainVar)) {
-			mainVar = mainVar[0];
-		}
-		const vars = (metadataCheck?.vars || []).map(v => {
-			const meta = metadata?.find((m: any) => m.field_name === v);
-			return {
-				instrument: meta?.form_name?.replace(/_/g, " ") ?? "",
-				variable: cleanLabel(
-					meta?.field_label ||
-					meta?.field_name ||
-					v
-				)
-			};
-		});
-		const paddedVars = [
-			...vars,
-			...Array(grouped[dqGroup].maxVars - vars.length).fill(null)
-		];
-		const variableColumns = paddedVars.flatMap(v => {
-			if (!v) {
-				return ["", ""];
-			}
-			return [
-				v.instrument,
-				v.variable
-			];
-		});
-		const checkLabel = metadataCheck?.desc || check;
-    const row = [
-			checkLabel,
-			...variableColumns,
-			...values.map(val => {
-				if (val === true || val === 0 || val == null) return "";
-				if (val === false) return 1;
-				return val;
-			}),
-			values.reduce((total, val) => {
-				if (val === false) return total + 1;
-				if (typeof val === "number" && Number.isFinite(val)) {
-					return total + val;
-				}
-				return total;
-			}, 0)
-		];
-    ////
-		const row = [
-
-			//checkLabel,
-			//...variableColumns,
-			//...values.map(val => val === 0 ? "" : val),
-			//sum
-			
-			checkLabel,
-			...variableColumns,
-			...values.map(val => {
-				if (val === true) return "";
-				if (val === false) return 1;
-				if (val === 0) return "";
-				return val;
-			}),
-			values.filter(val => val === false).length
-		];
-    ////
-		grouped[dqGroup].rows.push(row);
-	});
-
-	return Object.fromEntries(
-		Object.entries(grouped).map(([group, info]) => [
-			group,
-			info.rows
-		])
-	);
-};
-*/
-
-
 const getResultKey = (
   checkName: string,
   record: Record<string, DQRecord>
@@ -409,11 +245,11 @@ function buildCompletePatientsSheet(
   baselineCounters: any
 ) {
 	return [
-		["BASELINE", "", ""],
+		["", "BASELINE", ""],
 		["form status", "Description", "patients"],
 		[
 			"complete",
-			"unselected",
+			"unselected (disease extension)",
 			baselineCounters.complete2_blank
 		],
 		[
@@ -434,7 +270,7 @@ function buildCompletePatientsSheet(
 		["", "", ""],
 		[
 			"incomplete",
-			"unselected",
+			"unselected (disease extension)",
 			baselineCounters.complete0_blank
 		],
 		[
@@ -478,9 +314,8 @@ const buildUnknownSheet = (
 		[
 			"variable",
       "Form name",
-			"denominator missing",
+			"denominator",
 			"% missing",
-			"denominator unknown",
 			"% unknown"
 		]
 	];
@@ -492,16 +327,18 @@ const buildUnknownSheet = (
 			item.percentUnknown > 0
 		)
     */
+    .filter((item: any) => item.denominatorMissing > 0)
 		.forEach((item: any) => {
 			rows.push([
 				item.field,
         item.formName,
 				item.denominatorMissing,
 				//Math.round(item.percentMissing * 10) / 10,
-        Math.round(item.percentMissing),
-				item.denominator,
+				//Math.round(item.percentMissing),
+				`${Math.round(item.percentMissing)} %`,
 				//Math.round(item.percentUnknown * 10) / 10
-        Math.round(item.percentUnknown),
+				//Math.round(item.percentUnknown),
+				`${Math.round(item.percentUnknown)} %`
 			]);
 		});
 	return rows;
@@ -509,144 +346,35 @@ const buildUnknownSheet = (
 
 
 const buildFollowUpSheet = (
-  allTimelineSummary: any,
-  lifeStatusTimeline: lifeStatusType[] | undefined,
-  noLifeStatusUnifocalTimeline: lifeStatusType[] | undefined,
-  noLifeStatusLocoregionalTimeline: lifeStatusType[] | undefined,
-  noLifeStatusSystemicTimeline: lifeStatusType[] | undefined
+  allTimeline: any[],
 ) => {
   const rows = [];
 
-  // ============================================================
+  // I select the last global status for each patient.
+  const latestGlobalTimeline = getLatestStatusByPatient(allTimeline);
+
   // GENERAL
-  // ============================================================
   rows.push(
     ...buildFollowUpTable(
-      buildTimelineSummary(allTimelineSummary),
-      "GENERAL"
+      buildTimelineSummary(latestGlobalTimeline),
+      "GENERAL (disease extension follow-ups)"
     )
   );
 
   rows.push([]);
 
-  // ============================================================
   // LIFE STATUS UPDATE
-  // ============================================================
-  rows.push(
-    ...buildFollowUpTable(
-      buildTimelineSummary(lifeStatusTimeline),
-      "LIFE STATUS UPDATE"
-    )
+  const latestLifeStatusTimeline = latestGlobalTimeline.filter(
+    item => item.tipoRow === "life_status_update"
   );
-
-  rows.push([]);
-
-  // ============================================================
-  // NO LIFE STATUS - UNIFOCAL
-  // ============================================================
   rows.push(
     ...buildFollowUpTable(
-      buildTimelineSummary(noLifeStatusUnifocalTimeline),
-      "NO LIFE STATUS UPDATE - UNIFOCAL"
-    )
-  );
-
-  rows.push([]);
-
-  // ============================================================
-  // NO LIFE STATUS - LOCOREGIONAL
-  // ============================================================
-  rows.push(
-    ...buildFollowUpTable(
-      buildTimelineSummary(noLifeStatusLocoregionalTimeline),
-      "NO LIFE STATUS UPDATE - LOCOREGIONAL"
-    )
-  );
-
-  rows.push([]);
-
-  // ============================================================
-  // NO LIFE STATUS - SYSTEMIC METASTASES
-  // ============================================================
-  rows.push(
-    ...buildFollowUpTable(
-      buildTimelineSummary(noLifeStatusSystemicTimeline),
-      "NO LIFE STATUS UPDATE - SYSTEMIC METASTASES"
+      buildTimelineSummary(latestLifeStatusTimeline),
+      "LIFE STATUS form"
     )
   );
 
   return rows;
-
-  // This is for mapping the separate "dead" entries in the follow-up table:
-	/*
-	const STATUS_LABEL_MAP = {
-		"1": "Alive: no evidence of disease (NED)",
-		"2": "Alive with disease (AWD)",
-		"3": "Dead: no evidence of disease",
-		"4": "Dead: evidence of disease"
-	};
-	const STATUS_LABEL_MAP: Record<string, string> = {
-		"1": "Alive: no evidence of disease (NED)",
-		"2": "Alive with disease (AWD)",
-		"3": "Dead",
-		"4": "Dead"
-	};
-  */
- /*
-	const diagnosisYears = [...new Set(
-		allTimelineSummary.map((d: any) => d.diagnosisYear)
-	)].sort();
-	const followUpYears = [...new Set(
-		allTimelineSummary.map((d: any) => d.statusYear)
-	)].sort();
-	// Converto subito status -> label (una sola volta)
-	const rows = [];
-	// HEADER
-	rows.push([
-		"",
-		"",
-		"Diagnosis year"
-	]);
-	rows.push([
-		"Status at follow up",
-		"Year follow up",
-		...diagnosisYears
-	]);
-	// Status unici già tradotti in label
-	const statusLabels = [...new Set(
-		allTimelineSummary.map((d: any) =>
-			STATUS_LABEL_MAP[d.status] || "Unknown"
-		)
-	)];
-	for (const statusLabel of statusLabels) {
-		for (const fuYear of followUpYears) {
-			const row = [
-				statusLabel,
-				fuYear
-			];
-			for (const dxYear of diagnosisYears) {
-        / *
-        QUESTO FUNZIONA PER MAPPARE DEAD WITH/WITHOUT EVIDENCE OF DISEASE SEPARATI. PERO' INT LI VUOLE AGGREGATI COME 'DEAD'
-				const match = allTimelineSummary.find(
-					r =>
-						(STATUS_LABEL_MAP[r.status] || "Unknown") === statusLabel &&
-						r.statusYear === fuYear &&
-						r.diagnosisYear === dxYear
-				);
-				row.push(match ? match.count : "");
-        * /
-				const count = allTimelineSummary.filter((r: any) =>
-						(STATUS_LABEL_MAP[r.status] || "Unknown") === statusLabel &&
-						r.statusYear === fuYear &&
-						r.diagnosisYear === dxYear
-				).reduce((sum: any, r: any) => sum + r.count, 0);
-				row.push(count || "");
-			}
-			rows.push(row);
-		}
-	}
-	return rows;
-  */
 };
 
 
@@ -700,120 +428,135 @@ const buildFollowUpTable = (
     "NA": "NA"
   };
 
-  const diagnosisYears: string[] = [
-    ...new Set<string>(
-      timelineSummary
-        .map((d: any) => d.diagnosisYear)
-        .filter((v: any) => v !== undefined && v !== null)
-    )
-  ];
-
-  diagnosisYears.sort((a, b) => {
+  const diagnosisYears = [
+    ...new Set(timelineSummary.map((d: any) => d.diagnosisYear))
+  ].sort((a, b) => {
     if (a === "NA") return 1;
     if (b === "NA") return -1;
     return String(a).localeCompare(String(b));
   });
 
-  const statusLabels: string[] = [
-    ...new Set<string>(
-      timelineSummary.map((d: any) =>
-        STATUS_LABEL_MAP[d.status] || "NA"
-      )
+	const statusLabels = [
+		"AWD",
+		"NED",
+		"Dead",
+		...(timelineSummary.some((d: any) =>
+      (STATUS_LABEL_MAP[d.status] || "NA") === "NA"
+		) ? ["NA"] : [])
+	];
+
+  // ANNI DI FOLLOW-UP. Faccio in modo che siano tutti per tutti gli stati.
+	const allFollowUpYears = [
+		...new Set<string>(timelineSummary.map((d: any) =>
+      d.statusYear)
     )
-  ];
+	].sort((a, b) => {
+		if (a === "NA") return 1;
+		if (b === "NA") return -1;
+		return String(a).localeCompare(String(b));
+	});
 
-  statusLabels.sort((a: any, b: any) => {
-    if (a === "NA") return 1;
-    if (b === "NA") return -1;
-    return a.localeCompare(b);
-  });
+  const followUpYearsByStatus: Record<string, typeof allFollowUpYears> = {};
 
-  const followUpYears = [
-    ...new Set(
-      timelineSummary
-        .map((d: any) => d.statusYear)
-        .filter((v: any) => v !== undefined && v !== null)
-    )
-  ];
-
-  followUpYears.sort((a, b) => {
-    if (a === "NA") return 1;
-    if (b === "NA") return -1;
-    return String(a).localeCompare(String(b));
-  });
+  statusLabels.forEach(statusLabel => {
+		followUpYearsByStatus[statusLabel] = allFollowUpYears;
+	});
 
   const rows = [];
 
   // ============================================================
   // TITLE
   // ============================================================
-  rows.push([title]);
-
-  // ============================================================
-  // FIRST ROW - HEADER
-  // ============================================================
-  const firstHeaderRow = [
-    "",
-    "Diagnosis year"
-  ];
+  const titleRow = [title, ""];
 
   for (const statusLabel of statusLabels) {
-    firstHeaderRow.push(statusLabel);
-    for (let i = 1; i < diagnosisYears.length; i++) {
-      firstHeaderRow.push("");
+    if (statusLabel === "NED") {
+      titleRow.push("Life status by FUP year");
+      break;
     }
+    titleRow.push(
+      ...Array(followUpYearsByStatus[statusLabel].length).fill("")
+    );
   }
+
+  rows.push(titleRow);
+
+  // ============================================================
+  // HEADER STATUS
+  // ============================================================
+
+  // First Header
+  const firstHeaderRow = ["", ""];
+  for (const statusLabel of statusLabels) {
+		firstHeaderRow.push(statusLabel);
+		for (let i = 1; i < followUpYearsByStatus[statusLabel].length; i++) {
+			firstHeaderRow.push("");
+		}
+	}
 
   rows.push(firstHeaderRow);
 
-  // ============================================================
-  // SECOND ROW - HEADER
-  // ============================================================
-  const secondHeaderRow = [
-    "",
-    "FUP year"
-  ];
-
-  for (const statusLabel of statusLabels) {
-    // To avoid an "unused variable" error.
-    if (statusLabel === null) {
-      console.log("statusLabel = null");
-    }
-    for (const diagnosisYear of diagnosisYears) {
-      secondHeaderRow.push(diagnosisYear);
-    }
-  }
+  // Second Header
+	const secondHeaderRow = ["", "Diagnosis year"];
+  statusLabels.forEach(statusLabel => {
+    secondHeaderRow.push(
+      ...followUpYearsByStatus[statusLabel]
+    );
+  });
 
   rows.push(secondHeaderRow);
 
   // ============================================================
   // DATA
   // ============================================================
+  for (const diagnosisYear of diagnosisYears) {
+    const row = ["", diagnosisYear];
 
-  for (const followUpYear of followUpYears) {
-    const row = [
-      "",
-      followUpYear
-    ];
+    statusLabels.forEach(statusLabel => {
+      followUpYearsByStatus[statusLabel].forEach(followUpYear => {
+        const count = timelineSummary.filter((item: any) =>
+          (STATUS_LABEL_MAP[item.status] || "NA") === statusLabel &&
+          item.diagnosisYear === diagnosisYear &&
+          item.statusYear === followUpYear
+        )
+        .reduce((sum: any, item: any) => sum + item.count, 0);
 
-    for (const statusLabel of statusLabels) {
-      for (const diagnosisYear of diagnosisYears) {
-        const count = timelineSummary
-          .filter((item: any) =>
-            (STATUS_LABEL_MAP[item.status] || "NA") === statusLabel &&
-            item.statusYear === followUpYear &&
-            item.diagnosisYear === diagnosisYear
-          )
-          .reduce(
-            (sum: any, item: any) => sum + item.count,
-            0
-          );
         row.push(count || "");
-      }
-    }
+      });
+    });
 
     rows.push(row);
   }
 
   return rows;
+};
+
+
+const getLatestStatusByPatient = (
+  timeline: any[]
+) => {
+  const latestByPatient = new Map();
+
+  for (const item of timeline) {
+    if (!item.statusDate) continue;
+
+    const itemDate = new Date(item.statusDate);
+
+    if (isNaN(itemDate.getTime())) continue;
+
+    const current = latestByPatient.get(item.record);
+
+    if (!current) {
+      latestByPatient.set(item.record, item);
+      continue;
+    }
+
+    const currentDate = new Date(current.statusDate);
+
+    if (itemDate > currentDate) {
+      latestByPatient.set(item.record, item);
+    }
+  }
+
+  return Array.from(latestByPatient.values());
 };
